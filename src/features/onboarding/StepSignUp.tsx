@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import { useNavigate } from 'react-router-dom';
 
 interface StepSignUpProps {
   goBack: () => void;
@@ -11,6 +12,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
   // The sign-up email is only for authentication, not for the card preview
   const [localEmail, setLocalEmail] = useState<string>('');
   const [localPassword, setLocalPassword] = useState<string>(password);
+  const navigate = useNavigate();
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLocalEmail(e.target.value);
@@ -66,6 +68,14 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
             disabled={!localEmail.trim() || !localPassword.trim()}
           >
             Complete Sign Up <span className="text-sm">→</span>
+          </button>
+          <button
+            type="button"
+            className="px-4 py-1.5 rounded-full bg-orange-500 text-white font-semibold hover:bg-orange-600 shadow-md transition disabled:opacity-50 flex items-center gap-1 text-xs"
+            disabled={!localEmail.trim() || !localPassword.trim()}
+            onClick={() => navigate('/dashboard')}
+          >
+            Go to Dashboard (dev)
           </button>
         </div>
       </div>

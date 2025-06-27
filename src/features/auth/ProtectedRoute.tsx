@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // TODO: Implement authentication check
-  const isAuthenticated = false;
+  const isAuthenticated = true; // Dev: allow access
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

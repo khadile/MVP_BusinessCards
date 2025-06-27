@@ -2,27 +2,27 @@
 
 ## Overview
 
-The Card Preview component provides real-time visualization of the user's digital business card during the onboarding process and dashboard editing. It features IXL branding with a modern, professional design that updates instantly as users modify their information.
+The Card Preview component provides real-time visualization of the user's digital business card during the onboarding process and dashboard editing. It features ILX branding with a modern, professional design that updates instantly as users modify their information. The preview only shows info and links added in StepContacts (not the sign-up email).
 
 ## Features
 
 ### ✅ Implemented Features
 
 #### 1. Real-time Preview
-- **Live updates** as users type in onboarding forms
-- **Instant reflection** of all changes (name, job title, company, contact info)
+- **Live updates** as users type in onboarding forms (from Step 2 onward)
+- **Instant reflection** of all changes (name, job title, company, contact info, links)
 - **Smooth transitions** and visual feedback
 
-#### 2. IXL Branding & Design
+#### 2. ILX Branding & Design
 - **Orange theme** with gradient backgrounds
 - **Rounded corners** (3xl) for modern appearance
 - **Professional shadows** and depth
-- **IXL logo** integration in avatar placeholder
+- **ILX logo** integration in avatar placeholder
 - **Consistent color scheme** throughout
 
 #### 3. Professional Layout
 - **Cover photo placeholder** at the top
-- **Profile avatar** with IXL branding
+- **Profile avatar** with ILX branding
 - **Company logo placeholder** in top-right corner
 - **Clean typography** hierarchy
 - **Proper spacing** and alignment
@@ -204,6 +204,8 @@ interface CardLink {
 
 ## Conclusion
 
-The Card Preview component is now fully implemented and polished, providing users with an accurate, real-time representation of their digital business card. The IXL-branded design creates a professional, modern experience that enhances the overall user journey and builds confidence in the platform.
+The Card Preview component is now fully implemented and polished, providing users with an accurate, real-time representation of their digital business card. The ILX-branded design creates a professional, modern experience that enhances the overall user journey and builds confidence in the platform.
 
 The component serves as a foundation for future enhancements while maintaining high performance and accessibility standards. 
+
+The preview only shows info and links added by the user in StepContacts. 

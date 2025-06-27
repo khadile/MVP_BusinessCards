@@ -2,7 +2,7 @@
 
 ## Product Overview
 
-**Product Name:** IXL Digital Business Card Creator  
+**Product Name:** ILX Digital Business Card Creator  
 **Tagline:** "Create, share, and manage your digital business card with ease"  
 **Target Audience:** Professionals, entrepreneurs, and small business owners who want a modern, shareable digital business card solution.
 
@@ -17,7 +17,7 @@ Traditional business cards are:
 
 ## Solution
 
-IXL provides a comprehensive digital business card platform that allows users to:
+ILX provides a comprehensive digital business card platform that allows users to:
 - Create professional digital business cards with rich media
 - Share cards instantly via QR codes, links, or NFC
 - Track engagement and analytics
@@ -34,20 +34,22 @@ IXL provides a comprehensive digital business card platform that allows users to
 - **Four steps:**
   - **Step 1: Name** - Enter first and last name
   - **Step 2: Work** - Job title and company information
-  - **Step 3: Contacts** - Email, phone, and social media links
-  - **Step 4: Sign Up** - Authentication (Google or email/password)
-- **Live card preview** that updates in real-time
+  - **Step 3: Contacts** - Email, phone, and social media links (with a large, categorized, searchable modal for platform selection; supports multiple links per platform; only user-added links are shown on the card)
+  - **Step 4: Sign Up** - Authentication (Google or email/password; sign-up email is for authentication only and does not affect the card preview)
+- **Live card preview** that updates in real-time from Step 2 onward, always reflecting the latest user input
 - **Progress indicator** and navigation controls
-- **Modern, clean UI** with consistent spacing and styling
-- **IXL branding** throughout the experience
+- **Modern, clean, horizontally split UI** with consistent spacing and styling
+- **ILX branding** throughout the experience
+- **After sign-up, a development button leads to the dashboard (to be implemented)**
 
 #### 2. Card Preview Component ✅
 - **Real-time preview** during onboarding
-- **IXL-branded design** with orange theme
+- **ILX-branded design** with orange theme
 - **Professional layout** with avatar, cover photo, and company logo placeholders
 - **Interactive elements** (Save Contact button, link icons)
 - **Responsive design** for mobile and desktop
 - **Modern styling** with rounded corners, shadows, and gradients
+- **Only shows info and links added by the user in StepContacts**
 
 #### 3. Authentication System ✅
 - **Google OAuth integration**
@@ -142,7 +144,7 @@ IXL provides a comprehensive digital business card platform that allows users to
 - **LinkedIn** - Professional networking
 
 ### Differentiation
-- **IXL branding** and unique design
+- **ILX branding** and unique design
 - **Unauthenticated onboarding** - lower friction
 - **Modern, clean UI** - superior user experience
 - **Comprehensive analytics** - better insights
@@ -181,6 +183,6 @@ IXL provides a comprehensive digital business card platform that allows users to
 
 ## Conclusion
 
-The IXL Digital Business Card Creator MVP is now complete with a polished, production-ready onboarding flow and card preview system. The platform provides a modern, user-friendly experience that differentiates from competitors through superior UX design and IXL branding.
+The ILX Digital Business Card Creator MVP is now complete with a polished, production-ready onboarding flow and card preview system. The platform provides a modern, user-friendly experience that differentiates from competitors through superior UX design and ILX branding.
 
 The foundation is solid for future feature development and scaling to meet growing user demands. 

@@ -369,6 +369,41 @@ interface DashboardStore {
 - Sufficient color contrast
 - Focus management
 
+# Data Persistence & Multi-User Cloud Storage (with Authentication)
+
+## Overview
+When authentication is implemented, each user's dashboard data (business card, profile, theme, etc.) should be stored and retrieved from a secure cloud backend (e.g., Firebase Firestore, Supabase, etc.), keyed by their unique user ID (UID).
+
+## Data Flow
+- **On Login:** Fetch the user's business card/dashboard data from the backend using their UID and populate the UI state/store.
+- **On Update:** When the user clicks "Update", send the new data to the backend/cloud, updating their record.
+- **On Cancel:** Revert the UI to the last data fetched from the backend (or last successful update).
+
+## Example (Firestore)
+- Each user has a document in a `businessCards` collection, keyed by their UID:
+  ```json
+  businessCards: {
+    user123: { cardName: "Sophia", cardLayout: "Left Aligned", ... },
+    user456: { ... }
+  }
+  ```
+- On login, fetch `businessCards/{uid}` and populate the dashboard state.
+- On update, write the new data to `businessCards/{uid}`.
+- On cancel, reload the last-saved data from Firestore (or keep a local copy in state).
+
+## UI Integration
+- The dashboard UI should use a global store (e.g., Zustand) that syncs with the backend.
+- The "Cancel" button reverts to the last-fetched data.
+- The "Update" button saves the current state to the backend and updates the local "last saved" state.
+
+## Security
+- Only allow authenticated users to read/write their own data (enforced by backend security rules).
+
+## Best Practices
+- Always fetch user data on login and keep the UI in sync with the backend.
+- Use optimistic UI updates for responsiveness, but handle errors gracefully.
+- Store all user-specific dashboard data under their UID for easy retrieval and security.
+
 ---
 
 **Summary:**

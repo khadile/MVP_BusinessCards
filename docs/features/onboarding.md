@@ -2,7 +2,7 @@
 
 ## Overview
 
-The onboarding flow is a multi-step wizard that guides new users through creating their digital business card. Users can start the process without authentication, with sign-up occurring only on the final step. The flow features a modern, clean UI with IXL branding and real-time card preview.
+The onboarding flow is a multi-step wizard that guides new users through creating their digital business card. Users can start the process without authentication, with sign-up occurring only on the final step. The flow features a modern, clean, horizontally split UI with ILX branding and real-time card preview from Step 2 onward. All steps use a compact, accessible layout. StepContacts uses a large, categorized, searchable modal for platform selection, supports multiple links per platform, and only shows user-added links on the card. StepSignUp email is for authentication only and does not affect the card preview. After sign-up, a development button leads to the dashboard (to be implemented).
 
 ## Features
 
@@ -22,7 +22,7 @@ The onboarding flow is a multi-step wizard that guides new users through creatin
 
 #### 3. Real-time Card Preview
 - **Live updates** as users type
-- **Professional design** with IXL branding
+- **Professional design** with ILX branding
 - **Responsive layout** for all screen sizes
 - **Visual feedback** for all changes
 
@@ -62,38 +62,41 @@ The onboarding flow is a multi-step wizard that guides new users through creatin
 **UI Elements:**
 - Two-column layout (form + preview)
 - Large input fields with modern styling
-- Card preview with IXL branding
+- Card preview with ILX branding
 - Consistent spacing and typography
 
 ### Step 3: Contacts
 **Route:** `/onboarding/contacts`
 
 **Features:**
-- Email and phone number inputs (optional)
-- Social media link management
-- Modal overlay for link editing
-- Live preview with contact information
+- Email, phone, and social/social media links
+- Large, categorized, searchable modal for platform selection
+- Multiple links per platform supported
+- Only user-added links are shown on the card
+- Live card preview updates in real time
+- Navigation controls (Back/Continue)
 
 **UI Elements:**
-- Two-column responsive layout
-- Link management interface
-- Modal dialog for link editing
-- Professional form styling
+- Two-column layout (form + preview)
+- Modern, compact input fields and modal
+- Card preview with ILX branding
+- Consistent spacing and typography
 
 ### Step 4: Sign Up
 **Route:** `/onboarding/signup`
 
 **Features:**
-- Google OAuth integration
-- Email/password registration
-- Terms of service acceptance
-- Complete card preview
+- Authentication (Google or email/password)
+- Sign-up email is for authentication only and does not affect the card preview
+- Live card preview shows info from previous steps
+- Navigation controls (Back/Complete)
+- After sign-up, a development button leads to the dashboard (to be implemented)
 
 **UI Elements:**
-- Google sign-in button
-- Divider between authentication methods
-- Email/password form fields
-- Terms and privacy policy links
+- Two-column layout (form + preview)
+- Modern, compact input fields
+- Card preview with ILX branding
+- Consistent spacing and typography
 
 ## Technical Implementation
 
@@ -304,6 +307,6 @@ OnboardingWizard/
 
 ## Conclusion
 
-The onboarding flow is now fully implemented and polished, providing users with a smooth, professional experience for creating their digital business cards. The IXL-branded design, real-time preview, and progressive disclosure approach create an engaging user journey that maximizes completion rates and user satisfaction.
+The onboarding flow is now fully implemented and polished, providing users with a smooth, professional experience for creating their digital business cards. The ILX-branded design, real-time preview, and progressive disclosure approach create an engaging user journey that maximizes completion rates and user satisfaction.
 
 The foundation is solid for future enhancements while maintaining high performance and accessibility standards. 
