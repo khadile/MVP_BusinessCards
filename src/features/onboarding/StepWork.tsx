@@ -19,37 +19,37 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 items-start w-full">
-      <div className="flex-1 w-full max-w-lg">
-        <h2 className="text-3xl font-bold mb-2">Where do you work?</h2>
-        <p className="text-gray-500 mb-8">Add job title and company to your digital business card</p>
-        <label className="block mb-2 font-medium text-gray-700">Job Title</label>
+    <div className="flex flex-col md:flex-row gap-6 items-start w-full">
+      <div className="flex-1 w-full max-w-md">
+        <h2 className="text-lg font-bold mb-1">Where do you work?</h2>
+        <p className="text-gray-500 mb-4 text-sm">Add job title and company to your digital business card</p>
+        <label className="block mb-1 font-medium text-gray-700 text-xs">Job Title</label>
         <input
-          className="w-full border border-gray-200 rounded-xl px-4 py-4 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 shadow-sm"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 shadow-sm"
           type="text"
           value={localJobTitle}
           onChange={e => setLocalJobTitle(e.target.value)}
           placeholder="Job Title"
         />
-        <label className="block mb-2 font-medium text-gray-700">Company</label>
+        <label className="block mb-1 font-medium text-gray-700 text-xs">Company</label>
         <input
-          className="w-full border border-gray-200 rounded-xl px-4 py-4 mb-10 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 shadow-sm"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 shadow-sm"
           type="text"
           value={localCompany}
           onChange={e => setLocalCompany(e.target.value)}
           placeholder="Company"
         />
-        <div className="flex justify-between mt-2">
+        <div className="flex justify-between">
           <button
             type="button"
-            className="px-6 py-2 rounded-xl border text-gray-700 bg-white hover:bg-gray-50 font-medium shadow-sm"
+            className="px-4 py-1.5 rounded-md border text-gray-700 bg-white hover:bg-gray-50 font-medium shadow-sm text-xs"
             onClick={goBack}
           >
             Back
           </button>
           <button
             type="button"
-            className="px-8 py-2 rounded-xl bg-blue-500 text-white font-semibold hover:bg-blue-600 shadow-md transition disabled:opacity-50"
+            className="px-5 py-1.5 rounded-md bg-blue-500 text-white font-semibold hover:bg-blue-600 shadow-md transition disabled:opacity-50 text-xs"
             onClick={handleContinue}
             disabled={!localJobTitle.trim() || !localCompany.trim()}
           >
@@ -57,9 +57,9 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
           </button>
         </div>
       </div>
-      <div className="w-full md:w-80 flex-shrink-0 mt-10 md:mt-0">
+      <div className="w-full md:w-64 flex-shrink-0 mt-6 md:mt-0">
         <CardPreview name={name} jobTitle={localJobTitle} company={localCompany} />
-        <div className="text-center text-gray-400 mt-2 text-sm">Card Live Preview</div>
+        <div className="text-center text-gray-400 mt-1 text-xs">Card Live Preview</div>
       </div>
     </div>
   );

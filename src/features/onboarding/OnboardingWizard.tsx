@@ -23,21 +23,21 @@ export const OnboardingWizard: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-orange-50 to-blue-50 flex flex-col">
       {/* Top bar with logo and progress */}
-      <div className="flex items-center justify-between w-full px-12 pt-10">
-        <img src="/ixl-logo.svg" alt="IXL Logo" className="h-10 w-10" />
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between w-full px-8 pt-6">
+        <img src="/ixl-logo.svg" alt="IXL Logo" className="h-8 w-8" />
+        <div className="flex items-center gap-1">
           {steps.map((s, i) => (
             <div
               key={s.label}
-              className={`h-2 w-12 rounded-full ${i <= step ? 'bg-blue-500' : 'bg-gray-200'}`}
+              className={`h-1.5 w-8 rounded-full ${i <= step ? 'bg-blue-500' : 'bg-gray-200'}`}
             />
           ))}
-          <span className="ml-2 text-sm text-gray-500">{step + 1} of {totalSteps}</span>
+          <span className="ml-2 text-xs text-gray-500">{step + 1} of {totalSteps}</span>
         </div>
       </div>
-      {/* Horizontally spaced, left-aligned content */}
-      <div className="flex-1 flex items-center justify-start">
-        <div className="w-full max-w-2xl pl-24">
+      {/* Content positioned towards the top */}
+      <div className="flex-1 flex items-start justify-center pt-16">
+        <div className="w-full max-w-xl">
           <StepComponent goNext={goNext} goBack={goBack} />
         </div>
       </div>
