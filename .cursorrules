@@ -1,0 +1,164 @@
+# Digital Business Card Creator - Development Rules
+
+## Architecture Principles
+
+### Project Structure
+- Follow feature-based folder organization
+- Separate concerns: components, hooks, utils, types, tests
+- Use barrel exports for clean imports
+- Maintain clear separation between UI and business logic
+
+### Code Organization
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI components (buttons, inputs, etc.)
+│   ├── forms/          # Form-specific components
+│   └── layout/         # Layout components (header, sidebar, etc.)
+├── features/           # Feature-based modules
+│   ├── auth/           # Authentication feature
+│   ├── dashboard/      # Dashboard feature
+│   ├── preview/        # Business card preview
+│   ├── themes/         # Theme customization
+│   └── links/          # Link management
+├── hooks/              # Custom React hooks
+├── utils/              # Utility functions
+├── types/              # TypeScript type definitions
+├── services/           # API and external service integrations
+├── stores/             # State management (Zustand stores)
+└── tests/              # Test files
+```
+
+## Code Style & Standards
+
+### TypeScript
+- Use strict TypeScript configuration
+- Prefer interfaces over types for object shapes
+- Use generic types where appropriate
+- Avoid `any` type - use `unknown` if needed
+- Define proper return types for all functions
+
+### React Best Practices
+- Use functional components with hooks
+- Implement proper error boundaries
+- Use React.memo for performance optimization when needed
+- Follow the rules of hooks strictly
+- Use proper prop types and default props
+
+### Component Guidelines
+- Keep components small and focused (max 200 lines)
+- Use composition over inheritance
+- Implement proper loading and error states
+- Follow accessibility guidelines (ARIA labels, semantic HTML)
+- Use consistent naming conventions (PascalCase for components)
+
+### State Management
+- Use React Context for global state sparingly
+- Prefer Zustand for complex state management
+- Keep state as close to where it's used as possible
+- Use proper state immutability patterns
+
+## Testing Strategy
+
+### Test-Driven Development
+- Write tests before implementing features
+- Use descriptive test names that explain the behavior
+- Test user interactions, not implementation details
+- Maintain good test coverage (aim for 80%+)
+
+### Testing Tools
+- Vitest for unit and integration tests
+- React Testing Library for component testing
+- MSW for API mocking
+- Playwright for E2E testing (future)
+
+## Styling Guidelines
+
+### CSS Architecture
+- Use Tailwind CSS for utility-first styling
+- Create custom CSS modules for complex components
+- Follow BEM methodology for custom CSS
+- Use CSS custom properties for theming
+- Ensure responsive design from mobile-first approach
+
+### Design System
+- Maintain consistent spacing scale
+- Use a limited color palette
+- Implement proper typography hierarchy
+- Ensure sufficient color contrast for accessibility
+
+## Performance Standards
+
+### Optimization
+- Implement code splitting and lazy loading
+- Optimize bundle size and loading times
+- Use proper image optimization
+- Implement proper caching strategies
+- Monitor Core Web Vitals
+
+### Code Quality
+- Use ESLint and Prettier for code formatting
+- Implement pre-commit hooks
+- Regular dependency updates
+- Security vulnerability scanning
+
+## Security Guidelines
+
+### Authentication & Authorization
+- Implement proper JWT token handling
+- Use secure session management
+- Validate all user inputs
+- Implement proper CORS policies
+- Use HTTPS in production
+
+### Data Protection
+- Sanitize user inputs
+- Implement proper error handling
+- Use environment variables for sensitive data
+- Follow OWASP security guidelines
+
+## Firebase Integration
+
+### Best Practices
+- Use Firebase Auth for authentication
+- Implement proper Firestore security rules
+- Use Firebase Storage for file uploads
+- Implement proper error handling for Firebase operations
+- Use Firebase hosting for deployment
+
+## Development Workflow
+
+### Git Practices
+- Use conventional commit messages
+- Create feature branches for new development
+- Implement proper PR reviews
+- Maintain clean git history
+
+### Documentation
+- Document complex business logic
+- Maintain up-to-date README
+- Document API endpoints and data structures
+- Keep component documentation current
+
+## Accessibility Standards
+
+### WCAG Compliance
+- Ensure proper keyboard navigation
+- Implement screen reader support
+- Maintain proper color contrast ratios
+- Use semantic HTML elements
+- Provide alternative text for images
+
+## Error Handling
+
+### User Experience
+- Provide meaningful error messages
+- Implement proper loading states
+- Use toast notifications for user feedback
+- Graceful degradation for network issues
+
+### Development
+- Use proper error boundaries
+- Implement comprehensive logging
+- Handle edge cases appropriately
+- Provide fallback UI components 
