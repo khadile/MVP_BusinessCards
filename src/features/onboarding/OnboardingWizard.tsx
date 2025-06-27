@@ -24,7 +24,7 @@ export const OnboardingWizard: React.FC = () => {
     <div className="min-h-screen w-full bg-gradient-to-br from-orange-50 to-blue-50 flex flex-col">
       {/* Top bar with logo and progress */}
       <div className="flex items-center justify-between w-full px-8 pt-6">
-        <img src="/ixl-logo.svg" alt="IXL Logo" className="h-8 w-8" />
+        <img src="/ixl-logo.svg" alt="ILX Logo" className="h-8 w-8" />
         <div className="flex items-center gap-1">
           {steps.map((s, i) => (
             <div
@@ -37,7 +37,7 @@ export const OnboardingWizard: React.FC = () => {
       </div>
       {/* Content positioned towards the top */}
       <div className="flex-1 flex items-start justify-center pt-16">
-        <div className="w-full max-w-xl">
+        <div className="w-full max-w-3xl">
           <StepComponent goNext={goNext} goBack={goBack} />
         </div>
       </div>

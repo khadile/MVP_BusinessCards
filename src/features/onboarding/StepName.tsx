@@ -18,7 +18,7 @@ export const StepName: React.FC<StepNameProps> = ({ goNext, goBack }) => {
   return (
     <div className="flex flex-col items-center justify-start w-full">
       <h2 className="text-lg font-semibold mb-1 text-center">Let's get started</h2>
-      <p className="text-gray-500 mb-4 text-center text-sm max-w-md">Create your IXL digital business card in 3 simple steps. Let's start with your name.</p>
+      <p className="text-gray-500 mb-4 text-center text-xs max-w-md">Create your ILX digital business card in 3 simple steps. Let's start with your name.</p>
       <div className="w-full max-w-lg">
         <label className="block mb-1 font-medium text-gray-700 text-xs">Full Name</label>
         <input

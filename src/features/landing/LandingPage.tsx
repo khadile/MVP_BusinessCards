@@ -15,11 +15,11 @@ export const LandingPage: React.FC = () => {
           <div className="mb-8">
             <img 
               src="/ixl-logo.svg" 
-              alt="IXL" 
+              alt="ILX" 
               className="w-20 h-20 mx-auto mb-4"
             />
             <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Welcome to IXL
+              Welcome to ILX
             </h1>
             <h2 className="text-3xl font-semibold text-gray-700 mb-4">
               Digital Business Card Creator
