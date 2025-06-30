@@ -9,6 +9,7 @@ interface FileUploadProps {
   className?: string;
   previewClassName?: string;
   placeholder?: string;
+  isUploading?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -20,6 +21,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   className = '',
   previewClassName = '',
   placeholder = 'Upload',
+  isUploading = false,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -90,12 +92,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleRemove = useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
-    setPreviewUrl(null);
-    onFileSelect(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    
+    // Show confirmation dialog
+    if (window.confirm(`Are you sure you want to remove this ${label.toLowerCase()}?`)) {
+      setPreviewUrl(null);
+      onFileSelect(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
-  }, [onFileSelect]);
+  }, [onFileSelect, label]);
 
   // Sync previewUrl with currentImage prop
   useEffect(() => {
@@ -118,14 +124,38 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           ${previewClassName} 
           ${isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'} 
           border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden
-          transition-all duration-200
+          transition-all duration-200 relative group cursor-pointer
         `}>
           {previewUrl ? (
-            <img 
-              src={previewUrl} 
-              alt={label} 
-              className="w-full h-full object-cover"
-            />
+            <>
+              <img 
+                src={previewUrl} 
+                alt={label} 
+                className="w-full h-full object-cover"
+              />
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                <span className="text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Click to change
+                </span>
+              </div>
+              {/* Remove button overlay */}
+              <button
+                type="button"
+                onClick={handleRemove}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleRemove(e as any);
+                  }
+                }}
+                className="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold transition-colors shadow-sm hover:shadow-md z-10 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-1 opacity-80 group-hover:opacity-100"
+                title={`Remove ${label.toLowerCase()}`}
+                aria-label={`Remove ${label.toLowerCase()}`}
+              >
+                ×
+              </button>
+            </>
           ) : (
             <span className="text-[13px] text-gray-400">{placeholder}</span>
           )}
@@ -137,6 +167,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             <span className="text-blue-600 font-medium text-sm">Drop image here</span>
           </div>
         )}
+        
+        {/* Uploading overlay */}
+        {isUploading && (
+          <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              <span className="text-white font-medium text-xs">Uploading...</span>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Upload button */}
@@ -145,7 +185,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         onClick={handleClick}
         className="text-[11px] text-blue-500 hover:underline mt-0.5"
       >
-        {previewUrl ? 'Change' : 'Upload'}
+        {previewUrl ? 'Change Image' : 'Upload'}
       </button>
       
       {/* Error message */}

@@ -253,4 +253,18 @@ src/
 4. User tests link → Opens in new tab
 5. User saves link → Link added to card
 
-This implementation provides a comprehensive, user-friendly link management system that integrates seamlessly with both the dashboard and onboarding flows, with robust validation, testing capabilities, and a consistent user experience across all touchpoints. 
+This implementation provides a comprehensive, user-friendly link management system that integrates seamlessly with both the dashboard and onboarding flows, with robust validation, testing capabilities, and a consistent user experience across all touchpoints.
+
+## Instant Toggle & Auto-Save
+- **Toggle:** Enable or disable any link with a single click. The change is auto-saved instantly—no manual save or 'Unsaved Changes' banner.
+- **Per-card:** Each card has its own set of links and toggle states.
+
+## Toast Notifications
+- **Feedback:** Toasts appear for add, edit, remove, and error actions (top center, modern style).
+
+## Recent UX Improvements
+- Instant, silent auto-save for link toggles
+- Toast notifications for all major link actions
+- Per-card link state isolation
+
+# ...rest of your link management doc below... 

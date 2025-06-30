@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useOnboardingStore } from '../../stores/onboardingStore';
 
 interface StepNameProps {
@@ -9,10 +10,15 @@ interface StepNameProps {
 export const StepName: React.FC<StepNameProps> = ({ goNext, goBack }) => {
   const [name, setName] = useState('');
   const { setName: setStoreName } = useOnboardingStore();
+  const navigate = useNavigate();
 
   const handleContinue = () => {
     setStoreName(name.trim());
     goNext();
+  };
+
+  const handleBack = () => {
+    navigate('/');
   };
 
   return (
@@ -32,7 +38,7 @@ export const StepName: React.FC<StepNameProps> = ({ goNext, goBack }) => {
           <button
             type="button"
             className="px-3 py-1.5 rounded-full border text-gray-700 bg-white hover:bg-gray-50 font-medium shadow-sm flex items-center gap-1 text-xs"
-            onClick={goBack}
+            onClick={handleBack}
           >
             <span className="text-sm">←</span> Back
           </button>

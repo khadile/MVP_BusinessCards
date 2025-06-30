@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Business card images - users can only access their own images
+    match /business-cards/{userId}/{cardId}/{imageType} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+    
+    // Profile images - users can only access their own profile images
+    match /profile-images/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+    
+    // Public business card images (for sharing)
+    match /public-cards/{cardId}/{allPaths=**} {
+      allow read: if true; // Anyone can read public cards
+      allow write: if request.auth != null; // Only authenticated users can upload
+    }
+  }
+} 

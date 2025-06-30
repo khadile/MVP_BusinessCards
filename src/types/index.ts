@@ -18,8 +18,11 @@ export interface BusinessCardProfile {
   location: string;
   bio: string;
   profileImage?: string | undefined;
+  profileImagePath?: string | undefined;
   coverPhoto?: string | undefined;
+  coverPhotoPath?: string | undefined;
   companyLogo?: string | undefined;
+  companyLogoPath?: string | undefined;
   email?: string;
   phone?: string;
   website?: string;

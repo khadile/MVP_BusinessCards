@@ -1,6 +1,34 @@
-# Digital Business Card Creator - MVP
+# Digital Business Card Creator
 
-A modern, feature-rich digital business card creation platform built with React, TypeScript, and Tailwind CSS.
+## Key Features
+- **Multi-card management:** Create, switch, and delete multiple business cards per user. Each card is fully independent.
+- **Robust per-card image handling:** Profile, cover, and logo images are isolated per card and never lost on save or edit.
+- **Instant link toggling:** Enable/disable links with a single click—auto-saves instantly, no 'Unsaved Changes' banner.
+- **Toast notifications:** Modern, top-center toasts for all major actions (save, discard, create, delete, switch, error).
+- **Modern UX:** Responsive, accessible, and fast. All actions provide immediate feedback.
+
+## Usage
+1. **Create and Manage Cards:**
+   - Use the dropdown in the dashboard header to create, switch, or delete cards.
+   - Deleting a card (except the active/last card) requires confirmation and shows a toast.
+2. **Image Uploads:**
+   - Upload profile, cover, and logo images per card. Images persist across edits and saves unless explicitly changed.
+3. **Links Management:**
+   - Add, edit, or remove links. Toggle links on/off instantly—changes are auto-saved.
+4. **Saving and Feedback:**
+   - Most actions auto-save. Manual save is only needed for About or theme changes.
+   - Toast notifications appear for all major actions.
+
+## Screenshots
+<!-- Add updated screenshots/gifs here -->
+
+## Architecture & Best Practices
+- Feature-based folder structure
+- Zustand for state management
+- Strict TypeScript, accessibility, and modern React patterns
+
+## For Developers
+- See `docs/features/dashboard.md` and `docs/features/link-management.md` for detailed flows.
 
 ## 🚀 Current Status
 
@@ -56,12 +84,16 @@ A modern, feature-rich digital business card creation platform built with React,
 
 ### 🔧 Technical Implementation
 
-#### File Upload System
+#### File Upload System ✅ **FIREBASE STORAGE INTEGRATED**
 - **FileUpload Component**: Reusable with drag-and-drop support
-- **Image Validation**: File type and size restrictions
+- **Image Validation**: File type and size restrictions (max 5MB)
+- **Image Compression**: Automatic compression to 1200px max dimension
+- **Firebase Storage Integration**: Secure file storage with user isolation
 - **Preview Generation**: Object URLs for immediate preview
-- **Remove Functionality**: X button to clear images
-- **Error Handling**: User-friendly validation messages
+- **Remove Functionality**: X button with confirmation dialog
+- **Storage Cleanup**: Automatic deletion from Firebase Storage when removed
+- **Error Handling**: User-friendly validation messages with toast notifications
+- **Loading States**: Visual feedback during upload process
 
 #### Cancel/Revert Logic
 - **Full State Revert**: All changes revert to last saved state
@@ -138,8 +170,8 @@ A modern, feature-rich digital business card creation platform built with React,
 - **Advanced Themes**: Custom gradients and patterns
 - **Export Options**: PDF and image export
 
-#### Technical Improvements
-- **File Upload Optimization**: Image compression
+#### Technical Improvements ✅ **FIREBASE STORAGE COMPLETED**
+- **File Upload Optimization**: Image compression and Firebase Storage integration ✅
 - **Caching Strategy**: Performance improvements
 - **Offline Support**: Basic offline functionality
 - **Real-time Collaboration**: Multi-user editing

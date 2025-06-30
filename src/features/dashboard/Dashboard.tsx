@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useOnboardingStore } from '../../stores/onboardingStore';
+import { useAuthStore } from '../../stores/authStore';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { FileUpload } from '../../components/ui/FileUpload';
 import { LinksSection } from './LinksSection';
+import { SettingsModal } from './SettingsModal';
 import { Toast } from '../../components/ui/Toast';
+import { uploadBusinessCardImage, deleteFile } from '../../services/fileUpload';
 
 const SIDEBAR_SECTIONS = [
   { label: 'About', icon: '👤' },
@@ -15,19 +17,22 @@ const SIDEBAR_SECTIONS = [
 ];
 
 export const Dashboard: React.FC = () => {
-  const onboarding = useOnboardingStore();
+  const { user, currentCard, businessCards, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
   const dashboard = useDashboardStore();
   
-  // Initialize dashboard from onboarding data
+  // Initialize dashboard from auth store data
   useEffect(() => {
-    if (!dashboard.businessCard) {
-      dashboard.initializeFromOnboarding(onboarding);
+    if (currentCard && !dashboard.businessCard) {
+      console.log('🔄 Initializing dashboard from auth store:', currentCard);
+      dashboard.initializeFromAuthCard(currentCard);
     }
-  }, [dashboard, onboarding]);
+  }, [currentCard, dashboard]);
 
   // Local state for form fields
   const [showCardDropdown, setShowCardDropdown] = useState(false);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+  const [showSettings, setShowSettings] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Update business card when form fields change
   const updateBusinessCard = (updates: any) => {
@@ -110,59 +115,236 @@ export const Dashboard: React.FC = () => {
     });
   };
 
-  // Handle file uploads
-  const handleProfileImageSelect = (file: File | null) => {
+  // Handle file uploads with Firebase Storage
+  const handleProfileImageSelect = async (file: File | null) => {
+    if (!user || !currentCard) return;
+    
     if (file) {
-      const url = URL.createObjectURL(file);
-      dashboard.setProfileImage(file, url);
+      setIsUploading(true);
+      try {
+        // Upload to Firebase Storage
+        const result = await uploadBusinessCardImage(file, user.uid, currentCard.id, 'profile');
+        
+        // Update dashboard with the uploaded URL
+        dashboard.setProfileImage(file, result.url);
+        
+        // Store the storage path for future deletion if needed
+        const currentProfile = dashboard.businessCard?.profile;
+        if (currentProfile) {
+          dashboard.updateBusinessCard({
+            profile: { 
+              ...currentProfile,
+              profileImage: result.url,
+              profileImagePath: result.path,
+            }
+          });
+        }
+        
+        showToast('Profile image uploaded successfully!');
+      } catch (error) {
+        console.error('❌ Profile image upload failed:', error);
+        showToast('Failed to upload profile image');
+      } finally {
+        setIsUploading(false);
+      }
     } else {
-      // Remove image completely
+      // Remove image
       dashboard.setProfileImage(null, null);
+      const currentProfile = dashboard.businessCard?.profile;
+      if (currentProfile) {
+        // Delete from Firebase Storage if path exists
+        if (currentProfile.profileImagePath) {
+          try {
+            await deleteFile(currentProfile.profileImagePath);
+            console.log('✅ Profile image deleted from Firebase Storage');
+          } catch (error) {
+            console.error('❌ Failed to delete profile image from storage:', error);
+            // Continue with removal even if storage deletion fails
+          }
+        }
+        
+        dashboard.updateBusinessCard({
+          profile: { 
+            ...currentProfile,
+            profileImage: undefined,
+            profileImagePath: undefined,
+          }
+        });
+        showToast('Profile image removed');
+      }
     }
   };
 
-  const handleCoverPhotoSelect = (file: File | null) => {
+  const handleCoverPhotoSelect = async (file: File | null) => {
+    if (!user || !currentCard) return;
+    
     if (file) {
-      const url = URL.createObjectURL(file);
-      dashboard.setCoverPhoto(file, url);
+      setIsUploading(true);
+      try {
+        // Upload to Firebase Storage
+        const result = await uploadBusinessCardImage(file, user.uid, currentCard.id, 'cover');
+        
+        // Update dashboard with the uploaded URL
+        dashboard.setCoverPhoto(file, result.url);
+        
+        // Store the storage path for future deletion if needed
+        const currentProfile = dashboard.businessCard?.profile;
+        if (currentProfile) {
+          dashboard.updateBusinessCard({
+            profile: { 
+              ...currentProfile,
+              coverPhoto: result.url,
+              coverPhotoPath: result.path,
+            }
+          });
+        }
+        
+        showToast('Cover photo uploaded successfully!');
+      } catch (error) {
+        console.error('❌ Cover photo upload failed:', error);
+        showToast('Failed to upload cover photo');
+      } finally {
+        setIsUploading(false);
+      }
     } else {
-      // Remove image completely
+      // Remove image
       dashboard.setCoverPhoto(null, null);
+      const currentProfile = dashboard.businessCard?.profile;
+      if (currentProfile) {
+        // Delete from Firebase Storage if path exists
+        if (currentProfile.coverPhotoPath) {
+          try {
+            await deleteFile(currentProfile.coverPhotoPath);
+            console.log('✅ Cover photo deleted from Firebase Storage');
+          } catch (error) {
+            console.error('❌ Failed to delete cover photo from storage:', error);
+            // Continue with removal even if storage deletion fails
+          }
+        }
+        
+        dashboard.updateBusinessCard({
+          profile: { 
+            ...currentProfile,
+            coverPhoto: undefined,
+            coverPhotoPath: undefined,
+          }
+        });
+        showToast('Cover photo removed');
+      }
     }
   };
 
-  const handleCompanyLogoSelect = (file: File | null) => {
+  const handleCompanyLogoSelect = async (file: File | null) => {
+    if (!user || !currentCard) return;
+    
     if (file) {
-      const url = URL.createObjectURL(file);
-      dashboard.setCompanyLogo(file, url);
+      setIsUploading(true);
+      try {
+        // Upload to Firebase Storage
+        const result = await uploadBusinessCardImage(file, user.uid, currentCard.id, 'logo');
+        
+        // Update dashboard with the uploaded URL
+        dashboard.setCompanyLogo(file, result.url);
+        
+        // Store the storage path for future deletion if needed
+        const currentProfile = dashboard.businessCard?.profile;
+        if (currentProfile) {
+          dashboard.updateBusinessCard({
+            profile: { 
+              ...currentProfile,
+              companyLogo: result.url,
+              companyLogoPath: result.path,
+            }
+          });
+        }
+        
+        showToast('Company logo uploaded successfully!');
+      } catch (error) {
+        console.error('❌ Company logo upload failed:', error);
+        showToast('Failed to upload company logo');
+      } finally {
+        setIsUploading(false);
+      }
     } else {
-      // Remove image completely
+      // Remove image
       dashboard.setCompanyLogo(null, null);
+      const currentProfile = dashboard.businessCard?.profile;
+      if (currentProfile) {
+        // Delete from Firebase Storage if path exists
+        if (currentProfile.companyLogoPath) {
+          try {
+            await deleteFile(currentProfile.companyLogoPath);
+            console.log('✅ Company logo deleted from Firebase Storage');
+          } catch (error) {
+            console.error('❌ Failed to delete company logo from storage:', error);
+            // Continue with removal even if storage deletion fails
+          }
+        }
+        
+        dashboard.updateBusinessCard({
+          profile: { 
+            ...currentProfile,
+            companyLogo: undefined,
+            companyLogoPath: undefined,
+          }
+        });
+        showToast('Company logo removed');
+      }
     }
   };
 
   // Save and cancel handlers
   const handleSave = async () => {
     try {
-      await dashboard.saveChanges();
-      showToast('Changes saved.');
-      // Show success feedback
-      console.log('Changes saved successfully!');
+      if (currentCard && dashboard.businessCard) {
+        // Update the card in Firestore via auth store
+        const updates: any = {
+          profile: {
+            name: dashboard.businessCard.profile.name,
+            jobTitle: dashboard.businessCard.profile.jobTitle,
+            company: dashboard.businessCard.profile.company,
+            location: dashboard.businessCard.profile.location,
+            bio: dashboard.businessCard.profile.bio,
+            email: dashboard.businessCard.profile.email,
+            phone: dashboard.businessCard.profile.phone,
+            website: dashboard.businessCard.profile.website,
+          },
+          theme: dashboard.businessCard.theme,
+        };
+        
+        // Only add optional properties if they exist
+        if (dashboard.businessCard.profile.profileImage) {
+          updates.profile.profileImage = dashboard.businessCard.profile.profileImage;
+          updates.profile.profileImagePath = dashboard.businessCard.profile.profileImagePath;
+        }
+        if (dashboard.businessCard.profile.coverPhoto) {
+          updates.profile.coverPhoto = dashboard.businessCard.profile.coverPhoto;
+          updates.profile.coverPhotoPath = dashboard.businessCard.profile.coverPhotoPath;
+        }
+        if (dashboard.businessCard.profile.companyLogo) {
+          updates.profile.companyLogo = dashboard.businessCard.profile.companyLogo;
+          updates.profile.companyLogoPath = dashboard.businessCard.profile.companyLogoPath;
+        }
+        if (dashboard.businessCard.cardName) {
+          updates.cardName = dashboard.businessCard.cardName;
+        }
+        
+        await updateAuthCard(currentCard.id, updates);
+        
+        // Also update local dashboard store
+        await dashboard.saveChanges();
+        showToast('Changes saved successfully!');
+        console.log('✅ Changes saved to Firestore');
+      }
     } catch (error) {
       showToast('Error saving changes.');
-      console.error('Failed to save changes:', error);
-      // Show error feedback
+      console.error('❌ Failed to save changes:', error);
     }
   };
 
   const handleCancel = () => {
     dashboard.discardChanges();
     showToast('Changes discarded.');
-    // Reset local state to match the discarded changes
-    if (dashboard.lastSavedCard) {
-      // No need to call setCoverPhoto, setProfileImage, or setCompanyLogo here!
-      // discardChanges already restores businessCard and clears temp URLs
-    }
   };
 
   // Check if there are unsaved changes
@@ -196,10 +378,36 @@ export const Dashboard: React.FC = () => {
           <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="black" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="black" strokeWidth="2"/></svg></span> Links
         </button>
       </div>
-      <div>
+      <div className="mb-4">
         <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">SHARING</div>
         <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 text-gray-700">
           <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="black" strokeWidth="2"/><polyline points="17 8 12 3 7 8" stroke="black" strokeWidth="2"/><line x1="12" y1="3" x2="12" y2="15" stroke="black" strokeWidth="2"/></svg></span> QR Code
+        </button>
+      </div>
+      <div className="mt-auto">
+        <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">ACCOUNT</div>
+        <button 
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 text-gray-700"
+          onClick={handleSettings}
+        >
+          <span className="text-black">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" stroke="black" strokeWidth="2"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="black" strokeWidth="2"/>
+            </svg>
+          </span> Settings
+        </button>
+        <button 
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-50 text-red-600 mt-1"
+          onClick={handleSignOut}
+        >
+          <span className="text-red-600">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2"/>
+              <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2"/>
+              <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </span> Sign Out
         </button>
       </div>
     </aside>
@@ -245,6 +453,7 @@ export const Dashboard: React.FC = () => {
           onFileSelect={handleProfileImageSelect}
           previewClassName="w-16 h-16 rounded-full"
           placeholder="Profile"
+          isUploading={isUploading}
         />
         {/* Cover photo */}
         <FileUpload
@@ -254,6 +463,7 @@ export const Dashboard: React.FC = () => {
           onFileSelect={handleCoverPhotoSelect}
           previewClassName="w-48 h-20 rounded-lg"
           placeholder="Cover photo"
+          isUploading={isUploading}
         />
         {/* Company logo */}
         <FileUpload
@@ -263,6 +473,7 @@ export const Dashboard: React.FC = () => {
           onFileSelect={handleCompanyLogoSelect}
           previewClassName="w-16 h-16 rounded-full"
           placeholder="Logo"
+          isUploading={isUploading}
         />
       </div>
       {/* Name, Location, Job Title, Company */}
@@ -422,6 +633,24 @@ export const Dashboard: React.FC = () => {
 
   const hideToast = () => setToast(t => ({ ...t, visible: false }));
 
+  // Handle sign out
+  const handleSignOut = async () => {
+    if (window.confirm('Are you sure you want to sign out? Any unsaved changes will be lost.')) {
+      try {
+        await signOut();
+        showToast('Signed out successfully');
+      } catch (error) {
+        showToast('Error signing out');
+        console.error('❌ Sign out error:', error);
+      }
+    }
+  };
+
+  // Handle settings
+  const handleSettings = () => {
+    setShowSettings(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Outer header container */}
@@ -533,6 +762,12 @@ export const Dashboard: React.FC = () => {
       </div>
       {/* Toast notification */}
       <Toast message={toast.message} visible={toast.visible} onClose={hideToast} />
+      
+      {/* Settings Modal */}
+      <SettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+      />
     </div>
   );
 };

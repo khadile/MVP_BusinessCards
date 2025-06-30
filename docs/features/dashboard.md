@@ -56,12 +56,16 @@ The dashboard provides a comprehensive interface for users to manage and customi
 
 ### 🔧 Technical Implementation
 
-#### File Upload System
+#### File Upload System ✅ **UPDATED WITH FIREBASE STORAGE**
 - **FileUpload Component**: Reusable component with drag-and-drop
-- **Image Validation**: File type and size validation
+- **Image Validation**: File type and size validation (max 5MB)
+- **Image Compression**: Automatic compression to 1200px max dimension
+- **Firebase Storage Integration**: Secure file storage with user isolation
 - **Preview Generation**: Object URLs for immediate preview
-- **Remove Functionality**: X button to clear images
-- **Error Handling**: User-friendly error messages
+- **Remove Functionality**: X button with confirmation dialog
+- **Storage Cleanup**: Automatic deletion from Firebase Storage when removed
+- **Error Handling**: User-friendly error messages with toast notifications
+- **Loading States**: Visual feedback during upload process
 
 #### Cancel/Revert Logic
 - **Full State Revert**: All changes revert to last saved state
@@ -111,13 +115,13 @@ The dashboard provides a comprehensive interface for users to manage and customi
 5. Preview updates immediately
 6. Form fields reset
 
-#### Image Management
-1. User uploads image → temporary URL created
-2. Preview shows new image immediately
-3. User removes image → temporary URL cleared
+#### Image Management ✅ **FIREBASE STORAGE INTEGRATED**
+1. User uploads image → validation and compression → Firebase Storage upload
+2. Preview shows new image immediately via temporary URL
+3. User removes image → confirmation dialog → Firebase Storage deletion
 4. Preview shows placeholder or previous image
-5. Save → temporary URL becomes permanent
-6. Cancel → temporary URL cleared, saved image restored
+5. Save → storage paths saved to Firestore, temporary URLs become permanent
+6. Cancel → temporary URLs cleared, saved images restored from Firebase Storage
 
 ### 🔄 Integration Points
 
@@ -177,10 +181,12 @@ The dashboard provides a comprehensive interface for users to manage and customi
 
 ## Security Considerations
 
-### File Upload Security
-- **File Validation**: Type and size restrictions
+### File Upload Security ✅ **IMPLEMENTED**
+- **File Validation**: Type and size restrictions (max 5MB, image types only)
+- **Image Compression**: Automatic compression to prevent large file uploads
+- **Firebase Storage Security**: User-isolated storage with proper security rules
 - **Content Scanning**: Malware detection (future)
-- **Secure Storage**: Encrypted file storage (future)
+- **Secure Storage**: Encrypted file storage via Firebase Storage
 
 ### Data Protection
 - **Input Sanitization**: All user inputs validated
@@ -630,4 +636,29 @@ When authentication is implemented, each user's dashboard data (business card, p
 - Pagination or search for large numbers of cards.
 - Optimistic UI updates and error handling for backend sync.
 
---- 
+---
+
+## Card Management
+- **Dropdown:** Create, switch, and delete cards from the dashboard header dropdown.
+- **Delete:** Only non-active cards can be deleted (if more than one exists). Deletion requires confirmation and triggers a toast notification.
+- **Switch:** Switching cards updates all sections and shows a toast.
+
+## Image Handling
+- **Per-card images:** Profile, cover, and logo images are stored and previewed per card. Images are never lost on unrelated edits or saves.
+- **Image upload:** Images persist until explicitly changed or removed.
+
+## Link Management
+- **Instant toggle:** Toggling a link's active state auto-saves immediately—no 'Unsaved Changes' banner appears for this action.
+
+## Toast Notifications
+- **Feedback:** Toasts appear at the top center for all major actions: save, discard, create, delete, switch, and errors.
+
+## Recent UX Improvements
+- Card deletion with confirmation and toast
+- Per-card image isolation and robust save logic
+- Instant, silent auto-save for link toggles
+- Modern, accessible toast notifications
+
+---
+
+# ...rest of your dashboard feature doc below... 

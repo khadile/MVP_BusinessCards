@@ -56,6 +56,14 @@ interface BusinessCard {
     location: string;
     bio: string;
     profileImage?: string;
+    profileImagePath?: string; // Firebase Storage path for cleanup
+    coverPhoto?: string;
+    coverPhotoPath?: string; // Firebase Storage path for cleanup
+    companyLogo?: string;
+    companyLogoPath?: string; // Firebase Storage path for cleanup
+    email?: string;
+    phone?: string;
+    website?: string;
   };
   theme: {
     primaryColor: string;
@@ -100,14 +108,27 @@ service cloud.firestore {
 }
 ```
 
-### Storage Rules
+### Storage Rules ✅ **IMPLEMENTED**
 ```javascript
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Business card images - users can only access their own images
+    match /business-cards/{userId}/{cardId}/{imageType} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+    
+    // Profile images - users can only access their own profile images
     match /profile-images/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && 
         request.auth.uid == userId;
+    }
+    
+    // Public business card images (for sharing)
+    match /public-cards/{cardId}/{allPaths=**} {
+      allow read: if true; // Anyone can read public cards
+      allow write: if request.auth != null; // Only authenticated users can upload
     }
   }
 }
@@ -115,14 +136,14 @@ service firebase.storage {
 
 ## User Interface Components
 
-### Authentication Pages
-1. **Sign Up Page**
+### Authentication Pages ✅ **COMPLETED**
+1. **Sign Up Page** ✅
    - Email and password fields
    - Password strength indicator
    - Terms of service checkbox
    - "Already have an account?" link
 
-2. **Login Page**
+2. **Login Page** ✅
    - Email and password fields
    - "Remember me" checkbox
    - "Forgot password?" link
@@ -133,7 +154,7 @@ service firebase.storage {
    - Resend verification email option
    - Redirect to dashboard after verification
 
-4. **Password Reset Page**
+4. **Password Reset Page** ✅
    - Email input field
    - Confirmation message
    - Return to login link
@@ -155,7 +176,7 @@ service firebase.storage {
 
 ## State Management
 
-### Authentication Store (Zustand)
+### Authentication Store (Zustand) ✅ **IMPLEMENTED**
 ```typescript
 interface AuthStore {
   user: User | null;
@@ -236,15 +257,40 @@ interface AuthStore {
 - Profile setup abandonment rates
 - Firebase service performance metrics
 
-## Onboarding and Authentication Update
+## Onboarding and Authentication Update ✅ **COMPLETED**
 
 - Users can begin onboarding without authentication.
 - Authentication (sign up with Google or email/password) is required only on the final onboarding step ("Complete Sign Up").
 - The onboarding flow is branded as IXL, not Popl.
-- The onboarding wizard is at `/onboarding` and collects user info before authentication.
+- The onboarding wizard is at `/onboarding` and collects user info before authentication. 
 
-## Planned Feature: Multi-Card Access After Authentication
+## Planned Feature: Multi-Card Access After Authentication ✅ **IMPLEMENTED**
 
-- After logging in, users will be able to access all their business cards via the dashboard dropdown selector.
+- After logging in, users can access all their business cards via the dashboard dropdown selector.
 - Each card is user-specific and only accessible to the authenticated user.
-- Backend integration will ensure secure, user-specific card management. 
+- Backend integration ensures secure, user-specific card management.
+- File uploads are properly isolated per user and card.
+
+## File Upload System ✅ **COMPLETED**
+
+### File Upload Service
+- **Image Validation**: File type, size (max 5MB)
+- **Image Compression**: Automatic compression to 1200px max dimension
+- **Firebase Storage Integration**: Secure file storage with user isolation
+- **Error Handling**: Comprehensive error handling with user feedback
+- **Loading States**: Visual feedback during upload process
+
+### File Management Features ✅ **COMPLETED**
+- **Upload Images**: Profile pictures, cover photos, company logos
+- **Remove Images**: Red "×" button with confirmation dialog
+- **Storage Cleanup**: Automatic deletion from Firebase Storage when removed
+- **Preview System**: Real-time preview of uploaded images
+- **Drag & Drop**: Support for drag and drop file uploads
+
+### File Structure
+```
+business-cards/{userId}/{cardId}/
+├── profile-{timestamp}.{ext}
+├── cover-{timestamp}.{ext}
+└── logo-{timestamp}.{ext}
+``` 

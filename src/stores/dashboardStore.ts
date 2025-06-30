@@ -51,6 +51,9 @@ interface DashboardState {
   // Initialize from onboarding data
   initializeFromOnboarding: (onboardingData: any) => void;
   
+  // Initialize from auth store data
+  initializeFromAuthCard: (authCard: any) => void;
+  
   // Set links
   setLinks: (links: BusinessCard['links']) => void;
   
@@ -340,6 +343,62 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       businessCard, 
       lastSavedCard: { ...businessCard }, // Initialize last saved state
       lastSavedCardName: '',
+      cardName: businessCard.cardName || '',
+      isDirty: false, 
+      unsavedChanges: {},
+      cards: [businessCard], // Add initial card to cards array
+      activeCardId: businessCard.id, // Set as active
+    });
+  },
+  
+  // Initialize from auth store data
+  initializeFromAuthCard: (authCard) => {
+    if (!authCard) {
+      console.warn('No auth card provided to initializeFromAuthCard');
+      return;
+    }
+    
+    const businessCard: BusinessCard = {
+      id: authCard.id || 'temp-id',
+      userId: authCard.userId || 'temp-user-id',
+      cardName: authCard.name || authCard.profile?.name || '',
+      profile: {
+        name: authCard.name || authCard.profile?.name || '',
+        jobTitle: authCard.jobTitle || authCard.profile?.jobTitle || '',
+        company: authCard.company || authCard.profile?.company || '',
+        location: authCard.profile?.location || '',
+        bio: authCard.profile?.bio || '',
+        email: authCard.email || authCard.profile?.email || '',
+        phone: authCard.phone || authCard.profile?.phone || '',
+        website: authCard.profile?.website || '',
+        profileImage: authCard.profile?.profileImage,
+        coverPhoto: authCard.profile?.coverPhoto,
+        companyLogo: authCard.profile?.companyLogo,
+      },
+      theme: {
+        primaryColor: authCard.theme?.primaryColor || '#FDBA74',
+        secondaryColor: authCard.theme?.secondaryColor || '#000000',
+        backgroundColor: authCard.theme?.backgroundColor || '#FFFFFF',
+        textColor: authCard.theme?.textColor || '#000000',
+        fontFamily: authCard.theme?.fontFamily || 'Inter',
+        fontSize: authCard.theme?.fontSize || 14,
+        layout: authCard.theme?.layout || 'modern',
+        borderRadius: authCard.theme?.borderRadius || 12,
+        shadow: authCard.theme?.shadow !== false,
+      },
+      links: authCard.links || [],
+      settings: {
+        isPublic: authCard.isPublic !== false,
+        allowAnalytics: authCard.settings?.allowAnalytics !== false,
+      },
+      createdAt: authCard.createdAt || new Date(),
+      updatedAt: authCard.updatedAt || new Date(),
+    };
+    
+    set({ 
+      businessCard, 
+      lastSavedCard: { ...businessCard }, // Initialize last saved state
+      lastSavedCardName: businessCard.cardName || '',
       cardName: businessCard.cardName || '',
       isDirty: false, 
       unsavedChanges: {},
