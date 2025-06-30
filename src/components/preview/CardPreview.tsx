@@ -5,7 +5,7 @@ interface CardLink {
   type: string;
   label: string;
   url: string;
-  icon: string;
+  icon?: string;
 }
 
 interface CardPreviewProps {
@@ -15,6 +15,17 @@ interface CardPreviewProps {
   email?: string;
   phone?: string;
   links?: CardLink[];
+  // Theme props
+  theme?: string;
+  linkColor?: string;
+  layout?: 'Left Aligned' | 'Centered';
+  // Image props
+  profileImage?: string | undefined;
+  coverPhoto?: string | undefined;
+  companyLogo?: string | undefined;
+  // Additional profile props
+  location?: string;
+  bio?: string;
 }
 
 // Add SVGs for each platform
@@ -40,40 +51,103 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   email = '',
   phone = '',
   links = [],
+  theme = '#FDBA74',
+  linkColor = '#000000',
+  layout = 'Left Aligned',
+  profileImage,
+  coverPhoto,
+  companyLogo,
+  location = '',
+  bio = '',
 }: CardPreviewProps) => {
   // Determine if we need to make the links section scrollable
   const maxVisibleLinks = 4;
   const isScrollable = links && links.length > maxVisibleLinks;
 
+  // Generate gradient from theme color
+  const getGradientStyle = () => {
+    return {
+      background: `linear-gradient(135deg, ${theme}20 0%, ${theme}40 100%)`,
+    };
+  };
+
+  const isCentered = layout === 'Centered';
+
   return (
-    <div className="w-64 h-96 bg-gradient-to-b from-orange-100 to-orange-200 rounded-[1.5rem] overflow-hidden border border-orange-200 shadow-2xl mx-auto">
-      {/* Cover photo placeholder */}
-      <div className="h-16 w-full bg-orange-300 flex items-center justify-center">
-        <span className="text-xs text-white opacity-70">Cover Photo</span>
+    <div 
+      className="w-64 h-96 rounded-[1.5rem] overflow-hidden border shadow-2xl mx-auto"
+      style={getGradientStyle()}
+    >
+      {/* Cover photo */}
+      <div className="h-16 w-full flex items-center justify-center overflow-hidden">
+        {coverPhoto ? (
+          <img src={coverPhoto} alt="Cover" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: `${theme}60` }}>
+            <span className="text-xs text-white opacity-70">Cover Photo</span>
+          </div>
+        )}
       </div>
-      <div className="flex flex-col items-center -mt-6 mb-2">
-        {/* Profile avatar */}
-        <div className="w-14 h-14 rounded-full bg-white border-4 border-orange-400 flex items-center justify-center text-xl font-bold text-orange-500 mb-2 shadow-lg">
-          <img src="/ixl-logo.svg" alt="ILX" className="w-8 h-8" />
+      
+      {/* Profile section with layout-specific styling */}
+      <div className={`-mt-6 mb-2 ${isCentered ? 'text-center' : 'text-left'}`}>
+        {/* Profile avatar with layout positioning */}
+        <div className={`w-14 h-14 rounded-full bg-white border-4 flex items-center justify-center overflow-hidden shadow-lg ${isCentered ? 'mx-auto' : 'ml-4'} mb-2`} style={{ borderColor: theme }}>
+          {profileImage ? (
+            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <img src="/ixl-logo.svg" alt="ILX" className="w-8 h-8" />
+          )}
         </div>
-        <div className="text-base font-semibold text-gray-900 mt-1">{name || 'Your Name'}</div>
-        <div className="text-gray-500 text-xs">{jobTitle || 'Job Title'}</div>
-        <div className="text-gray-400 text-xs">{company || 'Company'}</div>
+        
+        {/* Company logo with layout positioning */}
+        {companyLogo && (
+          <div className={`w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center overflow-hidden shadow-md ${isCentered ? 'mx-auto' : 'ml-6'} mb-2`}>
+            <img src={companyLogo} alt="Company Logo" className="w-full h-full object-cover" />
+          </div>
+        )}
+        
+        {/* Name and title section with layout-specific styling */}
+        <div className={`${isCentered ? 'text-center px-4' : 'text-left px-4'}`}>
+          <div className="text-base font-semibold text-gray-900">{name || 'Your Name'}</div>
+          <div className="text-gray-500 text-xs">{jobTitle || 'Job Title'}</div>
+          <div className="text-gray-400 text-xs">{company || 'Company'}</div>
+          {location && <div className="text-gray-400 text-xs">{location}</div>}
+        </div>
       </div>
-      <div className="px-4 pb-3">
-        <div className="space-y-1 mb-2">
+      
+      {/* Content section with layout-specific styling */}
+      <div className={`pb-3 ${isCentered ? 'px-4 text-center' : 'px-4 text-left'}`}>
+        {/* Bio with layout-specific styling */}
+        {bio && (
+          <div className={`text-xs text-gray-600 mb-2 leading-relaxed ${isCentered ? 'text-center' : 'text-left'}`}>
+            {bio}
+          </div>
+        )}
+        
+        {/* Contact info with layout-specific styling */}
+        <div className={`space-y-1 mb-2 ${isCentered ? 'text-center' : 'text-left'}`}>
           {email && <div className="text-xs text-gray-500">{email}</div>}
           {phone && <div className="text-xs text-gray-500">{phone}</div>}
         </div>
-        <button className="w-full bg-orange-500 text-white rounded-lg py-1.5 font-semibold mb-2 shadow hover:bg-orange-600 transition text-xs">Save Contact</button>
+        
+        {/* Save Contact button */}
+        <button 
+          className="w-full rounded-lg py-1.5 font-semibold mb-2 shadow hover:opacity-90 transition text-xs text-white" 
+          style={{ backgroundColor: theme }}
+        >
+          Save Contact
+        </button>
+        
+        {/* Links section with layout-specific styling */}
         <div
           className={`space-y-1.5 ${isScrollable ? 'max-h-36 overflow-y-auto pr-1' : ''}`}
           style={isScrollable ? { scrollbarWidth: 'thin', scrollbarColor: 'black #fff' } : {}}
         >
           {links && links.map(link => (
-            <div key={link.type + link.url} className="flex items-center gap-3 bg-transparent rounded-lg px-3 py-2 text-sm">
-              <span>{platformIcons[link.type] || platformIcons.custom}</span>
-              <span className="font-medium">{link.label}</span>
+            <div key={link.type + link.url} className={`flex items-center gap-3 bg-transparent rounded-lg px-3 py-2 text-sm ${isCentered ? 'justify-center' : 'justify-start'}`}>
+              <span style={{ color: linkColor }}>{platformIcons[link.type] || platformIcons.custom}</span>
+              <span className="font-medium" style={{ color: linkColor }}>{link.label}</span>
             </div>
           ))}
         </div>

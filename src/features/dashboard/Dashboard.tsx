@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import { useDashboardStore } from '../../stores/dashboardStore';
 import { CardPreview } from '../../components/preview/CardPreview';
+import { FileUpload } from '../../components/ui/FileUpload';
 
 const SIDEBAR_SECTIONS = [
   { label: 'About', icon: '👤' },
@@ -11,89 +13,169 @@ const SIDEBAR_SECTIONS = [
 ];
 
 export const Dashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState('About');
   const onboarding = useOnboardingStore();
-  const [cardName, setCardName] = useState('Card Title');
-  const [cardLayout, setCardLayout] = useState('Left Aligned');
-  const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
-  const [coverPhoto, setCoverPhoto] = useState<string | undefined>(undefined);
-  const [companyLogo, setCompanyLogo] = useState<string | undefined>(undefined);
+  const dashboard = useDashboardStore();
+  
+  // Initialize dashboard from onboarding data
+  useEffect(() => {
+    if (!dashboard.businessCard) {
+      dashboard.initializeFromOnboarding(onboarding);
+    }
+  }, [dashboard, onboarding]);
+
+  // Local state for form fields
+  const [cardName, setCardName] = useState('');
+  const [cardLayout, setCardLayout] = useState<'Left Aligned' | 'Centered'>('Left Aligned');
   const [location, setLocation] = useState('');
   const [bio, setBio] = useState('');
   const [theme, setTheme] = useState('#FDBA74');
   const [linkColor, setLinkColor] = useState('#000000');
   const [matchLinkIcons, setMatchLinkIcons] = useState(false);
 
-  // About section form fields
-  const [name, setName] = useState(onboarding.name);
-  const [jobTitle, setJobTitle] = useState(onboarding.jobTitle);
-  const [company, setCompany] = useState(onboarding.company);
-  const [email, setEmail] = useState(onboarding.email);
-  const [phone, setPhone] = useState(onboarding.phone);
-  const [links, setLinks] = useState(onboarding.links);
+  // Update local state when business card changes
+  useEffect(() => {
+    if (dashboard.businessCard) {
+      setCardName(dashboard.cardName || '');
+      setLocation(dashboard.businessCard.profile.location || '');
+      setBio(dashboard.businessCard.profile.bio || '');
+      setTheme(dashboard.businessCard.theme.primaryColor);
+      setLinkColor(dashboard.businessCard.theme.secondaryColor);
+      setCardLayout(dashboard.businessCard.theme.layout === 'modern' ? 'Left Aligned' : 'Centered');
+    }
+  }, [dashboard.businessCard, dashboard.cardName]);
 
-  // Add previous state for About section fields
-  const [prevAbout, setPrevAbout] = useState({
-    cardName: cardName,
-    cardLayout: cardLayout,
-    profilePic: profilePic,
-    coverPhoto: coverPhoto,
-    companyLogo: companyLogo,
-    location: location,
-    bio: bio,
-    theme: theme,
-    linkColor: linkColor,
-    matchLinkIcons: matchLinkIcons,
-    name: name,
-    jobTitle: jobTitle,
-    company: company,
-    email: email,
-    phone: phone,
-    links: links,
-  });
-
-  // Cancel handler: revert all fields to previous state
-  const handleCancel = () => {
-    setCardName(prevAbout.cardName);
-    setCardLayout(prevAbout.cardLayout);
-    setProfilePic(prevAbout.profilePic);
-    setCoverPhoto(prevAbout.coverPhoto);
-    setCompanyLogo(prevAbout.companyLogo);
-    setLocation(prevAbout.location);
-    setBio(prevAbout.bio);
-    setTheme(prevAbout.theme);
-    setLinkColor(prevAbout.linkColor);
-    setMatchLinkIcons(prevAbout.matchLinkIcons);
-    setName(prevAbout.name);
-    setJobTitle(prevAbout.jobTitle);
-    setCompany(prevAbout.company);
-    setEmail(prevAbout.email);
-    setPhone(prevAbout.phone);
-    setLinks(prevAbout.links);
+  // Update business card when form fields change
+  const updateBusinessCard = (updates: any) => {
+    dashboard.updateBusinessCard(updates);
   };
 
-  // Update handler: save current state as previous
-  const handleUpdate = () => {
-    setPrevAbout({
-      cardName,
-      cardLayout,
-      profilePic,
-      coverPhoto,
-      companyLogo,
-      location,
-      bio,
-      theme,
-      linkColor,
-      matchLinkIcons,
-      name,
-      jobTitle,
-      company,
-      email,
-      phone,
-      links,
+  // Handle form field changes
+  const handleCardNameChange = (value: string) => {
+    setCardName(value);
+    dashboard.setCardName(value);
+    dashboard.updateBusinessCard({}); // Mark as dirty
+  };
+
+  const handleNameChange = (value: string) => {
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, name: value }
     });
-    // Here you can also add logic to persist the update to a backend or global store
   };
+
+  const handleJobTitleChange = (value: string) => {
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, jobTitle: value }
+    });
+  };
+
+  const handleCompanyChange = (value: string) => {
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, company: value }
+    });
+  };
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, location: value }
+    });
+  };
+
+  const handleBioChange = (value: string) => {
+    setBio(value);
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, bio: value }
+    });
+  };
+
+  const handleThemeChange = (color: string) => {
+    setTheme(color);
+    updateBusinessCard({
+      theme: { ...dashboard.businessCard?.theme, primaryColor: color }
+    });
+  };
+
+  const handleLinkColorChange = (color: string) => {
+    setLinkColor(color);
+    updateBusinessCard({
+      theme: { ...dashboard.businessCard?.theme, secondaryColor: color }
+    });
+  };
+
+  const handleLayoutChange = (layout: 'Left Aligned' | 'Centered') => {
+    setCardLayout(layout);
+    updateBusinessCard({
+      theme: { 
+        ...dashboard.businessCard?.theme, 
+        layout: layout === 'Left Aligned' ? 'modern' : 'classic' 
+      }
+    });
+  };
+
+  // Handle file uploads
+  const handleProfileImageSelect = (file: File | null) => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      dashboard.setProfileImage(file, url);
+    } else {
+      // When removing image, revert to previous state
+      dashboard.setProfileImage(null, dashboard.previousProfileImageUrl);
+    }
+  };
+
+  const handleCoverPhotoSelect = (file: File | null) => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      dashboard.setCoverPhoto(file, url);
+    } else {
+      // When removing image, revert to previous state
+      dashboard.setCoverPhoto(null, dashboard.previousCoverPhotoUrl);
+    }
+  };
+
+  const handleCompanyLogoSelect = (file: File | null) => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      dashboard.setCompanyLogo(file, url);
+    } else {
+      // When removing image, revert to previous state
+      dashboard.setCompanyLogo(null, dashboard.previousCompanyLogoUrl);
+    }
+  };
+
+  // Save and cancel handlers
+  const handleSave = async () => {
+    try {
+      await dashboard.saveChanges();
+      // Show success feedback
+      console.log('Changes saved successfully!');
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+      // Show error feedback
+    }
+  };
+
+  const handleCancel = () => {
+    dashboard.discardChanges();
+    // Reset local state to match the discarded changes
+    if (dashboard.lastSavedCard) {
+      setCardName(dashboard.cardName);
+      setLocation(dashboard.lastSavedCard.profile.location || '');
+      setBio(dashboard.lastSavedCard.profile.bio || '');
+      setTheme(dashboard.lastSavedCard.theme.primaryColor);
+      setLinkColor(dashboard.lastSavedCard.theme.secondaryColor);
+      setCardLayout(dashboard.lastSavedCard.theme.layout === 'modern' ? 'Left Aligned' : 'Centered');
+    }
+  };
+
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = dashboard.isDirty || 
+    dashboard.profileImage || 
+    dashboard.coverPhoto || 
+    dashboard.companyLogo ||
+    dashboard.tempProfileImageUrl ||
+    dashboard.tempCoverPhotoUrl ||
+    dashboard.tempCompanyLogoUrl;
 
   // Sidebar rendering
   const renderSidebar = () => (
@@ -101,14 +183,14 @@ export const Dashboard: React.FC = () => {
       <div className="mb-4">
         <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">CONTENT</div>
         <button
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${activeSection === 'About' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
-          onClick={() => setActiveSection('About')}
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'About' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          onClick={() => dashboard.setActiveSection('About')}
         >
           <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="black" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="black" strokeWidth="2"/></svg></span> About
         </button>
         <button
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${activeSection === 'Links' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
-          onClick={() => setActiveSection('Links')}
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'Links' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          onClick={() => dashboard.setActiveSection('Links')}
         >
           <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="black" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="black" strokeWidth="2"/></svg></span> Links
         </button>
@@ -133,12 +215,20 @@ export const Dashboard: React.FC = () => {
       <div className="flex flex-row gap-x-8 w-full">
         <div className="flex flex-row items-center gap-2 w-1/2">
           <label className="text-[11px] font-small text-gray-700 whitespace-nowrap">Card Name:</label>
-          <input className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" value={cardName} onChange={e => setCardName(e.target.value)} />
-          {/* Optional: Add edit icon here if needed */}
+          <input 
+            className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" 
+            value={cardName} 
+            onChange={e => handleCardNameChange(e.target.value)}
+            placeholder="Enter card name..."
+          />
         </div>
         <div className="flex flex-row items-center gap-2 w-1/2">
           <label className="text-[11px] font-small text-gray-700 whitespace-nowrap">Card Layout:</label>
-          <select className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" value={cardLayout} onChange={e => setCardLayout(e.target.value)}>
+          <select 
+            className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" 
+            value={cardLayout} 
+            onChange={e => handleLayoutChange(e.target.value as 'Left Aligned' | 'Centered')}
+          >
             <option>Left Aligned</option>
             <option>Centered</option>
           </select>
@@ -147,50 +237,74 @@ export const Dashboard: React.FC = () => {
       {/* Profile, Cover, Logo */}
       <div className="flex flex-row gap-20 items-center justify-center w-full">
         {/* Profile picture */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-            {profilePic ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" /> : <img src="/ixl-logo.svg" alt="Profile" className="w-16 h-16" />}
-          </div>
-          <button className="text-[11px] text-blue-500 hover:underline mt-0.5">Upload</button>
-        </div>
+        <FileUpload
+          label="Profile Picture"
+          currentImage={dashboard.tempProfileImageUrl || dashboard.businessCard?.profile.profileImage}
+          onFileSelect={handleProfileImageSelect}
+          previewClassName="w-16 h-16 rounded-full"
+          placeholder="Profile"
+        />
         {/* Cover photo */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="w-48 h-20 rounded-lg bg-gray-200 flex items-center justify-center overflow-hidden">
-            {coverPhoto ? <img src={coverPhoto} alt="Cover" className="w-full h-full object-cover" /> : <span className="text-[13px] text-gray-400">Cover photo</span>}
-          </div>
-          <button className="text-[11px] text-blue-500 hover:underline mt-0.5">Upload</button>
-        </div>
+        <FileUpload
+          label="Cover Photo"
+          currentImage={dashboard.tempCoverPhotoUrl || dashboard.businessCard?.profile.coverPhoto}
+          onFileSelect={handleCoverPhotoSelect}
+          previewClassName="w-48 h-20 rounded-lg"
+          placeholder="Cover photo"
+        />
         {/* Company logo */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-            {companyLogo ? <img src={companyLogo} alt="Company Logo" className="w-full h-full object-cover" /> : <span className="text-[13px] text-gray-400">Logo</span>}
-          </div>
-          <button className="text-[11px] text-blue-500 hover:underline mt-0.5">Upload</button>
-        </div>
+        <FileUpload
+          label="Company Logo"
+          currentImage={dashboard.tempCompanyLogoUrl || dashboard.businessCard?.profile.companyLogo}
+          onFileSelect={handleCompanyLogoSelect}
+          previewClassName="w-16 h-16 rounded-full"
+          placeholder="Logo"
+        />
       </div>
       {/* Name, Location, Job Title, Company */}
       <div className="grid grid-cols-2 gap-x-8 gap-y-3 w-full">
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-gray-600">Name</label>
-          <input className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" value={name} onChange={e => setName(e.target.value)} />
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={dashboard.businessCard?.profile.name || ''} 
+            onChange={e => handleNameChange(e.target.value)} 
+          />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-gray-600">Location</label>
-          <input className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" value={location} onChange={e => setLocation(e.target.value)} />
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={location} 
+            onChange={e => handleLocationChange(e.target.value)} 
+          />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-gray-600">Job Title</label>
-          <input className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" value={jobTitle} onChange={e => setJobTitle(e.target.value)} />
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={dashboard.businessCard?.profile.jobTitle || ''} 
+            onChange={e => handleJobTitleChange(e.target.value)} 
+          />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-gray-600">Company</label>
-          <input className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" value={company} onChange={e => setCompany(e.target.value)} />
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={dashboard.businessCard?.profile.company || ''} 
+            onChange={e => handleCompanyChange(e.target.value)} 
+          />
         </div>
       </div>
       {/* Bio */}
       <div className="flex flex-col gap-1 w-full">
         <label className="text-[11px] font-medium text-gray-600">Bio</label>
-        <textarea className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs min-h-[36px] w-full" value={bio} onChange={e => setBio(e.target.value)} placeholder="PR & Media Communications\nLet's work!" />
+        <textarea 
+          className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs min-h-[36px] w-full" 
+          value={bio} 
+          onChange={e => handleBioChange(e.target.value)} 
+          placeholder="PR & Media Communications\nLet's work!" 
+        />
       </div>
       {/* Theme pickers */}
       <div className="w-full mt-1">
@@ -202,7 +316,7 @@ export const Dashboard: React.FC = () => {
                 key={color}
                 className={`w-5 h-5 rounded-full border-2 ${theme === color ? 'border-orange-500' : 'border-white'} shadow`}
                 style={{ background: color }}
-                onClick={() => setTheme(color)}
+                onClick={() => handleThemeChange(color)}
               />
             ))}
           </div>
@@ -213,7 +327,7 @@ export const Dashboard: React.FC = () => {
                 key={color}
                 className={`w-5 h-5 rounded-full border-2 ${linkColor === color ? 'border-orange-500' : 'border-white'} shadow`}
                 style={{ background: color }}
-                onClick={() => setLinkColor(color)}
+                onClick={() => handleLinkColorChange(color)}
               />
             ))}
           </div>
@@ -222,16 +336,18 @@ export const Dashboard: React.FC = () => {
       {/* Action buttons */}
       <div className="justify-end bottom-0 flex gap-4 p-4">
         <button
-          className="px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-500 font-semibold text-xs hover:bg-gray-100 transition"
+          className="px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-500 font-semibold text-xs hover:bg-gray-100 transition disabled:opacity-50"
           onClick={handleCancel}
+          disabled={dashboard.isSaving || !hasUnsavedChanges}
         >
           Cancel
         </button>
         <button
-          className="px-5 py-2 rounded-full bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition shadow"
-          onClick={handleUpdate}
+          className="px-5 py-2 rounded-full bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition shadow disabled:opacity-50"
+          onClick={handleSave}
+          disabled={dashboard.isSaving || !hasUnsavedChanges}
         >
-          Update
+          {dashboard.isSaving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>
@@ -243,12 +359,20 @@ export const Dashboard: React.FC = () => {
       <header className="w-full flex items-center justify-between px-10 py-5 bg-transparent">
         <div className="flex items-center gap-3">
           <img src="/ixl-logo.svg" alt="ILX Logo" className="h-8 w-8 rounded-full" />
-          <span className="font-bold text-xl text-gray-800">Sofia</span>
+          <span className="font-bold text-xl text-gray-800">{dashboard.businessCard?.profile.name || 'Your Name'}</span>
+          {hasUnsavedChanges && (
+            <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+              Unsaved changes
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-4">
-          <select className="border rounded-lg px-3 py-1 text-sm" value={cardName} onChange={e => setCardName(e.target.value)}>
-            <option>Card Title</option>
-          </select>
+          <input 
+            className="border rounded-lg px-3 py-1 text-sm bg-white" 
+            value={cardName} 
+            onChange={e => handleCardNameChange(e.target.value)}
+            placeholder="Enter card name..."
+          />
           <button className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 transition">Share Your Card</button>
         </div>
       </header>
@@ -258,20 +382,27 @@ export const Dashboard: React.FC = () => {
           {renderSidebar()}
           <main className="flex-1 flex flex-row gap-0 px-10 py-10 overflow-y-auto">
             <div className="flex-1 flex flex-col">
-              {activeSection === 'About' && renderAboutSection()}
+              {dashboard.activeSection === 'About' && renderAboutSection()}
               {/* Add more sections as needed */}
             </div>
             <div className="w-[350px] flex-shrink-0 flex flex-col">
               <div className="sticky top-10">
                 <div className="p-0 bg-transparent shadow-none border-none">
                   <CardPreview
-                    name={name}
-                    jobTitle={jobTitle}
-                    company={company}
-                    email={email}
-                    phone={phone}
-                    links={links}
-                    // Add more props as needed for theme/colors
+                    name={dashboard.businessCard?.profile.name || ''}
+                    jobTitle={dashboard.businessCard?.profile.jobTitle || ''}
+                    company={dashboard.businessCard?.profile.company || ''}
+                    email={dashboard.businessCard?.profile.email || ''}
+                    phone={dashboard.businessCard?.profile.phone || ''}
+                    links={dashboard.businessCard?.links || []}
+                    theme={theme}
+                    linkColor={linkColor}
+                    layout={cardLayout}
+                    profileImage={dashboard.tempProfileImageUrl || dashboard.businessCard?.profile.profileImage}
+                    coverPhoto={dashboard.tempCoverPhotoUrl || dashboard.businessCard?.profile.coverPhoto}
+                    companyLogo={dashboard.tempCompanyLogoUrl || dashboard.businessCard?.profile.companyLogo}
+                    location={location}
+                    bio={bio}
                   />
                   <div className="text-center text-gray-400 mt-2 text-xs">Card live preview</div>
                   <a

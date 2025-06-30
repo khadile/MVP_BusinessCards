@@ -16,7 +16,9 @@ export interface BusinessCardProfile {
   company: string;
   location: string;
   bio: string;
-  profileImage?: string;
+  profileImage?: string | undefined;
+  coverPhoto?: string | undefined;
+  companyLogo?: string | undefined;
   email?: string;
   phone?: string;
   website?: string;
