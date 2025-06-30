@@ -1,56 +1,13 @@
 import React, { useState } from 'react';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import { PLATFORM_OPTIONS } from '../../utils/platforms.tsx';
+import { getPlatformLinkUrl } from '../../utils';
 
 interface StepContactsProps {
   goNext: () => void;
   goBack: () => void;
 }
-
-const PLATFORM_OPTIONS: {
-  type: string;
-  label: string;
-  icon: JSX.Element;
-  placeholder: string;
-  defaultTitle: string;
-}[] = [
-  {
-    type: 'linkedin',
-    label: 'LinkedIn',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0A66C2"/><path d="M9.429 12.857h3.143v9.714H9.429v-9.714zm1.571-4.857c1.029 0 1.857.829 1.857 1.857 0 1.029-.829 1.857-1.857 1.857-1.029 0-1.857-.829-1.857-1.857 0-1.029.829-1.857 1.857-1.857zm3.771 4.857h3.014v1.329h.043c.42-.8 1.443-1.643 2.971-1.643 3.177 0 3.771 2.093 3.771 4.814v5.214h-3.143v-4.629c0-1.104-.021-2.529-1.543-2.529-1.543 0-1.779 1.206-1.779 2.45v4.707h-3.143v-9.329z" fill="#fff"/></svg>
-    ),
-    placeholder: 'LinkedIn profile link',
-    defaultTitle: 'LinkedIn',
-  },
-  {
-    type: 'website',
-    label: 'Website',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6366F1"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Website URL',
-    defaultTitle: 'Website',
-  },
-  {
-    type: 'email',
-    label: 'Google Email',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#EA4335"/><path d="M16 18.667l-8-6V24h16V12.667l-8 6zm8-10.667H8c-1.104 0-2 .896-2 2v.667l10 7.5 10-7.5v-.667c0-1.104-.896-2-2-2z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Email address',
-    defaultTitle: 'Email',
-  },
-  {
-    type: 'custom',
-    label: 'Other',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6B7280"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Paste your link',
-    defaultTitle: 'Custom Link',
-  },
-];
 
 // Ensure PLATFORM_OPTIONS[0] is always defined
 const DEFAULT_PLATFORM = PLATFORM_OPTIONS[0] ?? {
@@ -198,6 +155,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
         label: modalLink.title,
         url: modalLink.url,
         icon: modalPlatform.type,
+        isActive: true,
       },
     ]);
     setShowLinksModal(false);
@@ -215,6 +173,9 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
         }]
       : [],
   ].flat();
+
+  // Recommended platforms for StepContacts
+  const RECOMMENDED_PLATFORMS = PLATFORM_OPTIONS.filter(p => ['linkedin', 'website', 'custom'].includes(p.type));
 
   return (
     <div className="flex flex-col md:flex-row gap-20 items-start w-full">
@@ -249,7 +210,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
         <div className="mb-4">
           <div className="font-medium text-xs mb-2">Recommended Platforms</div>
           <div className="flex gap-3 flex-wrap">
-            {PLATFORM_OPTIONS.map(platform => {
+            {RECOMMENDED_PLATFORMS.map(platform => {
               // Find all links for this platform
               const platformLinks = localLinks.filter(link => link.type === platform.type);
               const hasLinks = platformLinks.length > 0;
@@ -376,7 +337,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
               <div className="flex items-center gap-2 text-xs text-gray-400 mb-8">
                 <span>Test your link</span>
                 {modalLink.url && (
-                  <a href={modalLink.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline flex items-center gap-1">
+                  <a href={getPlatformLinkUrl(modalPlatform.type, modalLink.url.trim())} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline flex items-center gap-1">
                     {modalPlatform.label} ↗
                   </a>
                 )}

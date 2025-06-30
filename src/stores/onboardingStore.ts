@@ -5,6 +5,7 @@ interface Link {
   label: string;
   url: string;
   icon: string;
+  isActive?: boolean;
 }
 
 interface OnboardingState {

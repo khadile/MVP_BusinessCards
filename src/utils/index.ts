@@ -287,4 +287,35 @@ export function meetsContrastRequirements(
     AAA: { normal: 7, large: 4.5 },
   };
   return ratio >= requirements[level][size];
+}
+
+/**
+ * Get the correct URL for a platform link based on type and user input
+ */
+export function getPlatformLinkUrl(type: string, value: string = ''): string {
+  if (!value) return '#';
+  // If already a valid URL, use as-is
+  if (isValidUrl(value)) return value;
+  switch (type) {
+    case 'linkedin':
+      return `https://www.linkedin.com/in/${value.replace(/^@/, '').replace(/\/$/, '')}/`;
+    case 'website':
+      return value.startsWith('http') ? value : `https://${value}`;
+    case 'email':
+      return value.includes('@') ? `mailto:${value}` : value;
+    case 'call':
+      return `tel:${value.replace(/[^\d+]/g, '')}`;
+    case 'custom':
+      return value.startsWith('http') ? value : `https://${value}`;
+    case 'twitter':
+      return `https://twitter.com/${value.replace(/^@/, '')}`;
+    case 'facebook':
+      return `https://facebook.com/${value.replace(/^@/, '')}`;
+    case 'instagram':
+      return `https://instagram.com/${value.replace(/^@/, '')}`;
+    case 'whatsapp':
+      return `https://wa.me/${value.replace(/[^\d]/g, '')}`;
+    default:
+      return value;
+  }
 } 

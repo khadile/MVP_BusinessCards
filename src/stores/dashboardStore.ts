@@ -50,6 +50,9 @@ interface DashboardState {
   
   // Initialize from onboarding data
   initializeFromOnboarding: (onboardingData: any) => void;
+  
+  // Set links
+  setLinks: (links: BusinessCard['links']) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -310,4 +313,15 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Card management
   setCardName: (name) => set({ cardName: name, isDirty: true }),
+  
+  // Set links
+  setLinks: (links) => {
+    const { businessCard } = get();
+    if (!businessCard) return;
+    set({
+      businessCard: { ...businessCard, links },
+      isDirty: true,
+      unsavedChanges: { ...get().unsavedChanges, links },
+    });
+  },
 })); 

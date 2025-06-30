@@ -3,6 +3,7 @@ import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { FileUpload } from '../../components/ui/FileUpload';
+import { LinksSection } from './LinksSection';
 
 const SIDEBAR_SECTIONS = [
   { label: 'About', icon: '👤' },
@@ -118,8 +119,8 @@ export const Dashboard: React.FC = () => {
       const url = URL.createObjectURL(file);
       dashboard.setProfileImage(file, url);
     } else {
-      // When removing image, revert to previous state
-      dashboard.setProfileImage(null, dashboard.previousProfileImageUrl);
+      // Remove image completely
+      dashboard.setProfileImage(null, null);
     }
   };
 
@@ -128,8 +129,8 @@ export const Dashboard: React.FC = () => {
       const url = URL.createObjectURL(file);
       dashboard.setCoverPhoto(file, url);
     } else {
-      // When removing image, revert to previous state
-      dashboard.setCoverPhoto(null, dashboard.previousCoverPhotoUrl);
+      // Remove image completely
+      dashboard.setCoverPhoto(null, null);
     }
   };
 
@@ -138,8 +139,8 @@ export const Dashboard: React.FC = () => {
       const url = URL.createObjectURL(file);
       dashboard.setCompanyLogo(file, url);
     } else {
-      // When removing image, revert to previous state
-      dashboard.setCompanyLogo(null, dashboard.previousCompanyLogoUrl);
+      // Remove image completely
+      dashboard.setCompanyLogo(null, null);
     }
   };
 
@@ -165,6 +166,8 @@ export const Dashboard: React.FC = () => {
       setTheme(dashboard.lastSavedCard.theme.primaryColor);
       setLinkColor(dashboard.lastSavedCard.theme.secondaryColor);
       setCardLayout(dashboard.lastSavedCard.theme.layout === 'modern' ? 'Left Aligned' : 'Centered');
+      // No need to call setCoverPhoto, setProfileImage, or setCompanyLogo here!
+      // discardChanges already restores businessCard and clears temp URLs
     }
   };
 
@@ -383,6 +386,7 @@ export const Dashboard: React.FC = () => {
           <main className="flex-1 flex flex-row gap-0 px-10 py-10 overflow-y-auto">
             <div className="flex-1 flex flex-col">
               {dashboard.activeSection === 'About' && renderAboutSection()}
+              {dashboard.activeSection === 'Links' && <LinksSection />}
               {/* Add more sections as needed */}
             </div>
             <div className="w-[350px] flex-shrink-0 flex flex-col">
@@ -394,7 +398,7 @@ export const Dashboard: React.FC = () => {
                     company={dashboard.businessCard?.profile.company || ''}
                     email={dashboard.businessCard?.profile.email || ''}
                     phone={dashboard.businessCard?.profile.phone || ''}
-                    links={dashboard.businessCard?.links || []}
+                    links={dashboard.businessCard?.links?.filter(l => l.isActive) || []}
                     theme={theme}
                     linkColor={linkColor}
                     layout={cardLayout}
