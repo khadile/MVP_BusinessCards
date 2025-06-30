@@ -241,4 +241,10 @@ interface AuthStore {
 - Users can begin onboarding without authentication.
 - Authentication (sign up with Google or email/password) is required only on the final onboarding step ("Complete Sign Up").
 - The onboarding flow is branded as IXL, not Popl.
-- The onboarding wizard is at `/onboarding` and collects user info before authentication. 
+- The onboarding wizard is at `/onboarding` and collects user info before authentication.
+
+## Planned Feature: Multi-Card Access After Authentication
+
+- After logging in, users will be able to access all their business cards via the dashboard dropdown selector.
+- Each card is user-specific and only accessible to the authenticated user.
+- Backend integration will ensure secure, user-specific card management. 

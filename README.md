@@ -18,240 +18,218 @@ A modern, feature-rich digital business card creation platform built with React,
 - **Profile Information**: Name, job title, company, and contact details
 - **Link Management**: Comprehensive social media and contact link system
 - **Real-time Preview**: Live card preview during onboarding
-- **Data Persistence**: State management across onboarding steps
+- **Smart Navigation**: Back/forward navigation with state preservation
 
-#### Dashboard System
-- **Modern Dashboard UI**: Clean, professional interface with sidebar navigation
-- **About Section**: Complete profile management with file uploads
-- **Links Management**: Full CRUD operations for business card links
-- **Theme Customization**: Color schemes and layout options
-- **Real-time Preview**: Live card preview with all changes
-- **Save/Cancel Logic**: Proper state management with unsaved changes detection
+#### Dashboard & Management
+- **Comprehensive Dashboard**: Full-featured management interface
+- **About Section**: Profile info, images, themes, and layout customization
+- **Image Management**: Profile, cover photo, and company logo uploads
+- **File Upload System**: Drag-and-drop with validation and preview
+- **Theme Customization**: Color pickers for card and link themes
+- **Layout Options**: Left aligned vs centered card layouts
+- **Save/Cancel System**: Proper state management with revert functionality
+- **Unsaved Changes Detection**: Visual feedback for pending changes
 
 #### Link Management System
-- **Shared Platform Definitions**: Centralized platform options in `src/utils/platforms.tsx`
-- **Platform Picker Modal**: Large modal with search and categories
-- **Add/Edit Link Modal**: Form modal with live preview and testing
+- **Shared Platform System**: Centralized platform definitions in `src/utils/platforms.tsx`
+- **Modal Workflow**: Platform picker and add/edit link modals
 - **Smart URL Generation**: Platform-specific URL formatting
-- **Test Link Functionality**: Click-to-test links that open in new tab
-- **Dashboard Integration**: Seamless integration with dashboard workflow
-- **Onboarding Integration**: Consistent experience in onboarding flow
+- **Link Testing**: "Test your link" functionality with smart navigation
+- **Link Activation**: Toggle links on/off with real-time preview
+- **Recommended Links**: LinkedIn, Website, Other for quick access
+- **Full Platform Support**: All platforms available in modal
 
-#### File Upload System
-- **Profile Picture**: Circular profile image upload with preview
-- **Cover Photo**: Landscape cover photo upload
-- **Company Logo**: Company branding image upload
-- **Image Revert Logic**: Proper handling of image removal and restoration
-- **Preview System**: Real-time image preview in card
-
-#### Card Preview System
-- **Live Preview**: Real-time updates as user makes changes
-- **Theme Support**: Dynamic color scheme application
-- **Layout Options**: Left-aligned and centered layouts
-- **Interactive Links**: Smart URL formatting for different platforms
-- **Responsive Design**: Mobile-friendly card display
-
-### 🔧 Technical Architecture
-
-#### Project Structure
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # Base UI components (FileUpload, etc.)
-│   ├── forms/          # Form components (PlatformPickerModal, AddLinkModal)
-│   └── preview/        # Card preview components
-├── features/           # Feature-based modules
-│   ├── auth/           # Authentication feature
-│   ├── dashboard/      # Dashboard feature (Dashboard, LinksSection)
-│   ├── onboarding/     # Onboarding flow (OnboardingWizard, StepContacts)
-│   └── landing/        # Landing page
-├── hooks/              # Custom React hooks
-├── utils/              # Utility functions (platforms, URL generation)
-├── types/              # TypeScript type definitions
-├── stores/             # State management (Zustand stores)
-└── tests/              # Test files
-```
+#### Real-time Preview System
+- **Live Updates**: All changes reflect immediately in preview
+- **Image Preview**: Profile, cover, and company logo display
+- **Theme Preview**: Color changes apply instantly
+- **Layout Preview**: Left aligned vs centered layout switching
+- **Link Preview**: Active links with proper platform icons
+- **Responsive Design**: Mobile-optimized preview
 
 #### State Management
-- **Dashboard Store**: Manages dashboard state, business card data, and file uploads
-- **Onboarding Store**: Manages onboarding flow state and user progress
-- **Local State**: Component-level state for UI interactions
+- **Zustand Stores**: Separate stores for onboarding and dashboard
+- **Data Persistence**: Proper state management between flows
+- **Dirty State Tracking**: Unsaved changes detection
+- **Image State Management**: Temporary URLs with proper revert logic
+- **Onboarding Integration**: Seamless data transfer to dashboard
 
-#### Key Components
-1. **Dashboard**: Main dashboard with sidebar navigation and content areas
-2. **LinksSection**: Comprehensive link management with modal workflow
-3. **OnboardingWizard**: Multi-step onboarding with progress tracking
-4. **CardPreview**: Live card preview with theme and layout support
-5. **FileUpload**: Reusable file upload component with preview
-6. **PlatformPickerModal**: Large modal for platform selection
-7. **AddLinkModal**: Form modal for link configuration
+### 🔧 Technical Implementation
 
-### 🎨 Design System
+#### File Upload System
+- **FileUpload Component**: Reusable with drag-and-drop support
+- **Image Validation**: File type and size restrictions
+- **Preview Generation**: Object URLs for immediate preview
+- **Remove Functionality**: X button to clear images
+- **Error Handling**: User-friendly validation messages
 
-#### UI Components
-- **Consistent Styling**: Tailwind CSS with custom design tokens
-- **Responsive Design**: Mobile-first approach with breakpoint system
-- **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
-- **Interactive Elements**: Hover states, transitions, and animations
+#### Cancel/Revert Logic
+- **Full State Revert**: All changes revert to last saved state
+- **Image Revert**: Temporary URLs cleared, saved images restored
+- **Form Reset**: All form fields reset to saved values
+- **Preview Sync**: Preview immediately reflects reverted state
 
-#### Color Scheme
-- **Primary Colors**: Orange-based theme with customizable options
-- **Secondary Colors**: Link colors and accent colors
-- **Neutral Colors**: Gray scale for text and backgrounds
-- **Status Colors**: Success, error, and warning states
+#### Platform System
+- **TypeScript Interfaces**: Proper type safety for platform definitions
+- **Icon Management**: SVG icons for all platforms with branding
+- **URL Generation**: Smart URL formatting for different platforms
+- **Category Organization**: Recommended, Contact, Social Media groups
 
-### 🔗 Supported Platforms
+### 🎨 UI/UX Features
 
-#### Social Media
-- **LinkedIn**: Profile links with username validation
-- **Instagram**: Profile links with username formatting
-- **Facebook**: Profile links with username formatting
-- **Twitter**: Profile links with username formatting
+#### Design System
+- **Consistent Styling**: Tailwind-based design system
+- **Color Palette**: 10 predefined theme colors
+- **Typography**: Proper hierarchy and readability
+- **Spacing**: Consistent spacing scale throughout
 
-#### Contact & Communication
-- **Email**: Mailto links with email validation
-- **Phone**: Tel links for phone numbers
-- **WhatsApp**: WhatsApp API integration
-- **Text**: SMS links for text messages
+#### User Experience
+- **Intuitive Navigation**: Clear section switching
+- **Visual Feedback**: Loading states and error messages
+- **Accessibility**: WCAG compliant design
+- **Responsive Design**: Mobile-first approach
 
-#### Web & Custom
-- **Website**: Full URL support with protocol detection
-- **Custom**: Generic link support for any URL
-- **Address**: Location/map links
+#### Component Architecture
+- **Reusable Components**: FileUpload, CardPreview, modals
+- **Feature-based Organization**: Clear separation of concerns
+- **Props Interface**: TypeScript interfaces for all components
+- **State Management**: Proper prop drilling and state lifting
 
-### 🧪 Testing & Quality
+### 📋 Current Workflow
 
-#### Testing Setup
-- **Vitest**: Fast unit and integration testing
-- **React Testing Library**: Component testing utilities
-- **Test Coverage**: Comprehensive test coverage for core functionality
+#### Onboarding Flow
+1. **Step 1**: Name and basic info
+2. **Step 2**: Work details (job title, company)
+3. **Step 3**: Contact information and links
+4. **Step 4**: Sign up completion
+5. **Transition**: Automatic data transfer to dashboard
 
-#### Code Quality
-- **TypeScript**: Strict type checking and IntelliSense
-- **ESLint**: Code linting and style enforcement
-- **Prettier**: Code formatting and consistency
+#### Dashboard Management
+1. **About Section**: Profile info, images, themes
+2. **Links Section**: Add, edit, remove, and manage links
+3. **Real-time Preview**: Live updates as you make changes
+4. **Save/Cancel**: Proper state management with revert
 
-### 📱 Responsive Design
+#### Link Management
+1. **Platform Selection**: Choose from recommended or full list
+2. **Link Configuration**: URL and title setup
+3. **Preview**: Real-time preview with smart URL generation
+4. **Testing**: Test links before saving
+5. **Activation**: Toggle links on/off
 
-#### Breakpoints
-- **Mobile**: 320px - 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: 1024px+
+### 🔄 Integration Points
 
-#### Mobile Optimizations
-- **Touch-Friendly**: Large touch targets and gestures
-- **Performance**: Optimized for mobile devices
-- **Navigation**: Mobile-optimized navigation patterns
+#### Onboarding → Dashboard
+- **Data Transfer**: Profile, links, and settings
+- **State Initialization**: Proper setup of dashboard state
+- **Link Activation**: All onboarding links set to active
 
-### 🚀 Performance
+#### Shared Components
+- **PlatformPickerModal**: Used in both onboarding and dashboard
+- **AddLinkModal**: Consistent link editing experience
+- **CardPreview**: Real-time preview across all flows
+- **FileUpload**: Reusable image upload component
 
-#### Optimization Strategies
-- **Code Splitting**: Lazy loading of components and routes
-- **Image Optimization**: Efficient image handling and compression
-- **Bundle Optimization**: Minimized bundle size and loading times
-- **Caching**: Strategic caching for improved performance
+### 🚀 Next Steps
 
-### 🔒 Security
+#### Immediate Priorities
+- **QR Code Generation**: Share card via QR code
+- **Analytics Dashboard**: View card visit statistics
+- **Advanced Themes**: Custom gradients and patterns
+- **Export Options**: PDF and image export
 
-#### Data Protection
-- **Input Validation**: Comprehensive input sanitization
-- **URL Security**: Safe URL handling and validation
-- **File Upload Security**: Secure file upload handling
-- **Privacy Compliance**: GDPR and privacy considerations
+#### Technical Improvements
+- **File Upload Optimization**: Image compression
+- **Caching Strategy**: Performance improvements
+- **Offline Support**: Basic offline functionality
+- **Real-time Collaboration**: Multi-user editing
+
+### 🧪 Testing
+
+#### Current Test Setup
+- **Vitest**: Unit and integration testing
+- **React Testing Library**: Component testing
+- **Test Coverage**: Aiming for 80%+ coverage
+
+#### Testing Strategy
+- **Unit Tests**: Store logic and utility functions
+- **Integration Tests**: Component interactions
+- **E2E Tests**: Complete user workflows
+
+### 📚 Documentation
+
+#### Current Documentation
+- **Feature Specifications**: Detailed feature docs in `/docs/features/`
+- **API Documentation**: TypeScript interfaces and types
+- **Component Documentation**: Props and usage examples
+- **Architecture Guide**: Project structure and patterns
+
+#### Documentation Status
+- ✅ **Link Management**: Complete specification
+- ✅ **Dashboard**: Updated with current implementation
+- ✅ **Onboarding**: Feature specification
+- 🔄 **API Documentation**: In progress
+- 🔄 **Component Library**: In progress
 
 ## 🛠️ Development
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 ```bash
-# Clone the repository
 git clone <repository-url>
 cd BussinessCard_MVP
-
-# Install dependencies
 npm install
+```
 
-# Start development server
+### Development
+```bash
 npm run dev
+```
 
-# Run tests
+### Testing
+```bash
 npm run test
+npm run test:coverage
+```
 
-# Build for production
+### Building
+```bash
 npm run build
 ```
 
-### Environment Setup
-```bash
-# Copy environment variables
-cp env.example .env
+## 📁 Project Structure
 
-# Configure your environment variables
-# Add Firebase configuration, API keys, etc.
 ```
-
-### Development Workflow
-1. **Feature Development**: Create feature branches for new development
-2. **Testing**: Write tests for new functionality
-3. **Code Review**: Submit pull requests for review
-4. **Documentation**: Update documentation for new features
-
-## 📚 Documentation
-
-### Feature Documentation
-- [Link Management](./docs/features/link-management.md) - Comprehensive link management system
-- [Dashboard](./docs/features/dashboard.md) - Dashboard functionality and features
-- [Onboarding](./docs/features/onboarding.md) - Onboarding flow and user experience
-- [Authentication](./docs/features/auth.md) - Authentication and user management
-
-### Technical Documentation
-- [Product Requirements](./docs/PRD.md) - Product requirements and specifications
-- [RFCs](./rfc/) - Request for Comments and technical proposals
-
-## 🔮 Roadmap
-
-### Phase 1 (Current)
-- ✅ Core platform setup and architecture
-- ✅ Authentication and onboarding flow
-- ✅ Dashboard with basic functionality
-- ✅ Link management system
-- ✅ File upload and preview system
-
-### Phase 2 (Next)
-- 🔄 QR Code generation and sharing
-- 🔄 Advanced analytics and tracking
-- 🔄 Social media integration
-- 🔄 Payment link support
-- 🔄 Calendar integration
-
-### Phase 3 (Future)
-- 📋 AI-powered suggestions
-- 📋 Advanced customization options
-- 📋 Team collaboration features
-- 📋 API and third-party integrations
-- 📋 Mobile app development
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI components
+│   ├── forms/          # Form-specific components
+│   └── preview/        # Preview components
+├── features/           # Feature-based modules
+│   ├── auth/           # Authentication
+│   ├── dashboard/      # Dashboard feature
+│   ├── onboarding/     # Onboarding flow
+│   └── landing/        # Landing page
+├── stores/             # State management
+├── utils/              # Utility functions
+├── types/              # TypeScript definitions
+└── tests/              # Test files
+```
 
 ## 🤝 Contributing
 
-### Development Guidelines
-- Follow the established code style and architecture
-- Write comprehensive tests for new features
-- Update documentation for any changes
-- Ensure accessibility and responsive design
-- Follow security best practices
-
-### Code Standards
-- **TypeScript**: Use strict TypeScript configuration
-- **React**: Follow React best practices and hooks
-- **Testing**: Maintain good test coverage
-- **Documentation**: Keep documentation up to date
+1. Follow the established architecture patterns
+2. Use TypeScript for all new code
+3. Write tests for new features
+4. Update documentation for changes
+5. Follow the commit message conventions
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary software. All rights reserved.
 
 ## 🆘 Support
 

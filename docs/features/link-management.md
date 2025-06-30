@@ -211,6 +211,14 @@ const [editingLinkIdx, setEditingLinkIdx] = useState<number | null>(null);
 - **Payment Integration**: Direct payment processing
 - **Social Media APIs**: Direct platform integration
 
+## Planned Feature: Multi-Card Link Management
+
+- Each business card will have its own independent set of links.
+- The Links section will update to show the links for the currently selected card from the dropdown.
+- Creating a new card starts with an empty set of links.
+- Switching cards saves any unsaved link changes and loads the selected card's links.
+- This will be managed in local state for testing, with backend CRUD integration planned for production.
+
 ## Implementation Notes
 
 ### File Structure

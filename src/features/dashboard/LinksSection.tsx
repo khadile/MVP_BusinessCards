@@ -150,9 +150,10 @@ export const LinksSection: React.FC = () => {
     }
   };
   // Toggle active/inactive
-  const toggleActive = (idx: number) => {
+  const toggleActive = async (idx: number) => {
     const updatedLinks = links.map((l, i) => i === idx ? { ...l, isActive: !l.isActive } : l);
     dashboard.setLinks(updatedLinks);
+    await dashboard.saveChanges();
   };
 
   // Smart back handler for AddLinkModal
@@ -228,9 +229,9 @@ export const LinksSection: React.FC = () => {
         theme={dashboard.businessCard?.theme.primaryColor || '#FDBA74'}
         linkColor={dashboard.businessCard?.theme.secondaryColor || '#000000'}
         layout={dashboard.businessCard?.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'}
-        profileImage={dashboard.tempProfileImageUrl || dashboard.businessCard?.profile.profileImage}
-        coverPhoto={dashboard.tempCoverPhotoUrl || dashboard.businessCard?.profile.coverPhoto}
-        companyLogo={dashboard.tempCompanyLogoUrl || dashboard.businessCard?.profile.companyLogo}
+        profileImage={dashboard.activeCardId ? dashboard.tempProfileImageUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.profileImage : dashboard.businessCard?.profile.profileImage}
+        coverPhoto={dashboard.activeCardId ? dashboard.tempCoverPhotoUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.coverPhoto : dashboard.businessCard?.profile.coverPhoto}
+        companyLogo={dashboard.activeCardId ? dashboard.tempCompanyLogoUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.companyLogo : dashboard.businessCard?.profile.companyLogo}
         location={dashboard.businessCard?.profile.location || ''}
         bio={dashboard.businessCard?.profile.bio || ''}
       />
@@ -253,9 +254,9 @@ export const LinksSection: React.FC = () => {
           theme={dashboard.businessCard?.theme.primaryColor || '#FDBA74'}
           linkColor={dashboard.businessCard?.theme.secondaryColor || '#000000'}
           layout={dashboard.businessCard?.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'}
-          profileImage={dashboard.tempProfileImageUrl || dashboard.businessCard?.profile.profileImage}
-          coverPhoto={dashboard.tempCoverPhotoUrl || dashboard.businessCard?.profile.coverPhoto}
-          companyLogo={dashboard.tempCompanyLogoUrl || dashboard.businessCard?.profile.companyLogo}
+          profileImage={dashboard.activeCardId ? dashboard.tempProfileImageUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.profileImage : dashboard.businessCard?.profile.profileImage}
+          coverPhoto={dashboard.activeCardId ? dashboard.tempCoverPhotoUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.coverPhoto : dashboard.businessCard?.profile.coverPhoto}
+          companyLogo={dashboard.activeCardId ? dashboard.tempCompanyLogoUrls[dashboard.activeCardId] || dashboard.businessCard?.profile.companyLogo : dashboard.businessCard?.profile.companyLogo}
           location={dashboard.businessCard?.profile.location || ''}
           bio={dashboard.businessCard?.profile.bio || ''}
           editingLinkIdx={editingLinkIdx}

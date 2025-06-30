@@ -209,3 +209,10 @@ The Card Preview component is now fully implemented and polished, providing user
 The component serves as a foundation for future enhancements while maintaining high performance and accessibility standards. 
 
 The preview only shows info and links added by the user in StepContacts. 
+
+## Planned Feature: Multi-Card Preview Support
+
+- The CardPreview component will always reflect the currently selected card from the dropdown selector in the dashboard.
+- When switching cards, the preview updates to show the About, Links, and theme for the active card.
+- Creating a new card resets the preview to a blank state.
+- This logic will be tested locally with Zustand state, then integrated with backend card data once available. 

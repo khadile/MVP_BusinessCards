@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 
 interface FileUploadProps {
   label: string;
@@ -97,6 +97,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     }
   }, [onFileSelect]);
 
+  // Sync previewUrl with currentImage prop
+  useEffect(() => {
+    setPreviewUrl(currentImage || null);
+  }, [currentImage]);
+
   return (
     <div className={`flex flex-col items-center gap-1 ${className}`}>
       <div
@@ -125,18 +130,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             <span className="text-[13px] text-gray-400">{placeholder}</span>
           )}
         </div>
-        
-        {/* Remove button */}
-        {previewUrl && (
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-            title="Remove image"
-          >
-            ×
-          </button>
-        )}
         
         {/* Drag overlay */}
         {isDragOver && (

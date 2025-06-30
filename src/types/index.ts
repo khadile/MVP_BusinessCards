@@ -2,6 +2,7 @@
 export interface BusinessCard {
   id: string;
   userId: string;
+  cardName?: string;
   profile: BusinessCardProfile;
   theme: BusinessCardTheme;
   links: BusinessCardLink[];

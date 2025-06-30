@@ -24,9 +24,9 @@ interface DashboardState {
   isUploading: boolean;
   
   // Temporary file URLs for preview (will be cleared on save/cancel)
-  tempProfileImageUrl: string | null;
-  tempCoverPhotoUrl: string | null;
-  tempCompanyLogoUrl: string | null;
+  tempProfileImageUrls: Record<string, string | null>;
+  tempCoverPhotoUrls: Record<string, string | null>;
+  tempCompanyLogoUrls: Record<string, string | null>;
   
   // Previous image states for proper revert functionality
   previousProfileImageUrl: string | null;
@@ -53,6 +53,16 @@ interface DashboardState {
   
   // Set links
   setLinks: (links: BusinessCard['links']) => void;
+  
+  // Multi-card management
+  cards: BusinessCard[];
+  activeCardId: string | null;
+  
+  // Multi-card actions
+  createCard: (card: BusinessCard) => void;
+  updateCard: (cardId: string, updates: Partial<BusinessCard>) => void;
+  deleteCard: (cardId: string) => void;
+  setActiveCard: (cardId: string) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -70,12 +80,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   coverPhoto: null,
   companyLogo: null,
   isUploading: false,
-  tempProfileImageUrl: null,
-  tempCoverPhotoUrl: null,
-  tempCompanyLogoUrl: null,
+  tempProfileImageUrls: {},
+  tempCoverPhotoUrls: {},
+  tempCompanyLogoUrls: {},
   previousProfileImageUrl: null,
   previousCoverPhotoUrl: null,
   previousCompanyLogoUrl: null,
+  cards: [],
+  activeCardId: null,
   
   // Section navigation
   setActiveSection: (section) => set({ activeSection: section }),
@@ -83,39 +95,55 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   // Business card updates
   updateBusinessCard: (updates) => {
     const { businessCard, unsavedChanges } = get();
-    const newUnsavedChanges = { ...unsavedChanges, ...updates };
-    
+    if (!businessCard) return;
+    let newProfile = businessCard.profile;
+    if (updates.profile) {
+      newProfile = {
+        ...businessCard.profile,
+        ...updates.profile,
+        profileImage: ('profileImage' in updates.profile) ? updates.profile.profileImage : businessCard.profile.profileImage,
+        coverPhoto: ('coverPhoto' in updates.profile) ? updates.profile.coverPhoto : businessCard.profile.coverPhoto,
+        companyLogo: ('companyLogo' in updates.profile) ? updates.profile.companyLogo : businessCard.profile.companyLogo,
+      };
+    }
+    const newBusinessCard = {
+      ...businessCard,
+      ...updates,
+      profile: newProfile,
+    };
     set({
-      unsavedChanges: newUnsavedChanges,
+      unsavedChanges: { ...unsavedChanges, ...updates },
       isDirty: true,
-      businessCard: businessCard ? { ...businessCard, ...updates } : null,
+      businessCard: newBusinessCard,
     });
   },
   
   // Save changes
   saveChanges: async () => {
-    const { unsavedChanges, businessCard, cardName, tempProfileImageUrl, tempCoverPhotoUrl, tempCompanyLogoUrl } = get();
-    if (!businessCard || (Object.keys(unsavedChanges).length === 0 && !tempProfileImageUrl && !tempCoverPhotoUrl && !tempCompanyLogoUrl)) return;
+    const { unsavedChanges, businessCard, cardName, tempProfileImageUrls, tempCoverPhotoUrls, tempCompanyLogoUrls, cards, activeCardId } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    if (!businessCard || (Object.keys(unsavedChanges).length === 0 && !tempProfileImageUrls[cardId] && !tempCoverPhotoUrls[cardId] && !tempCompanyLogoUrls[cardId])) return;
     
     set({ isSaving: true });
     
     try {
-      // TODO: Implement actual API call to save changes
-      // await updateBusinessCard(businessCard.id, unsavedChanges);
-      
       // Update business card with new image URLs if they exist
-      const updatedBusinessCard = { ...businessCard };
-      if (tempProfileImageUrl !== undefined) {
-        updatedBusinessCard.profile.profileImage = tempProfileImageUrl || undefined;
-      }
-      if (tempCoverPhotoUrl !== undefined) {
-        updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrl || undefined;
-      }
-      if (tempCompanyLogoUrl !== undefined) {
-        updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrl || undefined;
+      const updatedBusinessCard = { ...businessCard, cardName };
+      if (updatedBusinessCard.profile) {
+        if (tempProfileImageUrls[cardId]) {
+          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId];
+        }
+        if (tempCoverPhotoUrls[cardId]) {
+          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId];
+        }
+        if (tempCompanyLogoUrls[cardId]) {
+          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId];
+        }
       }
       
-      // Update last saved state
+      // Update cards array with the saved card
+      const updatedCards = cards.map(card => card.id === cardId ? { ...updatedBusinessCard } : card);
+      
       set({ 
         businessCard: updatedBusinessCard,
         lastSavedCard: { ...updatedBusinessCard },
@@ -124,9 +152,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         unsavedChanges: {},
         isSaving: false,
         // Clear temporary URLs and files after saving
-        tempProfileImageUrl: null,
-        tempCoverPhotoUrl: null,
-        tempCompanyLogoUrl: null,
+        tempProfileImageUrls: { ...tempProfileImageUrls, [cardId]: null },
+        tempCoverPhotoUrls: { ...tempCoverPhotoUrls, [cardId]: null },
+        tempCompanyLogoUrls: { ...tempCompanyLogoUrls, [cardId]: null },
         profileImage: null,
         coverPhoto: null,
         companyLogo: null,
@@ -134,6 +162,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         previousProfileImageUrl: null,
         previousCoverPhotoUrl: null,
         previousCompanyLogoUrl: null,
+        cards: updatedCards,
       });
     } catch (error) {
       set({ isSaving: false });
@@ -143,7 +172,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Discard changes
   discardChanges: () => {
-    const { lastSavedCard, lastSavedCardName, previousProfileImageUrl, previousCoverPhotoUrl, previousCompanyLogoUrl } = get();
+    const { lastSavedCard, lastSavedCardName, previousProfileImageUrl, previousCoverPhotoUrl, previousCompanyLogoUrl, activeCardId } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
     if (lastSavedCard) {
       set({ 
         businessCard: { ...lastSavedCard },
@@ -154,9 +184,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         profileImage: null,
         coverPhoto: null,
         companyLogo: null,
-        tempProfileImageUrl: null,
-        tempCoverPhotoUrl: null,
-        tempCompanyLogoUrl: null,
+        tempProfileImageUrls: {},
+        tempCoverPhotoUrls: {},
+        tempCompanyLogoUrls: {},
         // Reset previous image states
         previousProfileImageUrl: null,
         previousCoverPhotoUrl: null,
@@ -170,9 +200,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         profileImage: null,
         coverPhoto: null,
         companyLogo: null,
-        tempProfileImageUrl: null,
-        tempCoverPhotoUrl: null,
-        tempCompanyLogoUrl: null,
+        tempProfileImageUrls: {},
+        tempCoverPhotoUrls: {},
+        tempCompanyLogoUrls: {},
         // Reset previous image states
         previousProfileImageUrl: null,
         previousCoverPhotoUrl: null,
@@ -186,7 +216,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Reset to last saved
   resetToLastSaved: () => {
-    const { lastSavedCard, lastSavedCardName } = get();
+    const { lastSavedCard, lastSavedCardName, activeCardId } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
     if (lastSavedCard) {
       set({ 
         businessCard: { ...lastSavedCard },
@@ -197,9 +228,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         profileImage: null,
         coverPhoto: null,
         companyLogo: null,
-        tempProfileImageUrl: null,
-        tempCoverPhotoUrl: null,
-        tempCompanyLogoUrl: null,
+        tempProfileImageUrls: {},
+        tempCoverPhotoUrls: {},
+        tempCompanyLogoUrls: {},
         // Reset previous image states
         previousProfileImageUrl: null,
         previousCoverPhotoUrl: null,
@@ -210,36 +241,39 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // File upload actions
   setProfileImage: (file, url) => {
-    const { businessCard, tempProfileImageUrl } = get();
-    const previousUrl = tempProfileImageUrl || businessCard?.profile.profileImage || null;
-    
-    set({ 
-      profileImage: file, 
-      tempProfileImageUrl: url || null,
+    const { activeCardId, tempProfileImageUrls, businessCard } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    if (!activeCardId) return;
+    const previousUrl = tempProfileImageUrls[cardId] || businessCard?.profile.profileImage || null;
+    set({
+      profileImage: file,
+      tempProfileImageUrls: { ...tempProfileImageUrls, [cardId]: url || null },
       previousProfileImageUrl: previousUrl,
-      isDirty: true 
+      isDirty: true,
     });
   },
   setCoverPhoto: (file, url) => {
-    const { businessCard, tempCoverPhotoUrl } = get();
-    const previousUrl = tempCoverPhotoUrl || businessCard?.profile.coverPhoto || null;
-    
-    set({ 
-      coverPhoto: file, 
-      tempCoverPhotoUrl: url || null,
+    const { activeCardId, tempCoverPhotoUrls, businessCard } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    if (!activeCardId) return;
+    const previousUrl = tempCoverPhotoUrls[cardId] || businessCard?.profile.coverPhoto || null;
+    set({
+      coverPhoto: file,
+      tempCoverPhotoUrls: { ...tempCoverPhotoUrls, [cardId]: url || null },
       previousCoverPhotoUrl: previousUrl,
-      isDirty: true 
+      isDirty: true,
     });
   },
   setCompanyLogo: (file, url) => {
-    const { businessCard, tempCompanyLogoUrl } = get();
-    const previousUrl = tempCompanyLogoUrl || businessCard?.profile.companyLogo || null;
-    
-    set({ 
-      companyLogo: file, 
-      tempCompanyLogoUrl: url || null,
+    const { activeCardId, tempCompanyLogoUrls, businessCard } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    if (!activeCardId) return;
+    const previousUrl = tempCompanyLogoUrls[cardId] || businessCard?.profile.companyLogo || null;
+    set({
+      companyLogo: file,
+      tempCompanyLogoUrls: { ...tempCompanyLogoUrls, [cardId]: url || null },
       previousCompanyLogoUrl: previousUrl,
-      isDirty: true 
+      isDirty: true,
     });
   },
   
@@ -271,6 +305,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const businessCard: BusinessCard = {
       id: 'temp-id',
       userId: 'temp-user-id',
+      cardName: onboardingData.name || '',
       profile: {
         name: onboardingData.name || '',
         jobTitle: onboardingData.jobTitle || '',
@@ -305,9 +340,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       businessCard, 
       lastSavedCard: { ...businessCard }, // Initialize last saved state
       lastSavedCardName: '',
-      cardName: '',
+      cardName: businessCard.cardName || '',
       isDirty: false, 
       unsavedChanges: {},
+      cards: [businessCard], // Add initial card to cards array
+      activeCardId: businessCard.id, // Set as active
     });
   },
   
@@ -315,13 +352,94 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setCardName: (name) => set({ cardName: name, isDirty: true }),
   
   // Set links
-  setLinks: (links) => {
-    const { businessCard } = get();
-    if (!businessCard) return;
+  setLinks: (links = []) => {
+    const { businessCard, activeCardId, cards } = get();
+    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    if (!businessCard || !cardId || !cards) return;
+    // Update links on the active card in the cards array
+    const updatedCards = cards.map(card =>
+      card.id === cardId ? { ...card, links } : card
+    );
     set({
-      businessCard: { ...businessCard, links },
+      businessCard: businessCard ? { ...businessCard, links } : null,
+      cards: updatedCards,
       isDirty: true,
-      unsavedChanges: { ...get().unsavedChanges, links },
+    });
+  },
+  
+  createCard: (card) => {
+    set(state => {
+      const cardWithName = { ...card, cardName: card.profile.name };
+      return {
+        cards: [...state.cards, cardWithName],
+        activeCardId: cardWithName.id,
+        businessCard: cardWithName, // for backward compatibility
+        lastSavedCard: cardWithName,
+        cardName: cardWithName.cardName || '',
+        isDirty: false,
+        unsavedChanges: {},
+      };
+    });
+  },
+  updateCard: (cardId, updates) => {
+    set(state => {
+      const updatedCards = state.cards.map(card => {
+        if (card.id !== cardId) return card;
+        let newProfile = card.profile;
+        if (updates.profile) {
+          newProfile = {
+            ...card.profile,
+            ...updates.profile,
+            profileImage: ('profileImage' in updates.profile) ? updates.profile.profileImage : card.profile.profileImage,
+            coverPhoto: ('coverPhoto' in updates.profile) ? updates.profile.coverPhoto : card.profile.coverPhoto,
+            companyLogo: ('companyLogo' in updates.profile) ? updates.profile.companyLogo : card.profile.companyLogo,
+          };
+        }
+        return {
+          ...card,
+          ...updates,
+          profile: newProfile,
+        };
+      });
+      const updatedCard = updatedCards.find(card => card.id === cardId);
+      return {
+        cards: updatedCards,
+        businessCard: state.activeCardId === cardId && updatedCard ? updatedCard : state.businessCard,
+        isDirty: true,
+        unsavedChanges: { ...state.unsavedChanges, ...updates },
+      };
+    });
+  },
+  deleteCard: (cardId) => {
+    set(state => {
+      const newCards = state.cards.filter(card => card.id !== cardId);
+      let newActiveId = state.activeCardId;
+      if (state.activeCardId === cardId) {
+        newActiveId = newCards.length > 0 ? newCards[0].id : null;
+      }
+      const newActiveCard = newActiveId ? newCards.find(card => card.id === newActiveId) : null;
+      return {
+        cards: newCards,
+        activeCardId: newActiveId,
+        businessCard: newActiveCard || null,
+        lastSavedCard: newActiveCard || null,
+        cardName: newActiveCard ? newActiveCard.profile.name : '',
+        isDirty: false,
+        unsavedChanges: {},
+      };
+    });
+  },
+  setActiveCard: (cardId) => {
+    set(state => {
+      const card = state.cards.find(c => c.id === cardId) || null;
+      return {
+        activeCardId: cardId,
+        businessCard: card,
+        lastSavedCard: card,
+        cardName: card?.profile.name || '',
+        isDirty: false,
+        unsavedChanges: {},
+      };
     });
   },
 })); 

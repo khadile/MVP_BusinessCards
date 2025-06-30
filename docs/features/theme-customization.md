@@ -334,4 +334,11 @@ interface ThemeStore {
 - **Design Tool Integration**: Figma, Sketch plugins
 - **Brand Kit Integration**: Company brand guidelines
 - **Social Media Integration**: Platform-specific themes
-- **Analytics Integration**: Theme performance tracking 
+- **Analytics Integration**: Theme performance tracking
+
+## Planned Feature: Multi-Card Theme Customization
+
+- Each card can have its own theme (colors, layout, etc.).
+- Switching cards in the dropdown updates the theme controls and preview to match the selected card.
+- Creating a new card starts with default theme settings.
+- Local state will be used for initial testing; backend integration will follow. 

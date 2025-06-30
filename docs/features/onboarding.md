@@ -1,309 +1,219 @@
-# Onboarding Feature
+# Onboarding Feature Specification
 
 ## Overview
+The onboarding flow provides a guided, multi-step experience for new users to create their digital business card. It features progressive disclosure, real-time preview, and seamless transition to the dashboard.
 
-The onboarding flow is a multi-step wizard that guides new users through creating their digital business card. Users can start the process without authentication, with sign-up occurring only on the final step. The flow features a modern, clean, horizontally split UI with ILX branding and real-time card preview from Step 2 onward. All steps use a compact, accessible layout. StepContacts uses a large, categorized, searchable modal for platform selection, supports multiple links per platform, and only shows user-added links on the card. StepSignUp email is for authentication only and does not affect the card preview. After sign-up, a development button leads to the dashboard (to be implemented).
-
-## Features
+## Current Implementation Status
 
 ### ✅ Implemented Features
 
-#### 1. Multi-step Wizard
-- **Four sequential steps** with clear progression
-- **Progress indicator** showing current step and completion
-- **Navigation controls** (Back/Continue buttons)
-- **Step validation** and error handling
+#### Multi-step Onboarding Flow
+- **Step 1 - Name**: Basic personal information collection
+- **Step 2 - Work**: Job title and company information
+- **Step 3 - Contacts**: Email, phone, and comprehensive link management
+- **Step 4 - Sign Up**: Account creation and completion
+- **Progress Tracking**: Visual progress indicator with step completion
 
-#### 2. Unauthenticated Start
-- **No login required** to begin onboarding
-- **Data persistence** across steps via Zustand store
-- **Authentication** only on final step
-- **Seamless transition** to authenticated state
+#### Contact & Link Management (Step 3)
+- **Recommended Links**: LinkedIn, Website, and Other (custom) for quick access
+- **Full Platform Support**: All platforms available in modal workflow
+- **Smart URL Generation**: Platform-specific URL formatting
+- **Link Testing**: "Test your link" functionality with smart navigation
+- **Real-time Preview**: Live card preview with link updates
+- **Link Activation**: All added links automatically set to active
+- **Modal Workflow**: Platform picker and add/edit link modals
 
-#### 3. Real-time Card Preview
-- **Live updates** as users type
-- **Professional design** with ILX branding
-- **Responsive layout** for all screen sizes
-- **Visual feedback** for all changes
+#### Real-time Preview System
+- **Live Updates**: All changes reflect immediately in preview
+- **Profile Information**: Name, job title, company display
+- **Contact Information**: Email and phone display
+- **Link Preview**: Active links with proper platform icons
+- **Theme Preview**: Default theme colors and layout
+- **Responsive Design**: Mobile-optimized preview
 
-#### 4. Modern UI/UX
-- **Clean, minimalist design**
-- **Consistent spacing** and typography
-- **Accessible components** with proper ARIA labels
-- **Mobile-first responsive** design
+#### State Management
+- **Zustand Store**: Centralized state management for onboarding
+- **Data Persistence**: State preserved across navigation
+- **Form Validation**: Input validation and error handling
+- **Progress Tracking**: Step completion and navigation state
 
-## Step-by-Step Flow
+#### Navigation & UX
+- **Smart Navigation**: Back/forward with state preservation
+- **Step Validation**: Required field validation before proceeding
+- **Error Handling**: User-friendly error messages
+- **Loading States**: Proper loading feedback during transitions
 
-### Step 1: Name
-**Route:** `/onboarding/name`
+### 🔧 Technical Implementation
 
-**Features:**
-- First name and last name input fields
-- Large, accessible form inputs
-- Real-time validation
-- Continue button (disabled until valid input)
-- Progress indicator
+#### Shared Platform System
+- **Centralized Definitions**: All platforms defined in `src/utils/platforms.tsx`
+- **TypeScript Interfaces**: Proper type safety for platform definitions
+- **Icon Management**: SVG icons for all platforms with branding
+- **URL Generation**: Smart URL formatting for different platforms
+- **Category Organization**: Recommended, Contact, Social Media groups
 
-**UI Elements:**
-- Clean form layout with proper spacing
-- Modern input styling with focus states
-- Clear labels and placeholders
-- Responsive design for mobile/desktop
+#### Modal Workflow
+- **PlatformPickerModal**: Large modal with search and categories
+- **AddLinkModal**: Form modal with live preview and testing
+- **Consistent Experience**: Same modals used in dashboard
+- **Smart Navigation**: Back/close logic with state preservation
 
-### Step 2: Work
-**Route:** `/onboarding/work`
+#### Link Management Features
+- **Recommended Links**: LinkedIn, Website, Other for quick access
+- **Full Platform Access**: All platforms available in modal
+- **Smart URL Generation**: Platform-specific URL formatting
+- **Link Testing**: Click-to-test functionality with proper URL generation
+- **Link Activation**: All onboarding links set to active by default
 
-**Features:**
-- Job title and company input fields
-- Live card preview (first appearance)
-- Data from previous step displayed
-- Navigation controls (Back/Continue)
+#### Data Flow
+- **Step Progression**: Data collected and stored in onboarding store
+- **State Preservation**: Data maintained during navigation
+- **Dashboard Transfer**: Complete data transfer to dashboard on completion
+- **Link Activation**: All links automatically activated for immediate use
 
-**UI Elements:**
-- Two-column layout (form + preview)
-- Large input fields with modern styling
-- Card preview with ILX branding
-- Consistent spacing and typography
+### 🎨 UI/UX Features
 
-### Step 3: Contacts
-**Route:** `/onboarding/contacts`
+#### Design System
+- **Consistent Styling**: Tailwind-based design system
+- **Progress Indicator**: Visual step completion tracking
+- **Form Design**: Clean, accessible form layouts
+- **Modal Design**: Consistent modal styling and behavior
 
-**Features:**
-- Email, phone, and social/social media links
-- Large, categorized, searchable modal for platform selection
-- Multiple links per platform supported
-- Only user-added links are shown on the card
-- Live card preview updates in real time
-- Navigation controls (Back/Continue)
+#### User Experience
+- **Progressive Disclosure**: Information revealed step by step
+- **Real-time Feedback**: Immediate preview updates
+- **Error Prevention**: Validation and helpful error messages
+- **Accessibility**: WCAG compliant design and navigation
 
-**UI Elements:**
-- Two-column layout (form + preview)
-- Modern, compact input fields and modal
-- Card preview with ILX branding
-- Consistent spacing and typography
+#### Component Architecture
+- **Step Components**: Individual step components with clear responsibilities
+- **Shared Components**: CardPreview, modals, and form elements
+- **State Management**: Proper state lifting and prop drilling
+- **Navigation Logic**: Smart back/forward navigation
 
-### Step 4: Sign Up
-**Route:** `/onboarding/signup`
+### 📋 Step-by-Step Flow
 
-**Features:**
-- Authentication (Google or email/password)
-- Sign-up email is for authentication only and does not affect the card preview
-- Live card preview shows info from previous steps
-- Navigation controls (Back/Complete)
-- After sign-up, a development button leads to the dashboard (to be implemented)
+#### Step 1: Name
+- **Purpose**: Collect basic personal information
+- **Fields**: Name input
+- **Validation**: Required field validation
+- **Navigation**: Next button enabled when valid
 
-**UI Elements:**
-- Two-column layout (form + preview)
-- Modern, compact input fields
-- Card preview with ILX branding
-- Consistent spacing and typography
+#### Step 2: Work
+- **Purpose**: Collect professional information
+- **Fields**: Job title, company
+- **Validation**: Required field validation
+- **Navigation**: Back to Step 1, Next to Step 3
 
-## Technical Implementation
+#### Step 3: Contacts
+- **Purpose**: Collect contact information and links
+- **Fields**: Email, phone, links
+- **Features**: 
+  - Recommended links (LinkedIn, Website, Other)
+  - Full platform access via modal
+  - Real-time preview
+  - Link testing functionality
+- **Validation**: Email format validation
+- **Navigation**: Back to Step 2, Next to Step 4
 
-### State Management
-```typescript
-interface OnboardingState {
-  // Personal Information
-  name: string;
-  jobTitle: string;
-  company: string;
-  
-  // Contact Information
-  email: string;
-  phone: string;
-  links: CardLink[];
-  
-  // Authentication
-  password: string;
-  
-  // Navigation
-  currentStep: number;
-  isComplete: boolean;
-}
-```
+#### Step 4: Sign Up
+- **Purpose**: Complete account creation
+- **Fields**: Account creation form
+- **Features**: Final preview and completion
+- **Navigation**: Back to Step 3, Complete onboarding
 
-### Store Actions
-- `setName(name: string)`
-- `setJobTitle(title: string)`
-- `setCompany(company: string)`
-- `setEmail(email: string)`
-- `setPhone(phone: string)`
-- `setLinks(links: CardLink[])`
-- `setPassword(password: string)`
-- `nextStep()`
-- `previousStep()`
-- `resetOnboarding()`
+### 🔄 Integration Points
 
-### Component Structure
-```
-OnboardingWizard/
-├── StepName.tsx
-├── StepWork.tsx
-├── StepContacts.tsx
-├── StepSignUp.tsx
-└── CardPreview.tsx
-```
+#### With Dashboard
+- **Data Transfer**: Complete profile, links, and settings transfer
+- **State Initialization**: Proper setup of dashboard state
+- **Link Activation**: All onboarding links set to active
+- **Seamless Transition**: Smooth flow from onboarding to dashboard
 
-## User Experience
+#### With Link Management
+- **Shared Components**: PlatformPickerModal and AddLinkModal
+- **Shared Platform Definitions**: Consistent platform options
+- **Shared URL Generation**: Same smart URL logic
+- **Shared Preview**: Same CardPreview component
 
-### Progressive Disclosure
-- **Step-by-step information** collection
-- **Reduced cognitive load** with focused inputs
-- **Clear progress indication** throughout flow
-- **Logical information grouping**
+### 🚀 Future Enhancements
 
-### Visual Feedback
-- **Real-time preview** updates
-- **Form validation** with immediate feedback
-- **Loading states** for async operations
-- **Success indicators** for completed steps
+#### Planned Features
+- **Social Login**: Google, Facebook, Apple sign-in
+- **Profile Import**: Import from LinkedIn, Google Contacts
+- **Template Selection**: Pre-designed card templates
+- **Advanced Customization**: Theme selection during onboarding
 
-### Accessibility
-- **Keyboard navigation** support
-- **Screen reader** compatibility
-- **Focus management** between steps
-- **ARIA labels** and descriptions
-- **Color contrast** compliance
-
-## Design System
-
-### Colors
-- **Primary**: Blue (`#3B82F6`)
-- **Secondary**: Gray scale (`#6B7280`, `#9CA3AF`)
-- **Background**: White and light gray
-- **Borders**: Light gray (`#E5E7EB`)
-
-### Typography
-- **Headings**: Large, bold text (`text-3xl font-bold`)
-- **Body**: Medium weight (`font-medium`)
-- **Labels**: Regular weight with proper hierarchy
-- **Placeholders**: Light gray, descriptive text
-
-### Spacing
-- **Container**: `max-w-lg` for form sections
-- **Inputs**: Large padding (`px-4 py-4`)
-- **Sections**: Consistent margins (`mb-8`)
-- **Buttons**: Proper touch targets
-
-### Components
-- **Input Fields**: Rounded corners, focus rings, shadows
-- **Buttons**: Primary/secondary styles with hover states
-- **Progress Bar**: Visual step indicator
-- **Modal**: Overlay with backdrop blur
-
-## Integration Points
-
-### Authentication Integration
-- **Google OAuth** setup and configuration
-- **Firebase Auth** integration
-- **Protected route** implementation
-- **Session management** and persistence
-
-### Dashboard Integration
-- **Data transfer** from onboarding to dashboard
-- **Profile completion** status
-- **Welcome flow** for new users
-- **Onboarding completion** tracking
-
-### Analytics Integration
-- **Step completion** tracking
-- **Drop-off point** identification
-- **Conversion rate** measurement
-- **User behavior** analysis
-
-## Error Handling
-
-### Form Validation
-- **Real-time validation** with immediate feedback
-- **Required field** indicators
-- **Format validation** for email/phone
-- **Error message** display
-
-### Network Errors
-- **Retry mechanisms** for failed requests
-- **Offline support** with local storage
-- **Graceful degradation** for API failures
-- **User-friendly error** messages
-
-### Navigation Errors
-- **Step validation** before progression
-- **Data persistence** across browser sessions
-- **Recovery mechanisms** for incomplete flows
-- **Clear error** communication
-
-## Performance Optimization
-
-### Loading Strategy
-- **Lazy loading** of step components
-- **Preloading** of next step data
-- **Optimized images** and assets
-- **Minimal bundle** size impact
-
-### State Management
-- **Efficient updates** with Zustand
-- **Debounced input** handling
-- **Optimized re-renders** with React.memo
-- **Memory leak** prevention
-
-### User Experience
-- **Fast step transitions** (<100ms)
-- **Smooth animations** and transitions
-- **Responsive interactions** across devices
-- **Progressive enhancement** for older browsers
+#### Technical Improvements
+- **Form Optimization**: Better validation and error handling
+- **Performance**: Optimized rendering and state updates
+- **Accessibility**: Enhanced screen reader support
+- **Mobile Optimization**: Better mobile experience
 
 ## Testing Strategy
 
-### Unit Testing
-- **Component rendering** tests
-- **State management** validation
-- **Form validation** logic
-- **Navigation flow** testing
+### Unit Tests
+- **Step Components**: Individual step functionality
+- **Form Validation**: Input validation logic
+- **State Management**: Onboarding store logic
+- **Utility Functions**: URL generation and platform logic
 
-### Integration Testing
-- **Step progression** validation
-- **Data persistence** across steps
-- **Authentication flow** testing
-- **Error handling** scenarios
+### Integration Tests
+- **Step Navigation**: Complete step-to-step flow
+- **Data Persistence**: State preservation during navigation
+- **Modal Integration**: Platform picker and link modals
+- **Dashboard Transfer**: Data transfer on completion
 
-### User Testing
-- **Usability testing** with target users
-- **Accessibility testing** with screen readers
-- **Mobile device** testing
-- **Cross-browser** compatibility
+### E2E Tests
+- **Complete Onboarding**: End-to-end user journey
+- **Link Management**: Add, edit, test links during onboarding
+- **Navigation**: Back/forward navigation with state
+- **Dashboard Transition**: Seamless transition to dashboard
 
-## Success Metrics
+## Performance Considerations
 
-### Completion Rates
-- **Step 1 completion**: >90%
-- **Step 2 completion**: >85%
-- **Step 3 completion**: >80%
-- **Full flow completion**: >70%
+### State Optimization
+- **Selective Updates**: Only necessary state updates
+- **Debounced Updates**: Form field changes optimized
+- **Memoization**: Expensive calculations cached
+
+### Component Optimization
+- **Lazy Loading**: Components loaded when needed
+- **Memoization**: React.memo for expensive components
+- **Bundle Splitting**: Code splitting for better performance
+
+## Security Considerations
+
+### Data Validation
+- **Input Sanitization**: All user inputs validated
+- **Email Validation**: Proper email format validation
+- **URL Validation**: Safe URL handling and validation
+
+### Privacy Protection
+- **Data Minimization**: Only collect necessary information
+- **Secure Storage**: Proper data storage practices
+- **User Consent**: Clear data usage communication
+
+## Accessibility Standards
+
+### WCAG Compliance
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Screen Reader Support**: Proper ARIA labels and semantic HTML
+- **Color Contrast**: Sufficient color contrast ratios
+- **Focus Management**: Proper focus indicators and management
 
 ### User Experience
-- **Time to complete**: <3 minutes
-- **Error rate**: <5%
-- **Support requests**: <2%
-- **User satisfaction**: >4.5/5
+- **Error Messages**: Clear, helpful error messages
+- **Loading States**: Proper loading indicators
+- **Progress Feedback**: Clear progress indication
+- **Form Labels**: Proper form labeling and associations
 
-### Technical Performance
-- **Load time**: <2 seconds
-- **Step transition**: <100ms
-- **Form validation**: <50ms
-- **Preview updates**: <50ms
+## Note on Multi-Card Support
 
-## Future Enhancements
-
-### Phase 2 Features
-- **Social login** options (LinkedIn, Apple)
-- **Profile photo** upload during onboarding
-- **Custom themes** selection
-- **Advanced link** management
-
-### Phase 3 Features
-- **Team onboarding** flow
-- **Bulk import** functionality
-- **Custom branding** options
-- **Analytics dashboard** integration
+- Onboarding will continue to create a single card for new users.
+- After onboarding, users can create and manage multiple cards from the dashboard dropdown.
+- Each card is independent (profile, links, theme, etc.).
+- Backend support for multi-card management is planned after local testing.
 
 ## Conclusion
 

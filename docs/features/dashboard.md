@@ -1,33 +1,191 @@
 # Dashboard Feature Specification
 
 ## Overview
-The main dashboard interface where users can manage their business card information, customize themes, and preview their digital business card in real-time. The dashboard provides an intuitive, drag-and-drop style interface similar to Popl's UI flow.
+The dashboard provides a comprehensive interface for users to manage and customize their digital business cards after completing the onboarding process. It features real-time preview, advanced customization options, and seamless integration with the onboarding flow.
 
-## Core Functionality
+## Current Implementation Status
 
-### Profile Information Management
-- **Personal Details**: Name, job title, company, location, bio
-- **Profile Image**: Upload, crop, and manage profile pictures
-- **Contact Information**: Email, phone, website
-- **Social Media**: LinkedIn, Twitter, Instagram, etc.
+### ✅ Implemented Features
 
-### Real-time Preview
-- Live preview of business card changes
-- Mobile and desktop view toggles
-- Responsive design preview
-- Theme customization preview
+#### Core Dashboard Structure
+- **Responsive Layout**: Sidebar navigation with main content area and live preview
+- **Section Management**: About and Links sections with smooth transitions
+- **Header Integration**: Card name display with unsaved changes indicator
+- **State Management**: Zustand store with proper dirty state tracking
 
-### Theme Customization
-- Color scheme selection with color pickers
-- Font family and size options
-- Layout variations (modern, classic, minimal)
-- Background customization
+#### About Section
+- **Card Management**: 
+  - Card name (separate from profile name)
+  - Card layout selection (Left Aligned/Centered)
+- **Profile Information**:
+  - Name, job title, company, location, bio
+  - Real-time updates with live preview
+- **Image Management**:
+  - Profile picture upload with preview
+  - Cover photo upload with preview  
+  - Company logo upload with preview
+  - File validation and error handling
+  - Remove functionality (X button)
+- **Theme Customization**:
+  - Primary color picker (card theme)
+  - Secondary color picker (link colors)
+  - 10 predefined color options
+- **Save/Cancel Functionality**:
+  - Save changes with proper state management
+  - Cancel with full revert to last saved state
+  - Unsaved changes detection and UI feedback
 
-### Link Management
-- Add/edit/remove CTA buttons
-- Customize button appearance and order
-- Link validation and testing
-- Social media integration
+#### Links Section Integration
+- **Seamless Integration**: LinksSection component with full functionality
+- **Shared Platform System**: Uses centralized platform definitions
+- **Modal Workflow**: Platform picker and add/edit link modals
+- **Real-time Preview**: Links update immediately in card preview
+
+#### Live Preview System
+- **Real-time Updates**: All changes reflect immediately in preview
+- **Image Preview**: Profile, cover, and company logo display
+- **Theme Preview**: Color changes apply instantly
+- **Layout Preview**: Left aligned vs centered layout switching
+- **Link Preview**: Active links display with proper icons
+
+#### State Management
+- **Zustand Store**: Centralized state management
+- **Dirty State Tracking**: Proper detection of unsaved changes
+- **Image State Management**: Temporary URLs for preview, proper revert logic
+- **Onboarding Integration**: Automatic initialization from onboarding data
+
+### 🔧 Technical Implementation
+
+#### File Upload System
+- **FileUpload Component**: Reusable component with drag-and-drop
+- **Image Validation**: File type and size validation
+- **Preview Generation**: Object URLs for immediate preview
+- **Remove Functionality**: X button to clear images
+- **Error Handling**: User-friendly error messages
+
+#### Cancel/Revert Logic
+- **Full State Revert**: All changes revert to last saved state
+- **Image Revert**: Temporary URLs cleared, saved images restored
+- **Form Reset**: All form fields reset to saved values
+- **Preview Sync**: Preview immediately reflects reverted state
+
+#### Onboarding Integration
+- **Data Transfer**: Profile info, links, and settings from onboarding
+- **State Initialization**: Proper setup of dashboard state
+- **Link Activation**: All onboarding links set to active by default
+
+### 🎨 UI/UX Features
+
+#### Responsive Design
+- **Desktop-First**: Optimized for desktop with responsive elements
+- **Sidebar Navigation**: Clean section switching
+- **Preview Panel**: Fixed preview with scrollable content
+- **Form Layout**: Grid-based form with proper spacing
+
+#### User Feedback
+- **Unsaved Changes Indicator**: Visual feedback in header
+- **Save/Cancel Buttons**: Clear action buttons with proper states
+- **Loading States**: Save operation feedback
+- **Error Handling**: Validation and error messages
+
+#### Accessibility
+- **Keyboard Navigation**: Proper focus management
+- **Screen Reader Support**: Semantic HTML and ARIA labels
+- **Color Contrast**: WCAG compliant color combinations
+
+### 📋 Data Flow
+
+#### Save Process
+1. User makes changes (forms, images, theme)
+2. State marked as dirty
+3. Save button triggers `saveChanges()`
+4. Temporary URLs become permanent
+5. Last saved state updated
+6. Dirty state cleared
+
+#### Cancel Process
+1. User clicks cancel
+2. `discardChanges()` called
+3. All temporary state cleared
+4. Business card reverted to last saved
+5. Preview updates immediately
+6. Form fields reset
+
+#### Image Management
+1. User uploads image → temporary URL created
+2. Preview shows new image immediately
+3. User removes image → temporary URL cleared
+4. Preview shows placeholder or previous image
+5. Save → temporary URL becomes permanent
+6. Cancel → temporary URL cleared, saved image restored
+
+### 🔄 Integration Points
+
+#### With Onboarding
+- **Data Initialization**: Profile, links, and settings transfer
+- **Link Management**: Shared platform definitions and workflows
+- **State Consistency**: Proper state management between flows
+
+#### With Link Management
+- **Shared Components**: PlatformPickerModal and AddLinkModal
+- **State Integration**: Links managed in dashboard store
+- **Preview Integration**: Links display in real-time preview
+
+### 🚀 Future Enhancements
+
+#### Planned Features
+- **QR Code Generation**: Share card via QR code
+- **Analytics Dashboard**: View card visit statistics
+- **Advanced Themes**: Custom gradient and pattern options
+- **Bulk Operations**: Multiple link management
+- **Export Options**: PDF and image export
+
+#### Technical Improvements
+- **File Upload Optimization**: Image compression and optimization
+- **Caching Strategy**: Improved performance for large images
+- **Offline Support**: Basic offline functionality
+- **Real-time Collaboration**: Multi-user editing (future)
+
+## Testing Strategy
+
+### Unit Tests
+- **Store Logic**: State management and business logic
+- **Component Logic**: Form validation and user interactions
+- **Utility Functions**: Image handling and data transformation
+
+### Integration Tests
+- **Onboarding Integration**: Data transfer and state consistency
+- **Link Management**: Modal workflows and state updates
+- **Save/Cancel Flow**: Complete user workflows
+
+### E2E Tests
+- **Complete User Journey**: Onboarding to dashboard to save
+- **Image Management**: Upload, preview, remove, revert
+- **Theme Customization**: Color changes and preview updates
+
+## Performance Considerations
+
+### Image Optimization
+- **Lazy Loading**: Images load only when needed
+- **Object URLs**: Efficient preview generation
+- **Memory Management**: Proper cleanup of object URLs
+
+### State Optimization
+- **Selective Updates**: Only necessary state updates
+- **Debounced Updates**: Form field changes optimized
+- **Memoization**: Expensive calculations cached
+
+## Security Considerations
+
+### File Upload Security
+- **File Validation**: Type and size restrictions
+- **Content Scanning**: Malware detection (future)
+- **Secure Storage**: Encrypted file storage (future)
+
+### Data Protection
+- **Input Sanitization**: All user inputs validated
+- **XSS Prevention**: Proper content encoding
+- **CSRF Protection**: Token-based requests (future)
 
 ## User Interface Layout
 
@@ -413,4 +571,63 @@ When authentication is implemented, each user's dashboard data (business card, p
 - Live Preview: Always visible on the right, updates in real time, matches the current theme and content.
 - Theme Controls: Color pickers, toggles, and font selectors, visually grouped.
 - File Uploads: For profile, cover, and company logo, with drag-and-drop and cropping.
-- Modern, minimal, and accessible design. 
+- Modern, minimal, and accessible design.
+
+## Planned Feature: Multi-Card Management
+
+### Overview
+- Users can create and manage multiple business cards from a dropdown selector in the dashboard header.
+- The card name input becomes a dropdown listing all cards, with a "+ Create New Card" button.
+- Selecting a card loads its About, Links, and Preview data; creating a new card resets all sections to blank.
+
+### Key Behaviors
+- **Dropdown Selector:** Shows all cards and a create button. If only one card exists, only the create button is shown.
+- **Create New Card:** Resets About, Links, and Preview to a blank state. Adds a new card to the list and sets it as active.
+- **Switch Cards:** Saves current card if dirty, then loads the selected card's data into all sections.
+- **Persistence:** Initially, cards are managed in Zustand/local state for local testing. Backend CRUD integration is planned for production.
+- **Edge Cases:** Prompt user to save/discard changes when switching if there are unsaved changes.
+
+### Technical Notes
+- Extend Zustand dashboard store to manage an array of cards and activeCardId.
+- All About, Links, and Preview components read/write to the active card.
+- Backend API endpoints for card CRUD will be integrated after local testing.
+
+### Future Extensions
+- Card deletion, duplication, sharing, and team access.
+- Pagination or search for large numbers of cards.
+
+---
+
+## RFC: Multi-Card Management Implementation Plan
+
+### 1. State Structure
+- Extend Zustand dashboard store:
+  - `cards: BusinessCard[]` — array of all cards
+  - `activeCardId: string` — ID of the currently selected card
+  - CRUD actions: `createCard`, `updateCard`, `deleteCard`, `setActiveCard`
+- All About, Links, and Preview components read/write to the active card.
+
+### 2. UI Flow
+- Replace card name input with dropdown selector in dashboard header.
+- Dropdown lists all cards and a "+ Create New Card" button.
+- Selecting a card loads its data into About, Links, and Preview.
+- Creating a new card resets all sections to blank and adds a new card to the list.
+- Prompt user to save/discard changes if switching with unsaved changes.
+
+### 3. Local Testing
+- Implement all logic in Zustand/local state for initial development.
+- Use mock data for multiple cards.
+- Ensure all sections update correctly when switching cards.
+
+### 4. Backend Integration
+- Add API endpoints for card CRUD (create, read, update, delete).
+- On login, fetch all user cards and populate store.
+- All card actions (create, update, delete, switch) sync with backend.
+- Ensure user-specific access and security.
+
+### 5. Edge Cases & Future Extensions
+- Card deletion, duplication, sharing, and team access.
+- Pagination or search for large numbers of cards.
+- Optimistic UI updates and error handling for backend sync.
+
+--- 
