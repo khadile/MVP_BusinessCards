@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth, db, testFirestoreWrite, testAuthenticatedWrite } from '../../services/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Toast } from '../../components/ui/Toast';
 // import { useToast } from '../../components/ui/ToastContext'; // Uncomment if you have a Toast context
 
 interface StepSignUpProps {
@@ -27,6 +28,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
   const [localPassword, setLocalPassword] = useState<string>(password);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
   const navigate = useNavigate();
   // const toast = useToast();
 
@@ -69,15 +71,26 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       
       // 3. Save onboarding data to Firestore under user's UID
       const cardData = {
-        name,
-        jobTitle,
-        company,
-        email,
-        phone,
+        profile: {
+          name,
+          jobTitle,
+          company,
+          email,
+          phone,
+          bio: '', // Add onboarding bio if available
+        },
         links,
+        theme: {
+          primaryColor: '#FDBA74',
+          secondaryColor: '#000000',
+          fontFamily: 'Inter',
+          fontSize: 14,
+          layout: 'modern',
+        },
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         userId: user.uid,
+        isPublic: true,
       };
       
       console.log('📝 Saving card data to Firestore...');
@@ -89,7 +102,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
     } catch (err: any) {
       console.error('❌ Sign up error:', err);
       setError(err.message || 'Sign up failed.');
-      // toast?.show(err.message || 'Sign up failed.', { type: 'error' });
+      setToastVisible(true);
     } finally {
       setLoading(false);
     }
@@ -153,15 +166,26 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       
       // Save onboarding data to Firestore
       const cardData = {
-        name,
-        jobTitle,
-        company,
-        email: user.email || email, // Use Google email if available
-        phone,
+        profile: {
+          name,
+          jobTitle,
+          company,
+          email: user.email || email, // Use Google email if available
+          phone,
+          bio: '', // Add onboarding bio if available
+        },
         links,
+        theme: {
+          primaryColor: '#FDBA74',
+          secondaryColor: '#000000',
+          fontFamily: 'Inter',
+          fontSize: 14,
+          layout: 'modern',
+        },
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         userId: user.uid,
+        isPublic: true,
       };
       
       console.log('📝 Saving card data to Firestore...');
@@ -190,7 +214,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       }
       
       setError(errorMessage);
-      // toast?.show(errorMessage, { type: 'error' });
+      setToastVisible(true);
     } finally {
       setLoading(false);
     }
@@ -230,7 +254,9 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
           placeholder="Password"
           disabled={loading}
         />
-        {error && <div className="text-red-500 text-xs mb-3">{error}</div>}
+        {error && (
+          <div className="text-red-500 text-sm mt-2">Firebase: Error ({error})</div>
+        )}
         <p className="text-xs text-gray-400 mb-5">
           By signing up, you agree to ILX's <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>
         </p>
@@ -257,6 +283,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         <CardPreview name={name} jobTitle={jobTitle} company={company} email={email} phone={phone} links={links} />
         <div className="text-center text-gray-400 mt-1 pt-2 text-xs">Card Live Preview</div>
       </div>
+      <Toast message={error || ''} visible={toastVisible} onClose={() => setToastVisible(false)} type="error" />
     </div>
   );
 }; 

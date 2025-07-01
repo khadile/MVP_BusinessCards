@@ -7,6 +7,7 @@ import { LinksSection } from './LinksSection';
 import { SettingsModal } from './SettingsModal';
 import { Toast } from '../../components/ui/Toast';
 import { uploadBusinessCardImage, deleteFile } from '../../services/fileUpload';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const SIDEBAR_SECTIONS = [
   { label: 'About', icon: '👤' },
@@ -15,6 +16,74 @@ const SIDEBAR_SECTIONS = [
     { label: 'QR Code' },
   ] },
 ];
+
+const QR_COLORS = [
+  '#000000', '#F87171', '#F59E42', '#4ADE80', '#60A5FA', '#818CF8'
+];
+
+const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
+  const [color, setColor] = React.useState('#000000');
+  const [isDownloading, setIsDownloading] = React.useState(false);
+  const publicUrl = `${window.location.origin}/card/${cardId}`;
+  
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      // Find the existing QR code canvas element
+      const qrCanvas = document.querySelector('canvas[data-testid="qr-code"]') as HTMLCanvasElement;
+      if (!qrCanvas) {
+        console.error('QR code canvas not found');
+        setIsDownloading(false);
+        return;
+      }
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `business-card-qr-${cardId}.png`;
+      link.href = qrCanvas.toDataURL('image/png');
+      link.click();
+      
+      setIsDownloading(false);
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+      setIsDownloading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-8 w-full items-center justify-center py-10">
+      <div className="text-xl font-semibold mb-2">QR Code</div>
+      <div className="flex flex-row gap-3 items-center mb-4">
+        {QR_COLORS.map(c => (
+          <button
+            key={c}
+            className={`w-7 h-7 rounded-full border-2 ${color === c ? 'border-blue-500' : 'border-gray-200'}`}
+            style={{ background: c }}
+            onClick={() => setColor(c)}
+            aria-label={`Choose color ${c}`}
+          />
+        ))}
+      </div>
+      <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center">
+        <QRCodeCanvas 
+          value={publicUrl} 
+          size={192} 
+          fgColor={color} 
+          bgColor="#fff" 
+          includeMargin={true}
+          data-testid="qr-code"
+        />
+        <button
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition disabled:opacity-50"
+          onClick={handleDownload}
+          disabled={isDownloading}
+        >
+          {isDownloading ? 'Downloading...' : 'Download QR Code'}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const Dashboard: React.FC = () => {
   const { user, currentCard, businessCards, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
@@ -310,6 +379,7 @@ export const Dashboard: React.FC = () => {
             website: dashboard.businessCard.profile.website,
           },
           theme: dashboard.businessCard.theme,
+          links: dashboard.businessCard.links,
         };
         
         // Only add optional properties if they exist
@@ -369,19 +439,22 @@ export const Dashboard: React.FC = () => {
           className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'About' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
           onClick={() => dashboard.setActiveSection('About')}
         >
-          <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="black" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="black" strokeWidth="2"/></svg></span> About
+          <span className="text-black"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="black" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="black" strokeWidth="2"/></svg></span> About
         </button>
         <button
           className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'Links' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
           onClick={() => dashboard.setActiveSection('Links')}
         >
-          <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="black" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="black" strokeWidth="2"/></svg></span> Links
+          <span className="text-black"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="black" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="black" strokeWidth="2"/></svg></span> Links
         </button>
       </div>
       <div className="mb-4">
         <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">SHARING</div>
-        <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 text-gray-700">
-          <span className="text-black">{/* black icon */} <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="black" strokeWidth="2"/><polyline points="17 8 12 3 7 8" stroke="black" strokeWidth="2"/><line x1="12" y1="3" x2="12" y2="15" stroke="black" strokeWidth="2"/></svg></span> QR Code
+        <button 
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'QR Code' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          onClick={() => dashboard.setActiveSection('QR Code')}
+        >
+          <span className="text-black"> <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="black" strokeWidth="2"/><polyline points="17 8 12 3 7 8" stroke="black" strokeWidth="2"/><line x1="12" y1="3" x2="12" y2="15" stroke="black" strokeWidth="2"/></svg></span> QR Code
         </button>
       </div>
       <div className="mt-auto">
@@ -713,7 +786,17 @@ export const Dashboard: React.FC = () => {
               </div>
             )}
           </div>
-          <button className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 transition">Share Your Card</button>
+          <button
+            className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 transition"
+            onClick={() => {
+              if (currentCard?.id) {
+                window.open(`/card/${currentCard.id}`, '_blank', 'noopener,noreferrer');
+              }
+            }}
+            disabled={!currentCard?.id}
+          >
+            Share Your Card
+          </button>
         </div>
       </header>
       {/* Main dashboard container */}
@@ -724,6 +807,7 @@ export const Dashboard: React.FC = () => {
             <div className="flex-1 flex flex-col">
               {dashboard.activeSection === 'About' && renderAboutSection()}
               {dashboard.activeSection === 'Links' && <LinksSection />}
+              {dashboard.activeSection === 'QR Code' && currentCard && <QRCodeSection cardId={currentCard.id} />}
               {/* Add more sections as needed */}
             </div>
             <div className="w-[350px] flex-shrink-0 flex flex-col">

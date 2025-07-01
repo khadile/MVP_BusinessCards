@@ -11,33 +11,6 @@ export const PLATFORM_OPTIONS = [
     defaultTitle: 'LinkedIn',
   },
   {
-    type: 'website',
-    label: 'Website',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6366F1"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Website URL',
-    defaultTitle: 'Website',
-  },
-  {
-    type: 'email',
-    label: 'Google Email',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#EA4335"/><path d="M16 18.667l-8-6V24h16V12.667l-8 6zm8-10.667H8c-1.104 0-2 .896-2 2v.667l10 7.5 10-7.5v-.667c0-1.104-.896-2-2-2z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Email address',
-    defaultTitle: 'Email',
-  },
-  {
-    type: 'custom',
-    label: 'Other',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6B7280"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Paste your link',
-    defaultTitle: 'Custom Link',
-  },
-  {
     type: 'instagram',
     label: 'Instagram',
     icon: (
@@ -45,6 +18,42 @@ export const PLATFORM_OPTIONS = [
     ),
     placeholder: 'Instagram profile link',
     defaultTitle: 'Instagram',
+  },
+  {
+    type: 'facebook',
+    label: 'Facebook',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1877F3"/><path d="M21.5 16h-3v8h-3v-8h-2v-3h2v-2c0-1.7 1.3-3 3-3h2v3h-2c-.6 0-1 .4-1 1v1h3l-.5 3z" fill="#fff"/></svg>
+    ),
+    placeholder: 'Facebook profile link',
+    defaultTitle: 'Facebook',
+  },
+  {
+    type: 'twitter',
+    label: 'Twitter',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1DA1F2"/><path d="M24 10.6c-.6.3-1.2.5-1.8.6.6-.4 1.1-1 1.3-1.7-.6.4-1.3.7-2 .9-.6-.6-1.5-1-2.4-1-1.8 0-3.2 1.5-3.2 3.2 0 .3 0 .6.1.8-2.7-.1-5.1-1.4-6.7-3.4-.3.6-.5 1.2-.5 1.9 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.4-.4v.1c0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.2-.9.2-.2 0-.4 0-.6-.1.4 1.3 1.6 2.2 3 2.2-1.1.9-2.5 1.4-4 1.4-.3 0-.6 0-.8-.1 1.4.9 3.1 1.5 4.9 1.5 5.9 0 9.1-4.9 9.1-9.1v-.4c.6-.4 1.1-1 1.5-1.6z" fill="#fff"/></svg>
+    ),
+    placeholder: 'Twitter profile link',
+    defaultTitle: 'Twitter',
+  },
+  {
+    type: 'youtube',
+    label: 'YouTube',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FF0000"/><path d="M13.5 10.5l6 5.5-6 5.5v-11z" fill="#fff"/></svg>
+    ),
+    placeholder: 'YouTube channel link',
+    defaultTitle: 'YouTube',
+  },
+  {
+    type: 'tiktok',
+    label: 'TikTok',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#000000"/><path d="M20.5 8.5c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm-4.5 1.5c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5zm-3 3c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5zm3 3c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5zm3 3c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5z" fill="#fff"/></svg>
+    ),
+    placeholder: 'TikTok profile link',
+    defaultTitle: 'TikTok',
   },
   {
     type: 'whatsapp',
@@ -74,30 +83,39 @@ export const PLATFORM_OPTIONS = [
     defaultTitle: 'Text',
   },
   {
+    type: 'email',
+    label: 'Email',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#EA4335"/><path d="M16 18.667l-8-6V24h16V12.667l-8 6zm8-10.667H8c-1.104 0-2 .896-2 2v.667l10 7.5 10-7.5v-.667c0-1.104-.896-2-2-2z" fill="#fff"/></svg>
+    ),
+    placeholder: 'Email address',
+    defaultTitle: 'Email',
+  },
+  {
+    type: 'website',
+    label: 'Website',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6366F1"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
+    ),
+    placeholder: 'Website URL',
+    defaultTitle: 'Website',
+  },
+  {
     type: 'address',
     label: 'Address',
     icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#4285F4"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#4285F4"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#fff"/></svg>
     ),
     placeholder: 'Address',
     defaultTitle: 'Address',
   },
   {
-    type: 'facebook',
-    label: 'Facebook',
+    type: 'custom',
+    label: 'Other',
     icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1877F3"/><path d="M21.5 16h-3v8h-3v-8h-2v-3h2v-2c0-1.7 1.3-3 3-3h2v3h-2c-.6 0-1 .4-1 1v1h3l-.5 3z" fill="#fff"/></svg>
+      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6B7280"/><path d="M16 8a8 8 0 100 16 8 8 0 000-16zm0 14.4A6.4 6.4 0 1116 9.6a6.4 6.4 0 010 12.8zm0-11.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" fill="#fff"/></svg>
     ),
-    placeholder: 'Facebook profile link',
-    defaultTitle: 'Facebook',
-  },
-  {
-    type: 'twitter',
-    label: 'Twitter',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1DA1F2"/><path d="M24 10.6c-.6.3-1.2.5-1.8.6.6-.4 1.1-1 1.3-1.7-.6.4-1.3.7-2 .9-.6-.6-1.5-1-2.4-1-1.8 0-3.2 1.5-3.2 3.2 0 .3 0 .6.1.8-2.7-.1-5.1-1.4-6.7-3.4-.3.6-.5 1.2-.5 1.9 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.4-.4v.1c0 1.6 1.1 2.9 2.6 3.2-.3.1-.6.2-.9.2-.2 0-.4 0-.6-.1.4 1.3 1.6 2.2 3 2.2-1.1.9-2.5 1.4-4 1.4-.3 0-.6 0-.8-.1 1.4.9 3.1 1.5 4.9 1.5 5.9 0 9.1-4.9 9.1-9.1v-.4c.6-.4 1.1-1 1.5-1.6z" fill="#fff"/></svg>
-    ),
-    placeholder: 'Twitter profile link',
-    defaultTitle: 'Twitter',
+    placeholder: 'Paste your link',
+    defaultTitle: 'Custom Link',
   },
 ]; 

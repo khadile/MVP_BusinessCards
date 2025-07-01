@@ -28,6 +28,7 @@ interface CardPreviewProps {
   // Additional profile props
   location?: string;
   bio?: string;
+  fullScreen?: boolean;
 }
 
 // Build a map of platform type to icon from PLATFORM_OPTIONS
@@ -50,9 +51,10 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   companyLogo,
   location = '',
   bio = '',
+  fullScreen = false,
 }: CardPreviewProps) => {
   // Determine if we need to make the links section scrollable
-  const maxVisibleLinks = 4;
+  const maxVisibleLinks = 3;
   const isScrollable = links && links.length > maxVisibleLinks;
 
   // Generate gradient from theme color
@@ -64,9 +66,14 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
 
   const isCentered = layout === 'Centered';
 
+  // Responsive sizing
+  const cardClass = fullScreen
+    ? 'w-full h-full max-w-[700px] max-h-[90vh] sm:max-w-[420px] sm:max-h-[700px]'
+    : 'w-64 h-96';
+
   return (
     <div 
-      className="w-64 h-96 rounded-[1.5rem] overflow-hidden border shadow-2xl mx-auto"
+      className={`${cardClass} rounded-[1.5rem] overflow-hidden border shadow-2xl mx-auto`}
       style={getGradientStyle()}
     >
       {/* Cover photo as normal block */}
@@ -118,33 +125,46 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
           {phone && <div className="text-xs text-gray-500">{phone}</div>}
         </div>
         
-        {/* Save Contact button */}
-        <button 
-          className="w-full rounded-lg py-1.5 font-semibold mb-2 shadow hover:opacity-90 transition text-xs text-white" 
-          style={{ backgroundColor: theme }}
-        >
-          Save Contact
-        </button>
-        
         {/* Links section with layout-specific styling */}
         <div
-          className={`space-y-1.5 ${isScrollable ? 'max-h-36 overflow-y-auto pr-1' : ''}`}
-          style={isScrollable ? { scrollbarWidth: 'thin', scrollbarColor: 'black #fff' } : {}}
+          className={`space-y-1.5 ${isScrollable ? 'max-h-32 overflow-y-auto pr-1 custom-scrollbar' : ''}`}
+          style={isScrollable ? { maxHeight: 128, scrollbarWidth: 'thin', scrollbarColor: 'black #fff' } : {}}
         >
-          {links && links.map(link => (
-            <a
-              key={link.type + link.url}
-              href={getPlatformLinkUrl(link.type, link.url || '')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center gap-3 bg-transparent rounded-lg px-3 py-2 text-sm transition hover:bg-gray-100 ${isCentered ? 'justify-center' : 'justify-start'}`}
-              style={{ textDecoration: 'underline', color: linkColor }}
-            >
-              <span style={{ color: linkColor }}>{platformIcons[link.type] || platformIcons.custom}</span>
-              <span className="font-medium">{link.label}</span>
-            </a>
-          ))}
+          {links && links.map(link => {
+            const href = getPlatformLinkUrl(link.type, link.url || '');
+            // Debug log
+            console.log('[CardPreview Link]', { label: link.label, type: link.type, url: link.url, href });
+            const isInvalid = href === '#';
+            return (
+              <a
+                key={link.type + link.url}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-3 bg-transparent rounded-lg px-3 py-2 text-sm transition hover:bg-gray-100 ${isCentered ? 'justify-center' : 'justify-start'}${isInvalid ? ' border border-red-500' : ''}`}
+                style={{ textDecoration: 'underline', color: linkColor }}
+              >
+                <span style={{ color: linkColor }}>{platformIcons[link.type] || platformIcons.custom}</span>
+                <span className="font-medium">{link.label}</span>
+                {isInvalid && <span className="text-xs text-red-500 ml-2">Invalid</span>}
+              </a>
+            );
+          })}
         </div>
+        {/* Custom scrollbar styles */}
+        <style>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 6px;
+          }
+          .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #d1d5db #fff;
+          }
+        `}</style>
       </div>
     </div>
   );

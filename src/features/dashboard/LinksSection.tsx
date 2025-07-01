@@ -45,7 +45,7 @@ const RECOMMENDED_PLATFORMS = [
 ];
 
 // Map platform type to icon
-const PLATFORM_ICONS: Record<string, JSX.Element> = Object.fromEntries(RECOMMENDED_PLATFORMS.map(p => [p.type, p.icon]));
+const PLATFORM_ICONS: Record<string, JSX.Element> = Object.fromEntries(PLATFORM_OPTIONS.map(p => [p.type, p.icon]));
 
 export const LinksSection: React.FC = () => {
   const dashboard = useDashboardStore();

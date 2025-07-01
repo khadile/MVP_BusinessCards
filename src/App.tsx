@@ -6,6 +6,7 @@ import { PasswordResetPage } from '@features/auth/PasswordResetPage'
 import { Dashboard } from '@features/dashboard/Dashboard'
 import { ProtectedRoute } from '@features/auth/ProtectedRoute'
 import { OnboardingWizard } from '@features/onboarding/OnboardingWizard'
+import { PublicCardView } from './features/dashboard/PublicCardView'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/card/:cardId" element={<PublicCardView />} />
           </Routes>
         </div>
       </Router>
