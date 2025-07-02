@@ -115,12 +115,12 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
     try {
       console.log('🔄 Starting Google sign up...');
       
-      // First, test basic Firestore connection
-      console.log('🧪 Testing Firestore connection...');
-      const writeTest = await testFirestoreWrite();
-      if (!writeTest) {
-        throw new Error('Firestore connection test failed');
-      }
+      // Removed Firestore test write for production security
+      // console.log('🧪 Testing Firestore connection...');
+      // const writeTest = await testFirestoreWrite();
+      // if (!writeTest) {
+      //   throw new Error('Firestore connection test failed');
+      // }
       
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
@@ -133,13 +133,6 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       // Verify user is authenticated
       if (!user || !user.uid) {
         throw new Error('User authentication failed');
-      }
-      
-      // Test authenticated write
-      console.log('🧪 Testing authenticated Firestore write...');
-      const authWriteTest = await testAuthenticatedWrite(user.uid);
-      if (!authWriteTest) {
-        throw new Error('Authenticated Firestore write test failed');
       }
       
       // Wait a moment to ensure auth state is fully propagated

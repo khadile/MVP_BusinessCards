@@ -356,8 +356,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       return;
     }
     
+    console.log('🔄 Initializing dashboard from auth card:', authCard);
+    
     const businessCard: BusinessCard = {
-      id: authCard.id || 'temp-id',
+      id: authCard.id, // Use the actual Firestore document ID
       userId: authCard.userId || 'temp-user-id',
       cardName: authCard.name || authCard.profile?.name || '',
       profile: {
@@ -392,6 +394,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       createdAt: authCard.createdAt || new Date(),
       updatedAt: authCard.updatedAt || new Date(),
     };
+    
+    console.log('✅ Dashboard initialized with card ID:', businessCard.id);
     
     set({ 
       businessCard, 

@@ -30,6 +30,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
   const [localPhone, setLocalPhone] = useState<string>(phone);
   const [localLinks, setLocalLinks] = useState<typeof links>(links);
   const [modalStage, setModalStage] = useState<null | 'platforms' | 'add-link'>(null);
+  const [addLinkSource, setAddLinkSource] = useState<'recommended' | 'modal' | null>(null);
   const [search, setSearch] = useState('');
 
   // List of 10 important platforms for the selection modal
@@ -137,12 +138,16 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
 
   // Modal open handler
   const openPlatformModal = () => setModalStage('platforms');
-  const openAddLinkModal = (platform: typeof DEFAULT_PLATFORM) => {
+  const openAddLinkModal = (platform: typeof DEFAULT_PLATFORM, source: 'recommended' | 'modal' = 'modal') => {
     setModalPlatform(platform);
     setModalLink({ url: '', title: platform.defaultTitle });
     setModalStage('add-link');
+    setAddLinkSource(source);
   };
-  const closeModal = () => setModalStage(null);
+  const closeModal = () => {
+    setModalStage(null);
+    setAddLinkSource(null);
+  };
 
   // Modal add handler
   const handleAddLink = () => {
@@ -218,7 +223,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
                   key={platform.type}
                   type="button"
                   className={`flex items-center px-4 py-2 rounded-xl border transition bg-white hover:bg-gray-50 focus:outline-none gap-2 min-w-[140px] shadow-sm text-left ${hasLinks ? 'border-blue-400' : 'border-gray-200'}`}
-                  onClick={() => openAddLinkModal(platform)}
+                  onClick={() => openAddLinkModal(platform, 'recommended')}
                 >
                   {React.cloneElement(platform.icon, { className: 'w-5 h-5' })}
                   <span className="text-sm font-medium flex-1">{platform.label}</span>
@@ -310,7 +315,16 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeModal} />
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl mx-auto p-10 flex flex-col md:flex-row gap-8" style={{ minHeight: '420px', maxHeight: '90vh' }}>
             <div className="flex-1 flex flex-col justify-center">
-              <button className="mb-6 text-gray-400 hover:text-gray-700 text-lg flex items-center gap-1 self-start" onClick={openPlatformModal}>
+              <button
+                className="mb-6 text-gray-400 hover:text-gray-700 text-lg flex items-center gap-1 self-start"
+                onClick={() => {
+                  if (addLinkSource === 'recommended') {
+                    closeModal(); // Close all modals, return to main step
+                  } else {
+                    openPlatformModal(); // Go back to platform modal
+                  }
+                }}
+              >
                 <span className="text-2xl">←</span> Back
               </button>
               <div className="flex items-center gap-4 mb-6">
@@ -344,7 +358,13 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
               <div className="flex gap-3 mt-auto">
                 <button
                   className="px-5 py-2 rounded-full border text-gray-700 bg-white hover:bg-gray-50 font-medium shadow-sm text-xs"
-                  onClick={openPlatformModal}
+                  onClick={() => {
+                    if (addLinkSource === 'recommended') {
+                      closeModal(); // Close all modals, return to main step
+                    } else {
+                      openPlatformModal(); // Go back to platform modal
+                    }
+                  }}
                 >
                   Back
                 </button>
