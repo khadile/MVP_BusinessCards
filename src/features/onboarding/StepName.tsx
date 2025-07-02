@@ -7,7 +7,7 @@ interface StepNameProps {
   goBack: () => void;
 }
 
-export const StepName: React.FC<StepNameProps> = ({ goNext, goBack }) => {
+export const StepName: React.FC<StepNameProps> = ({ goNext }) => {
   const [name, setName] = useState('');
   const { setName: setStoreName } = useOnboardingStore();
   const navigate = useNavigate();

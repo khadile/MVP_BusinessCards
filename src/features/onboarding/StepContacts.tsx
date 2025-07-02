@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { useOnboardingStore } from '../../stores/onboardingStore';
-import { PLATFORM_OPTIONS } from '../../utils/platforms.tsx';
+import { PLATFORM_OPTIONS } from '../../utils/platforms';
 import { getPlatformLinkUrl } from '../../utils';
 
 interface StepContactsProps {
@@ -24,7 +24,6 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
     setEmail, setPhone, setLinks
   } = useOnboardingStore();
   const [showLinksModal, setShowLinksModal] = useState(false);
-  const [showPlatformModal, setShowPlatformModal] = useState(false);
   const [modalPlatform, setModalPlatform] = useState<typeof DEFAULT_PLATFORM>(DEFAULT_PLATFORM);
   const [modalLink, setModalLink] = useState({ url: '', title: DEFAULT_PLATFORM.defaultTitle });
   const [localEmail, setLocalEmail] = useState<string>(email);

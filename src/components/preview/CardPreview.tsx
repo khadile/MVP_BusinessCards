@@ -1,7 +1,7 @@
 import React from 'react';
 import 'react/jsx-runtime';
 import { getPlatformLinkUrl } from '../../utils';
-import { PLATFORM_OPTIONS } from '../../utils/platforms.tsx';
+import { PLATFORM_OPTIONS } from '../../utils/platforms';
 
 interface CardLink {
   type: string;
@@ -53,10 +53,6 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   bio = '',
   fullScreen = false,
 }: CardPreviewProps) => {
-  // Determine if we need to make the links section scrollable
-  const maxVisibleLinks = 3;
-  const isScrollable = links && links.length > maxVisibleLinks;
-
   // Generate gradient from theme color
   const getGradientStyle = () => {
     return {
@@ -70,6 +66,9 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   const cardClass = fullScreen
     ? 'w-full h-full max-w-[700px] max-h-[90vh] sm:max-w-[420px] sm:max-h-[700px]'
     : 'w-64 h-96';
+
+  // Dynamically determine maxHeight for links section
+  const linksMaxHeight = email && phone ? '125px' : '150px';
 
   return (
     <div 
@@ -110,30 +109,27 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
           {location && <div className="text-gray-400 text-xs">{location}</div>}
         </div>
       </div>
-      {/* Content section with layout-specific styling */}
-      <div className={`pb-3 relative z-10 ${isCentered ? 'px-4 text-center' : 'px-4 text-left'}`}>
+      {/* Content section with layout-specific styling and flexible scrollable links */}
+      <div className={`pb-3 relative z-10 ${isCentered ? 'px-4 text-center' : 'px-4 text-left'} flex flex-col h-[calc(100%-6rem)]`}>
         {/* Bio with layout-specific styling */}
         {bio && (
           <div className={`text-xs text-gray-600 mb-2 leading-relaxed ${isCentered ? 'text-center' : 'text-left'}`}>
             {bio}
           </div>
         )}
-        
         {/* Contact info with layout-specific styling */}
         <div className={`space-y-1 mb-2 ${isCentered ? 'text-center' : 'text-left'}`}>
           {email && <div className="text-xs text-gray-500">{email}</div>}
           {phone && <div className="text-xs text-gray-500">{phone}</div>}
         </div>
-        
-        {/* Links section with layout-specific styling */}
+        {/* Links section - always scrollable if overflowing */}
         <div
-          className={`space-y-1.5 ${isScrollable ? 'max-h-32 overflow-y-auto pr-1 custom-scrollbar' : ''}`}
-          style={isScrollable ? { maxHeight: 128, scrollbarWidth: 'thin', scrollbarColor: 'black #fff' } : {}}
+          className="space-y-1.5 overflow-y-auto pr-1 custom-scrollbar"
+          style={{ maxHeight: linksMaxHeight }}
         >
           {links && links.map(link => {
             const href = getPlatformLinkUrl(link.type, link.url || '');
-            // Debug log
-            console.log('[CardPreview Link]', { label: link.label, type: link.type, url: link.url, href });
+            // const isInvalid = href === '#';
             const isInvalid = href === '#';
             return (
               <a

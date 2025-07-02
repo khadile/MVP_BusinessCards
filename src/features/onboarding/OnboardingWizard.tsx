@@ -3,7 +3,7 @@ import { StepName } from './StepName';
 import { StepWork } from './StepWork';
 import { StepContacts } from './StepContacts';
 import { StepSignUp } from './StepSignUp';
-import { useOnboardingStore } from '../../stores/onboardingStore';
+
 
 const steps = [
   { label: 'Name', component: StepName },
@@ -15,6 +15,7 @@ const steps = [
 export const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(0);
   const totalSteps = steps.length;
+  if (!steps[step]) return null; // or return a fallback UI
   const StepComponent = steps[step].component;
 
   const goNext = () => setStep((s) => Math.min(s + 1, totalSteps - 1));

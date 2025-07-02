@@ -9,14 +9,6 @@ import { Toast } from '../../components/ui/Toast';
 import { uploadBusinessCardImage, deleteFile } from '../../services/fileUpload';
 import { QRCodeCanvas } from 'qrcode.react';
 
-const SIDEBAR_SECTIONS = [
-  { label: 'About', icon: '👤' },
-  { label: 'Links', icon: '🔗' },
-  { label: 'Sharing', icon: '📤', children: [
-    { label: 'QR Code' },
-  ] },
-];
-
 const QR_COLORS = [
   '#000000', '#F87171', '#F59E42', '#4ADE80', '#60A5FA', '#818CF8'
 ];
@@ -86,7 +78,7 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
 };
 
 export const Dashboard: React.FC = () => {
-  const { user, currentCard, businessCards, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
+  const { user, currentCard, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
   const dashboard = useDashboardStore();
   
   // Initialize dashboard from auth store data
@@ -181,6 +173,18 @@ export const Dashboard: React.FC = () => {
         ...dashboard.businessCard?.theme, 
         layout: layout === 'Left Aligned' ? 'modern' : 'classic' 
       }
+    });
+  };
+
+  const handleEmailChange = (value: string) => {
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, email: value }
+    });
+  };
+
+  const handlePhoneChange = (value: string) => {
+    updateBusinessCard({
+      profile: { ...dashboard.businessCard?.profile, phone: value }
     });
   };
 
@@ -549,7 +553,7 @@ export const Dashboard: React.FC = () => {
           isUploading={isUploading}
         />
       </div>
-      {/* Name, Location, Job Title, Company */}
+      {/* Name, Location, Job Title, Company, Email, Phone */}
       <div className="grid grid-cols-2 gap-x-8 gap-y-3 w-full mt-2">
         <div className="flex flex-col gap-1">
           <label className="text-[11px] font-medium text-gray-600">Name</label>
@@ -582,6 +586,26 @@ export const Dashboard: React.FC = () => {
             className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
             value={dashboard.businessCard?.profile.company || ''} 
             onChange={e => handleCompanyChange(e.target.value)} 
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-medium text-gray-600">Email</label>
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={dashboard.businessCard?.profile.email || ''} 
+            onChange={e => handleEmailChange(e.target.value)} 
+            placeholder="Enter your email..."
+            type="email"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-medium text-gray-600">Phone</label>
+          <input 
+            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            value={dashboard.businessCard?.profile.phone || ''} 
+            onChange={e => handlePhoneChange(e.target.value)} 
+            placeholder="Enter your phone number..."
+            type="tel"
           />
         </div>
       </div>

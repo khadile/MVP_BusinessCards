@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { BusinessCard } from '../../types';
-import { PLATFORM_OPTIONS } from '../../utils/platforms.tsx';
+import { PLATFORM_OPTIONS } from '../../utils/platforms';
 
 export const PublicCardView: React.FC = () => {
   const { cardId } = useParams<{ cardId: string }>();

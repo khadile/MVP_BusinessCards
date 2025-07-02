@@ -13,6 +13,7 @@ export const Toast: React.FC<ToastProps> = ({ message, visible, onClose, type = 
       const timer = setTimeout(onClose, 3000);
       return () => clearTimeout(timer);
     }
+    return undefined; 
   }, [visible, onClose]);
 
   const borderColor = type === 'error' ? 'border-red-500' : type === 'success' ? 'border-green-500' : 'border-blue-500';

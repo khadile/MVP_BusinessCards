@@ -3,7 +3,7 @@ import { PlatformPickerModal } from '../../components/forms/PlatformPickerModal'
 import { AddLinkModal } from '../../components/forms/AddLinkModal';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { BusinessCardLink } from '../../types';
-import { PLATFORM_OPTIONS } from '../../utils/platforms.tsx';
+import { PLATFORM_OPTIONS } from '../../utils/platforms';
 
 const RECOMMENDED_PLATFORMS = [
   {
@@ -222,10 +222,7 @@ export const LinksSection: React.FC = () => {
         title="Add Links and Contact Info"
         name={dashboard.businessCard?.profile.name || ''}
         jobTitle={dashboard.businessCard?.profile.jobTitle || ''}
-        company={dashboard.businessCard?.profile.company || ''}
-        email={dashboard.businessCard?.profile.email || ''}
-        phone={dashboard.businessCard?.profile.phone || ''}
-        links={links.filter(l => l.isActive)}
+
         theme={dashboard.businessCard?.theme.primaryColor || '#FDBA74'}
         linkColor={dashboard.businessCard?.theme.secondaryColor || '#000000'}
         layout={dashboard.businessCard?.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'}

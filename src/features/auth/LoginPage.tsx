@@ -2,7 +2,6 @@ import React, { useState, ChangeEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../../services/firebase';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useAuthStore } from '../../stores/authStore';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +9,6 @@ export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { signOut } = useAuthStore();
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);

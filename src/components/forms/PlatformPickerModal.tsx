@@ -1,5 +1,4 @@
 import React from 'react';
-import { CardPreview } from '../preview/CardPreview';
 
 interface PlatformOption {
   type: string;
@@ -20,10 +19,6 @@ interface PlatformPickerModalProps {
   // Card preview props
   name?: string;
   jobTitle?: string;
-  company?: string;
-  email?: string;
-  phone?: string;
-  links?: any[];
   theme?: string;
   linkColor?: string;
   layout?: 'Left Aligned' | 'Centered';
@@ -61,21 +56,6 @@ export const PlatformPickerModal: React.FC<PlatformPickerModalProps> = ({
   search,
   setSearch,
   title = 'Add content',
-  // Card preview props
-  name = '',
-  jobTitle = '',
-  company = '',
-  email = '',
-  phone = '',
-  links = [],
-  theme = '#FDBA74',
-  linkColor = '#000000',
-  layout = 'Left Aligned',
-  profileImage,
-  coverPhoto,
-  companyLogo,
-  location = '',
-  bio = '',
 }) => {
   if (!open) return null;
 

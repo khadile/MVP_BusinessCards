@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BusinessCard, BusinessCardProfile, BusinessCardTheme } from '../types';
+import { BusinessCard } from '../types';
 
 interface DashboardState {
   // Active section and UI state
@@ -175,8 +175,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Discard changes
   discardChanges: () => {
-    const { lastSavedCard, lastSavedCardName, previousProfileImageUrl, previousCoverPhotoUrl, previousCompanyLogoUrl, activeCardId } = get();
-    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    const { lastSavedCard, lastSavedCardName } = get();
     if (lastSavedCard) {
       set({ 
         businessCard: { ...lastSavedCard },
@@ -219,8 +218,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Reset to last saved
   resetToLastSaved: () => {
-    const { lastSavedCard, lastSavedCardName, activeCardId } = get();
-    const cardId = typeof activeCardId === 'string' ? activeCardId : '';
+    const { lastSavedCard, lastSavedCardName } = get();
     if (lastSavedCard) {
       set({ 
         businessCard: { ...lastSavedCard },
@@ -471,12 +469,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
   deleteCard: (cardId) => {
     set(state => {
-      const newCards = state.cards.filter(card => card.id !== cardId);
+      const newCards = (state.cards || []).filter(card => card.id !== cardId);
       let newActiveId = state.activeCardId;
       if (state.activeCardId === cardId) {
-        newActiveId = newCards.length > 0 ? newCards[0].id : null;
+        newActiveId = (newCards && newCards.length > 0) ? newCards[0]?.id ?? null : null;
       }
-      const newActiveCard = newActiveId ? newCards.find(card => card.id === newActiveId) : null;
+      const newActiveCard = newActiveId ? (newCards ?? []).find(card => card.id === newActiveId) : null;
       return {
         cards: newCards,
         activeCardId: newActiveId,

@@ -72,11 +72,11 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       // 3. Save onboarding data to Firestore under user's UID
       const cardData = {
         profile: {
-          name,
-          jobTitle,
-          company,
-          email,
-          phone,
+        name,
+        jobTitle,
+        company,
+        email,
+        phone,
           bio: '', // Add onboarding bio if available
         },
         links,
@@ -167,11 +167,11 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       // Save onboarding data to Firestore
       const cardData = {
         profile: {
-          name,
-          jobTitle,
-          company,
-          email: user.email || email, // Use Google email if available
-          phone,
+        name,
+        jobTitle,
+        company,
+        email: user.email || email, // Use Google email if available
+        phone,
           bio: '', // Add onboarding bio if available
         },
         links,
