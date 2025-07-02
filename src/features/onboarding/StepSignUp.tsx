@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useNavigate } from 'react-router-dom';
-import { auth, db, testFirestoreWrite, testAuthenticatedWrite } from '../../services/firebase';
+import { auth, db } from '../../services/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Toast } from '../../components/ui/Toast';
@@ -111,38 +111,30 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
   const handleGoogleSignUp = async () => {
     setLoading(true);
     setError(null);
-    
     try {
       console.log('🔄 Starting Google sign up...');
-      
-      // Removed Firestore test write for production security
-      // console.log('🧪 Testing Firestore connection...');
-      // const writeTest = await testFirestoreWrite();
-      // if (!writeTest) {
-      //   throw new Error('Firestore connection test failed');
-      // }
-      
+
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
-      
+
       console.log('✅ Google sign in successful:', user.uid);
       console.log('👤 User email:', user.email);
       console.log('🔐 User email verified:', user.emailVerified);
-      
+
       // Verify user is authenticated
       if (!user || !user.uid) {
         throw new Error('User authentication failed');
       }
-      
+
       // Wait a moment to ensure auth state is fully propagated
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create user profile in Firestore
+
+      // Create user profile in Firestore (same structure as handleSignUp)
       const userProfile = {
         uid: user.uid,
-        email: user.email || email,
-        displayName: user.displayName || name || '',
+        email: user.email || localEmail || email,
+        displayName: name || user.displayName || '',
         photoURL: user.photoURL,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -152,19 +144,19 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
           notifications: true,
         },
       };
-      
+
       console.log('📝 Creating user profile...');
       await setDoc(doc(db, 'users', user.uid), userProfile);
       console.log('✅ User profile created successfully');
-      
-      // Save onboarding data to Firestore
+
+      // Save onboarding data to Firestore (same structure as handleSignUp)
       const cardData = {
         profile: {
-        name,
-        jobTitle,
-        company,
-        email: user.email || email, // Use Google email if available
-        phone,
+          name,
+          jobTitle,
+          company,
+          email: user.email || localEmail || email,
+          phone,
           bio: '', // Add onboarding bio if available
         },
         links,
@@ -180,20 +172,16 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         userId: user.uid,
         isPublic: true,
       };
-      
+
       console.log('📝 Saving card data to Firestore...');
-      console.log('📄 Card data:', cardData);
-      
       await setDoc(doc(db, 'businessCards', `card-${user.uid}`), cardData);
       console.log('✅ Card data saved successfully');
-      
+
       navigate('/dashboard');
     } catch (err: any) {
       console.error('❌ Google sign up error:', err);
-      
       // Handle specific Firebase errors
       let errorMessage = 'Google sign up failed.';
-      
       if (err.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Sign up was cancelled. Please try again.';
       } else if (err.code === 'auth/popup-blocked') {
@@ -205,7 +193,6 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
       setToastVisible(true);
     } finally {
