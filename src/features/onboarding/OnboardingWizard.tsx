@@ -15,8 +15,14 @@ const steps = [
 export const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(0);
   const totalSteps = steps.length;
-  if (!steps[step]) return null; // or return a fallback UI
-  const StepComponent = steps[step].component;
+  
+  // Early return if step is out of bounds
+  if (step < 0 || step >= totalSteps) return null;
+  
+  const currentStep = steps[step];
+  if (!currentStep) return null; // Additional safety check
+  
+  const StepComponent = currentStep.component;
 
   const goNext = () => setStep((s) => Math.min(s + 1, totalSteps - 1));
   const goBack = () => setStep((s) => Math.max(s - 1, 0));

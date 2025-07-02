@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, getDocs, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -22,7 +22,6 @@ export default app;
 export async function testFirebaseConnection() {
   try {
     // Try to read a non-existent collection (should not throw if connected)
-    const { getDocs, collection } = await import('firebase/firestore');
     const snapshot = await getDocs(collection(db, 'test-connection'));
     console.log('✅ Firebase connection successful. Document count:', snapshot.size);
   } catch (error) {
@@ -33,7 +32,6 @@ export async function testFirebaseConnection() {
 // Test Firestore write permissions
 export async function testFirestoreWrite() {
   try {
-    const { doc, setDoc, deleteDoc } = await import('firebase/firestore');
     const testDocRef = doc(db, 'test-write', 'test-doc');
     
     // Try to write a test document
@@ -57,7 +55,6 @@ export async function testFirestoreWrite() {
 // Test authenticated Firestore write
 export async function testAuthenticatedWrite(userId: string) {
   try {
-    const { doc, setDoc, deleteDoc } = await import('firebase/firestore');
     const testDocRef = doc(db, 'businessCards', `test-${userId}`);
     
     // Try to write a test business card

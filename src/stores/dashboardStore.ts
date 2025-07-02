@@ -133,14 +133,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       // Update business card with new image URLs if they exist
       const updatedBusinessCard = { ...businessCard, cardName };
       if (updatedBusinessCard.profile) {
-        if (tempProfileImageUrls[cardId]) {
-          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId];
+        if (tempProfileImageUrls[cardId] !== undefined) {
+          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId] ?? undefined;
         }
-        if (tempCoverPhotoUrls[cardId]) {
-          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId];
+        if (tempCoverPhotoUrls[cardId] !== undefined) {
+          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId] ?? undefined;
         }
-        if (tempCompanyLogoUrls[cardId]) {
-          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId];
+        if (tempCompanyLogoUrls[cardId] !== undefined) {
+          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId] ?? undefined;
         }
       }
       

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 
 export interface UserProfile {
@@ -175,8 +175,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // Load user's business cards
   loadBusinessCards: async (uid: string) => {
     try {
-      const { collection, query, where, getDocs } = await import('firebase/firestore');
-      
       const cardsQuery = query(
         collection(db, 'businessCards'),
         where('userId', '==', uid)
@@ -226,8 +224,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // Update business card
   updateBusinessCard: async (cardId: string, data: Partial<BusinessCard>) => {
     try {
-      const { serverTimestamp } = await import('firebase/firestore');
-      
       await updateDoc(doc(db, 'businessCards', cardId), {
         ...data,
         updatedAt: serverTimestamp(),
@@ -256,7 +252,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // Update user profile
   updateProfile: async (data: Partial<UserProfile>) => {
     try {
-      const { serverTimestamp } = await import('firebase/firestore');
       const uid = get().user?.uid;
       
       if (!uid) throw new Error('User not authenticated');

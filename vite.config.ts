@@ -18,6 +18,14 @@ export default defineConfig({
       '@tests': path.resolve(__dirname, './src/tests'),
     },
   },
+  optimizeDeps: {
+    include: [
+      'firebase/app',
+      'firebase/auth',
+      'firebase/firestore',
+      'firebase/storage'
+    ]
+  },
   server: {
     port: 5173,
     open: true,
@@ -29,8 +37,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          firebase: ['firebase'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
         },
       },
     },
