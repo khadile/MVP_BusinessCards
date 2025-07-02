@@ -4,7 +4,7 @@ import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../../services/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { Toast } from '../../components/ui/Toast';
 // import { useToast } from '../../components/ui/ToastContext'; // Uncomment if you have a Toast context
 
@@ -49,6 +49,16 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       const user = userCredential.user;
       
       console.log('✅ User created successfully:', user.uid);
+
+      // Check if user profile already exists
+      const userProfileRef = doc(db, 'users', user.uid);
+      const userProfileSnap = await getDoc(userProfileRef);
+      if (userProfileSnap.exists()) {
+        // User already has a profile, redirect to dashboard
+        console.log('ℹ️ User already has a profile, redirecting to dashboard.');
+        navigate('/dashboard');
+        return;
+      }
       
       // 2. Create user profile in Firestore
       const userProfile = {
@@ -125,6 +135,16 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       // Verify user is authenticated
       if (!user || !user.uid) {
         throw new Error('User authentication failed');
+      }
+
+      // Check if user profile already exists
+      const userProfileRef = doc(db, 'users', user.uid);
+      const userProfileSnap = await getDoc(userProfileRef);
+      if (userProfileSnap.exists()) {
+        // User already has a profile, redirect to dashboard
+        console.log('ℹ️ User already has a profile, redirecting to dashboard.');
+        navigate('/dashboard');
+        return;
       }
 
       // Wait a moment to ensure auth state is fully propagated
