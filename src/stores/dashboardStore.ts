@@ -54,6 +54,9 @@ interface DashboardState {
   // Initialize from auth store data
   initializeFromAuthCard: (authCard: any) => void;
   
+  // Initialize from all auth store business cards
+  initializeFromBusinessCards: (businessCards: any[], currentCardId?: string) => void;
+  
   // Set links
   setLinks: (links: BusinessCard['links']) => void;
   
@@ -340,31 +343,37 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       updatedAt: new Date(),
     };
     
-    set({ 
-      businessCard, 
-      lastSavedCard: { ...businessCard }, // Initialize last saved state
-      lastSavedCardName: '',
-      cardName: businessCard.cardName || '',
-      isDirty: false, 
-      unsavedChanges: {},
-      cards: [businessCard], // Add initial card to cards array
-      activeCardId: businessCard.id, // Set as active
+    set(state => {
+      // For onboarding, we typically start fresh, but preserve existing cards if any
+      const existingCards = state.cards || [];
+      const cardExists = existingCards.some(card => card.id === businessCard.id);
+      
+      const updatedCards = cardExists 
+        ? existingCards.map(card => card.id === businessCard.id ? businessCard : card)
+        : [...existingCards, businessCard];
+      
+      return {
+        businessCard, 
+        lastSavedCard: { ...businessCard }, // Initialize last saved state
+        lastSavedCardName: '',
+        cardName: businessCard.cardName || '',
+        isDirty: false, 
+        unsavedChanges: {},
+        cards: updatedCards, // Preserve existing cards
+        activeCardId: businessCard.id, // Set as active
+      };
     });
   },
   
   // Initialize from auth store data
   initializeFromAuthCard: (authCard) => {
     if (!authCard) {
-      console.warn('No auth card provided to initializeFromAuthCard');
       return;
     }
-    
-    console.log('🔄 Initializing dashboard from auth card:', authCard);
     
     // Clear any existing temporary state when switching users
     const existingCard = get().businessCard;
     if (existingCard && existingCard.userId !== authCard.userId) {
-      console.log('🔄 Switching users - clearing temporary state');
     }
     
     const businessCard: BusinessCard = {
@@ -404,18 +413,97 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       updatedAt: authCard.updatedAt || new Date(),
     };
     
-    console.log('✅ Dashboard initialized with card ID:', businessCard.id);
+    set(state => {
+      // Check if we already have cards (to avoid replacing existing cards)
+      const existingCards = state.cards || [];
+      const cardExists = existingCards.some(card => card.id === businessCard.id);
+      
+      // If card doesn't exist, add it; otherwise update it
+      const updatedCards = cardExists 
+        ? existingCards.map(card => card.id === businessCard.id ? businessCard : card)
+        : [...existingCards, businessCard];
+      
+      return {
+        businessCard, 
+        lastSavedCard: { ...businessCard }, // Initialize last saved state
+        lastSavedCardName: businessCard.cardName || '',
+        cardName: businessCard.cardName || '',
+        isDirty: false, 
+        unsavedChanges: {},
+        cards: updatedCards, // Preserve existing cards, don't replace
+        activeCardId: businessCard.id, // Set as active
+        // Clear temporary state when switching users
+        tempProfileImageUrls: {},
+        tempCoverPhotoUrls: {},
+        tempCompanyLogoUrls: {},
+        profileImage: null,
+        coverPhoto: null,
+        companyLogo: null,
+        previousProfileImageUrl: null,
+        previousCoverPhotoUrl: null,
+        previousCompanyLogoUrl: null,
+      };
+    });
+  },
+  
+  // Initialize from all business cards from auth store
+  initializeFromBusinessCards: (businessCards, currentCardId) => {
+    if (!businessCards || businessCards.length === 0) {
+      return;
+    }
     
-    set({ 
-      businessCard, 
-      lastSavedCard: { ...businessCard }, // Initialize last saved state
-      lastSavedCardName: businessCard.cardName || '',
-      cardName: businessCard.cardName || '',
-      isDirty: false, 
+    // Convert auth store business cards to dashboard business cards
+    const dashboardCards: BusinessCard[] = businessCards.map(authCard => ({
+      id: authCard.id,
+      userId: authCard.userId || 'temp-user-id',
+      cardName: authCard.cardName || authCard.name || authCard.profile?.name || 'Untitled Card',
+      profile: {
+        name: authCard.name || authCard.profile?.name || '',
+        jobTitle: authCard.jobTitle || authCard.profile?.jobTitle || '',
+        company: authCard.company || authCard.profile?.company || '',
+        location: authCard.profile?.location || '',
+        bio: authCard.profile?.bio || '',
+        email: authCard.email || authCard.profile?.email || '',
+        phone: authCard.phone || authCard.profile?.phone || '',
+        website: authCard.profile?.website || '',
+        profileImage: authCard.profile?.profileImage,
+        coverPhoto: authCard.profile?.coverPhoto,
+        companyLogo: authCard.profile?.companyLogo,
+      },
+      theme: {
+        primaryColor: authCard.theme?.primaryColor || '#FDBA74',
+        secondaryColor: authCard.theme?.secondaryColor || '#000000',
+        backgroundColor: authCard.theme?.backgroundColor || '#FFFFFF',
+        textColor: authCard.theme?.textColor || '#000000',
+        fontFamily: authCard.theme?.fontFamily || 'Inter',
+        fontSize: authCard.theme?.fontSize || 14,
+        layout: authCard.theme?.layout || 'modern',
+        borderRadius: authCard.theme?.borderRadius || 12,
+        shadow: authCard.theme?.shadow !== false,
+      },
+      links: authCard.links || [],
+      settings: {
+        isPublic: authCard.isPublic !== false,
+        allowAnalytics: authCard.settings?.allowAnalytics !== false,
+      },
+      createdAt: authCard.createdAt || new Date(),
+      updatedAt: authCard.updatedAt || new Date(),
+    }));
+    
+    // Find the active card (current card or first card)
+    const activeCardId = currentCardId || dashboardCards[0]?.id;
+    const activeCard = dashboardCards.find(card => card.id === activeCardId) || dashboardCards[0];
+    
+    set({
+      cards: dashboardCards,
+      activeCardId: activeCardId || null,
+      businessCard: activeCard || null,
+      lastSavedCard: activeCard ? { ...activeCard } : null,
+      lastSavedCardName: activeCard?.cardName || '',
+      cardName: activeCard?.cardName || '',
+      isDirty: false,
       unsavedChanges: {},
-      cards: [businessCard], // Add initial card to cards array
-      activeCardId: businessCard.id, // Set as active
-      // Clear temporary state when switching users
+      // Clear temporary state
       tempProfileImageUrls: {},
       tempCoverPhotoUrls: {},
       tempCompanyLogoUrls: {},
@@ -449,7 +537,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   createCard: (card) => {
     set(state => {
-      const cardWithName = { ...card, cardName: card.profile.name };
+      // Check if card already exists to prevent duplicates
+      const cardExists = state.cards.some(existingCard => existingCard.id === card.id);
+      if (cardExists) {
+        return state; // Return current state unchanged
+      }
+
+      // Preserve the original cardName instead of overriding with profile.name
+      const cardWithName = { ...card, cardName: card.cardName || card.profile.name || 'Untitled Card' };
       return {
         cards: [...state.cards, cardWithName],
         activeCardId: cardWithName.id,
@@ -512,13 +607,27 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setActiveCard: (cardId) => {
     set(state => {
       const card = state.cards.find(c => c.id === cardId) || null;
+      if (!card) {
+        return state; // Return unchanged state if card not found
+      }
+      
       return {
         activeCardId: cardId,
         businessCard: card,
-        lastSavedCard: card,
-        cardName: card?.profile.name || '',
+        lastSavedCard: card ? { ...card } : null,
+        cardName: card?.cardName || card?.profile.name || '',
         isDirty: false,
         unsavedChanges: {},
+        // Clear temporary states when switching cards
+        tempProfileImageUrls: {},
+        tempCoverPhotoUrls: {},
+        tempCompanyLogoUrls: {},
+        profileImage: null,
+        coverPhoto: null,
+        companyLogo: null,
+        previousProfileImageUrl: null,
+        previousCoverPhotoUrl: null,
+        previousCompanyLogoUrl: null,
       };
     });
   },

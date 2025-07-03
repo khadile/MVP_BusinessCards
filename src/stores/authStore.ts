@@ -83,8 +83,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true });
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('🔄 Auth state changed:', user?.uid);
-      
       if (user) {
         set({ user });
         
@@ -93,7 +91,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           await get().loadUserProfile(user.uid);
           await get().loadBusinessCards(user.uid);
         } catch (error) {
-          console.error('❌ Error loading user data:', error);
           set({ error: 'Failed to load user data' });
         }
       } else {
@@ -125,7 +122,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null 
       });
     } catch (error) {
-      console.error('❌ Sign out error:', error);
       set({ error: 'Failed to sign out' });
     } finally {
       set({ isLoading: false });
@@ -140,7 +136,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (userDoc.exists()) {
         const profileData = userDoc.data() as UserProfile;
         set({ profile: profileData });
-        console.log('✅ User profile loaded:', profileData);
       } else {
         // Create default profile if it doesn't exist
         const photoURL = get().user?.photoURL;
@@ -164,10 +159,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         
         await setDoc(doc(db, 'users', uid), defaultProfile);
         set({ profile: defaultProfile });
-        console.log('✅ Default user profile created:', defaultProfile);
       }
     } catch (error) {
-      console.error('❌ Error loading user profile:', error);
       throw error;
     }
   },
@@ -208,10 +201,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           set({ currentCard: firstCard });
         }
       }
-      
-      console.log('✅ Business cards loaded:', cards.length);
     } catch (error) {
-      console.error('❌ Error loading business cards:', error);
       throw error;
     }
   },
@@ -241,10 +231,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (currentCard?.id === cardId) {
         set({ currentCard: { ...currentCard, ...data } });
       }
-      
-      console.log('✅ Business card updated:', cardId);
     } catch (error) {
-      console.error('❌ Error updating business card:', error);
       throw error;
     }
   },
@@ -266,10 +253,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (profile) {
         set({ profile: { ...profile, ...data } });
       }
-      
-      console.log('✅ User profile updated');
     } catch (error) {
-      console.error('❌ Error updating user profile:', error);
       throw error;
     }
   },

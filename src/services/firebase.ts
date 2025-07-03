@@ -23,9 +23,9 @@ export async function testFirebaseConnection() {
   try {
     // Try to read a non-existent collection (should not throw if connected)
     const snapshot = await getDocs(collection(db, 'test-connection'));
-    console.log('✅ Firebase connection successful. Document count:', snapshot.size);
+    console.log('Firebase connection test: document count =', snapshot.size);
   } catch (error) {
-    console.error('❌ Firebase connection failed:', error);
+    console.error('Error during Firebase connection test:', error);
   }
 }
 
@@ -39,15 +39,13 @@ export async function testFirestoreWrite() {
       test: true,
       timestamp: new Date(),
     });
-    console.log('✅ Firestore write test successful');
     
     // Clean up - delete the test document
     await deleteDoc(testDocRef);
-    console.log('✅ Firestore cleanup successful');
     
     return true;
   } catch (error) {
-    console.error('❌ Firestore write test failed:', error);
+    console.error('Error during Firestore write test:', error);
     return false;
   }
 }
@@ -67,15 +65,13 @@ export async function testAuthenticatedWrite(userId: string) {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    console.log('✅ Authenticated Firestore write test successful');
     
     // Clean up - delete the test document
     await deleteDoc(testDocRef);
-    console.log('✅ Authenticated Firestore cleanup successful');
     
     return true;
   } catch (error) {
-    console.error('❌ Authenticated Firestore write test failed:', error);
+    console.error('Error during authenticated Firestore write test:', error);
     return false;
   }
 } 

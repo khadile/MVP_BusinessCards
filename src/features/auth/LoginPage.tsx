@@ -23,13 +23,9 @@ export const LoginPage: React.FC = () => {
     setError(null);
     
     try {
-      console.log('🔄 Starting email login...');
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('✅ Email login successful');
       navigate('/dashboard');
     } catch (err: any) {
-      console.error('❌ Email login error:', err);
-      
       // Handle specific Firebase errors
       let errorMessage = 'Login failed.';
       
@@ -58,16 +54,12 @@ export const LoginPage: React.FC = () => {
     setError(null);
     
     try {
-      console.log('🔄 Starting Google login...');
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
       
-      console.log('✅ Google login successful:', user.uid);
       navigate('/dashboard');
     } catch (err: any) {
-      console.error('❌ Google login error:', err);
-      
       // Handle specific Firebase errors
       let errorMessage = 'Google login failed.';
       

@@ -193,6 +193,11 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
           value={localEmail}
           onChange={e => setLocalEmail(e.target.value)}
           placeholder="Enter your email"
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              handleContinue();
+            }
+          }}
         />
         <label className="block mb-1 font-medium text-gray-700 text-xs">Phone Number <span className="text-gray-400 text-xs">Optional</span></label>
         <input
@@ -201,6 +206,11 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
           value={localPhone}
           onChange={e => setLocalPhone(e.target.value)}
           placeholder="Enter your phone number"
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              handleContinue();
+            }
+          }}
         />
         {/* Add additional links button */}
         <button

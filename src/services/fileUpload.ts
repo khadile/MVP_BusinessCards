@@ -107,20 +107,16 @@ export const uploadFile = async (
     const storageRef = ref(storage, path);
     
     // Upload file
-    console.log('📤 Uploading file to Firebase Storage:', path);
     const snapshot = await uploadBytes(storageRef, fileToUpload);
     
     // Get download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
-    
-    console.log('✅ File uploaded successfully:', downloadURL);
     
     return {
       url: downloadURL,
       path: snapshot.ref.fullPath,
     };
   } catch (error) {
-    console.error('❌ File upload failed:', error);
     throw error;
   }
 };
@@ -130,9 +126,7 @@ export const deleteFile = async (path: string): Promise<void> => {
   try {
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
-    console.log('✅ File deleted successfully:', path);
   } catch (error) {
-    console.error('❌ File deletion failed:', error);
     throw error;
   }
 };

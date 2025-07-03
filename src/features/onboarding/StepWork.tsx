@@ -30,6 +30,11 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
           value={localJobTitle}
           onChange={e => setLocalJobTitle(e.target.value)}
           placeholder="Job Title"
+          onKeyDown={e => {
+            if (e.key === 'Enter' && localJobTitle.trim() && localCompany.trim()) {
+              handleContinue();
+            }
+          }}
         />
         <label className="block mb-1 font-medium text-gray-700 text-xs">Company</label>
         <input
@@ -38,6 +43,11 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
           value={localCompany}
           onChange={e => setLocalCompany(e.target.value)}
           placeholder="Company"
+          onKeyDown={e => {
+            if (e.key === 'Enter' && localJobTitle.trim() && localCompany.trim()) {
+              handleContinue();
+            }
+          }}
         />
         <div className="flex gap-5 justify-end">
           <button

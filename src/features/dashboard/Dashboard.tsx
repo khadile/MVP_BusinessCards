@@ -79,12 +79,25 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
 };
 
 export const Dashboard: React.FC = () => {
-  const { user, currentCard, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
+  const { user, currentCard, businessCards, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
   const dashboard = useDashboardStore();
   const onboarding = useOnboardingStore();
   
+  // Debug logging for dashboard state changes
+  useEffect(() => {
+    console.log('📊 Dashboard state changed:', {
+      activeCardId: dashboard.activeCardId,
+      businessCardId: dashboard.businessCard?.id,
+      businessCardName: dashboard.businessCard?.cardName || dashboard.businessCard?.profile.name,
+      totalCards: dashboard.cards.length,
+      cardNames: dashboard.cards.map(c => c.cardName || c.profile.name)
+    });
+  }, [dashboard.activeCardId, dashboard.businessCard?.id, dashboard.cards.length]);
+  
   // Track current user to detect user changes
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // Track if user is manually switching cards to prevent useEffect interference
+  const [isUserSwitching, setIsUserSwitching] = useState(false);
   
   // Initialize dashboard from onboarding data or auth store data
   useEffect(() => {
@@ -99,6 +112,8 @@ export const Dashboard: React.FC = () => {
       currentUserId, 
       hasUserChanged, 
       currentCard: !!currentCard,
+      businessCardsCount: businessCards?.length || 0,
+      dashboardCardsCount: dashboard.cards.length,
       dashboardUserId: dashboard.businessCard?.userId,
       hasOnboardingData
     });
@@ -129,18 +144,31 @@ export const Dashboard: React.FC = () => {
       return;
     }
     
-    // Priority 2: Use auth store data for existing users
-    if (currentCard && userId) {
-      const shouldInitialize = !dashboard.businessCard || 
-                              dashboard.businessCard.userId !== userId ||
-                              dashboard.businessCard.id !== currentCard.id;
+          // Priority 2: Use auth store business cards for existing users (only if not manually switching)
+    if (businessCards && businessCards.length > 0 && userId && !isUserSwitching) {
+      const dashboardNeedsSync = dashboard.cards.length !== businessCards.length ||
+                                dashboard.cards.some(dashCard => !businessCards.find(authCard => authCard.id === dashCard.id)) ||
+                                businessCards.some(authCard => !dashboard.cards.find(dashCard => dashCard.id === authCard.id));
       
-      if (shouldInitialize) {
-        console.log('🔄 Initializing dashboard from auth store:', currentCard);
-        dashboard.initializeFromAuthCard(currentCard);
+      if (dashboardNeedsSync) {
+        console.log('🔄 Syncing dashboard with all business cards from auth store');
+        dashboard.initializeFromBusinessCards(businessCards, currentCard?.id);
+      } else if (currentCard && dashboard.activeCardId !== currentCard.id && hasUserChanged) {
+        // Only auto-switch when user changes (not for every mismatch)
+        console.log('🔄 Auto-switching to current card for new user:', currentCard.id);
+        dashboard.setActiveCard(currentCard.id);
       }
     }
-  }, [user?.uid, currentCard, dashboard, currentUserId, onboarding]);
+    
+    // Reset user switching flag after a short delay
+    if (isUserSwitching) {
+      const timer = setTimeout(() => setIsUserSwitching(false), 100);
+      return () => clearTimeout(timer);
+    }
+    
+    // Return undefined for consistency
+    return undefined;
+  }, [user?.uid, currentCard, businessCards, dashboard, currentUserId, onboarding, isUserSwitching]);
 
   // Clear dashboard when user logs out
   useEffect(() => {
@@ -156,6 +184,7 @@ export const Dashboard: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   const [showSettings, setShowSettings] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isCreatingCard, setIsCreatingCard] = useState(false);
 
   // Update business card when form fields change
   const updateBusinessCard = (updates: any) => {
@@ -731,59 +760,138 @@ export const Dashboard: React.FC = () => {
   const handleSelectCard = (cardId: string) => {
     setShowCardDropdown(false);
     if (dashboard.activeCardId !== cardId) {
+      console.log('🎯 User manually switching to card:', cardId);
+      setIsUserSwitching(true); // Prevent useEffect interference
+      
+      // Update dashboard state
       dashboard.setActiveCard(cardId);
+      
+      // Also update auth store's current card to keep them in sync
       const card = dashboard.cards.find(c => c.id === cardId);
+      if (card && businessCards) {
+        const { setCurrentCard } = useAuthStore.getState();
+        // Find the matching card in the auth store's business cards array
+        const authCard = businessCards.find(bc => bc.id === cardId);
+        if (authCard) {
+          setCurrentCard(authCard);
+          console.log('🔄 Updated auth store current card to:', cardId);
+        }
+      }
+      
       showToast(`Switched to card: ${card?.cardName || card?.profile.name || 'Untitled Card'}`);
     }
   };
 
-  const handleCreateNewCard = () => {
+  const handleCreateNewCard = async () => {
     setShowCardDropdown(false);
-    // Create a new blank card (generate a unique id, default values)
-    const newCard = {
-      id: `card-${Date.now()}`,
-      userId: 'temp-user-id',
-      cardName: 'Untitled Card',
-      profile: {
-        name: '',
-        jobTitle: '',
-        company: '',
-        location: '',
-        bio: '',
-        email: '',
-        phone: '',
-        website: '',
-      },
-      theme: {
-        primaryColor: '#FDBA74',
-        secondaryColor: '#000000',
-        backgroundColor: '#FFFFFF',
-        textColor: '#000000',
-        fontFamily: 'Inter',
-        fontSize: 14,
-        layout: 'modern' as 'modern',
-        borderRadius: 12,
-        shadow: true,
-      },
-      links: [],
-      settings: {
-        isPublic: true,
-        allowAnalytics: true,
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    dashboard.createCard(newCard);
-    dashboard.setCardName(newCard.cardName);
-    dashboard.updateBusinessCard({
-      profile: {
-        ...newCard.profile,
-        location: newCard.profile.location || '',
-        bio: newCard.profile.bio || '',
-      },
-      theme: newCard.theme,
-    });
-    showToast('Card created.');
+    
+    // Prevent rapid clicks
+    if (isCreatingCard) {
+      console.log('🚫 Card creation already in progress');
+      return;
+    }
+
+    // Check if user is logged in
+    if (!user?.uid) {
+      showToast('Please log in to create a new card.');
+      return;
+    }
+    
+    setIsCreatingCard(true);
+    
+    try {
+      // Create a new blank card with proper user ID and unique ID
+      const uniqueId = `card-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      const newCard = {
+        id: uniqueId,
+        userId: user.uid, // Use actual user ID
+        cardName: 'Untitled Card',
+        profile: {
+          name: '',
+          jobTitle: '',
+          company: '',
+          location: '',
+          bio: '',
+          email: '',
+          phone: '',
+          website: '',
+        },
+        theme: {
+          primaryColor: '#FDBA74',
+          secondaryColor: '#000000',
+          backgroundColor: '#FFFFFF',
+          textColor: '#000000',
+          fontFamily: 'Inter',
+          fontSize: 14,
+          layout: 'modern' as 'modern',
+          borderRadius: 12,
+          shadow: true,
+        },
+        links: [],
+        settings: {
+          isPublic: true,
+          allowAnalytics: true,
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      // Save to Firebase first - use setDoc for creating new cards
+      const cardData = {
+        userId: newCard.userId,
+        profile: newCard.profile,
+        theme: newCard.theme,
+        links: newCard.links,
+        isPublic: newCard.settings.isPublic,
+        createdAt: newCard.createdAt,
+        updatedAt: newCard.updatedAt,
+      };
+      
+      // Import required Firebase functions
+      const { doc, setDoc } = await import('firebase/firestore');
+      const { db } = await import('../../services/firebase');
+      
+      await setDoc(doc(db, 'businessCards', newCard.id), cardData);
+      
+      // Reload business cards from Firebase to ensure consistency
+      if (user.uid) {
+        const { loadBusinessCards, setCurrentCard } = useAuthStore.getState();
+        await loadBusinessCards(user.uid);
+        
+        // Set the new card as current card in auth store
+        const firebaseCard = {
+          id: newCard.id,
+          userId: newCard.userId,
+          profile: newCard.profile,
+          theme: newCard.theme,
+          links: newCard.links,
+          createdAt: newCard.createdAt,
+          updatedAt: newCard.updatedAt,
+          isPublic: newCard.settings.isPublic,
+        };
+        setCurrentCard(firebaseCard);
+        
+        // Small delay to ensure auth store state is updated
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Immediately switch dashboard to the new card
+        dashboard.setActiveCard(newCard.id);
+      }
+      
+      // Let the Dashboard useEffect handle card initialization via the auth store
+      // The setCurrentCard() above will trigger the useEffect to initialize the dashboard
+      console.log('✅ New card created and saved to Firebase:', {
+        cardId: newCard.id,
+        userId: newCard.userId
+      });
+      
+      showToast('Card created successfully!');
+    } catch (error) {
+      console.error('❌ Failed to create new card:', error);
+      showToast('Failed to create new card. Please try again.');
+    } finally {
+      setIsCreatingCard(false);
+    }
   };
 
   const showToast = (message: string) => {
@@ -816,7 +924,7 @@ export const Dashboard: React.FC = () => {
       <header className="w-full flex items-center justify-between px-10 py-5 bg-transparent">
         <div className="flex items-center gap-3">
           <img src="/ixl-logo.svg" alt="ILX Logo" className="h-8 w-8 rounded-full" />
-          <span className="font-bold text-xl text-gray-800">{dashboard.cardName || 'Your Card'}</span>
+          <span className="font-bold text-xl text-gray-800">{dashboard.businessCard?.cardName || dashboard.businessCard?.profile.name || 'Your Card'}</span>
           {hasUnsavedChanges && (
             <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
               Unsaved changes
@@ -830,44 +938,84 @@ export const Dashboard: React.FC = () => {
               onClick={() => setShowCardDropdown((v) => !v)}
               type="button"
             >
-              <span>{dashboard.cardName || 'Your Card'}</span>
+              <span>{dashboard.businessCard?.cardName || dashboard.businessCard?.profile.name || 'Your Card'}</span>
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2"/></svg>
             </button>
             {showCardDropdown && (
               <div className="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl z-50 p-4 flex flex-col gap-2">
-                {dashboard.cards.map(card => (
-                  <div key={card.id} className="relative">
-                    <button
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium ${dashboard.activeCardId === card.id ? 'bg-gray-100 text-black' : 'hover:bg-gray-50 text-gray-700'}`}
-                      onClick={() => handleSelectCard(card.id)}
-                    >
-                      <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">{(card.cardName || card.profile.name || 'U').charAt(0).toUpperCase()}</span>
-                      <span className="flex-1 truncate">{card.cardName || card.profile.name || 'Untitled Card'}</span>
-                      {dashboard.activeCardId === card.id && <span className="ml-2 text-xs text-orange-500">Active</span>}
-                    </button>
-                    {/* Delete button for non-active cards, only if more than one card exists */}
-                    {dashboard.activeCardId !== card.id && dashboard.cards.length > 1 && (
+                {dashboard.cards.map((card, index) => {
+                  const isActive = dashboard.activeCardId === card.id;
+                  console.log(`🔍 Card ${index + 1}: ID=${card.id}, ActiveID=${dashboard.activeCardId}, IsActive=${isActive}, BusinessCard=${dashboard.businessCard?.id}`);
+                  
+                  return (
+                    <div key={card.id} className="relative">
                       <button
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 p-1"
-                        title="Delete card"
-                        onClick={e => {
-                          e.stopPropagation();
-                          if (window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
-                            dashboard.deleteCard(card.id);
-                            showToast('Card deleted.');
-                          }
+                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium ${isActive ? 'bg-gray-100 text-black' : 'hover:bg-gray-50 text-gray-700'}`}
+                        onClick={() => {
+                          console.log('🖱️ Card clicked:', card.id);
+                          handleSelectCard(card.id);
                         }}
                       >
-                        <span role="img" aria-label="Delete">🗑️</span>
+                        <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">{(card.cardName || card.profile.name || 'U').charAt(0).toUpperCase()}</span>
+                        <span className="flex-1 truncate">{card.cardName || card.profile.name || 'Untitled Card'}</span>
+                        {isActive && <span className="ml-2 text-xs text-orange-500">Active</span>}
                       </button>
-                    )}
-                  </div>
-                ))}
+                      {/* Delete button for non-active cards, only if more than one card exists */}
+                      {!isActive && dashboard.cards.length > 1 && (
+                        <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 p-1"
+                          title="Delete card"
+                          onClick={async e => {
+                            e.stopPropagation();
+                            if (window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
+                              try {
+                                // Delete from Firebase first
+                                const { doc, deleteDoc } = await import('firebase/firestore');
+                                const { db } = await import('../../services/firebase');
+                                await deleteDoc(doc(db, 'businessCards', card.id));
+                                
+                                // Then delete from local state
+                                dashboard.deleteCard(card.id);
+                                
+                                // Reload business cards to ensure consistency
+                                if (user?.uid) {
+                                  const { loadBusinessCards } = useAuthStore.getState();
+                                  await loadBusinessCards(user.uid);
+                                }
+                                
+                                showToast('Card deleted successfully.');
+                                console.log('✅ Card deleted:', card.id);
+                              } catch (error) {
+                                console.error('❌ Failed to delete card:', error);
+                                showToast('Failed to delete card. Please try again.');
+                              }
+                            }
+                          }}
+                        >
+                          <span role="img" aria-label="Delete">🗑️</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
                 <button
-                  className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-full px-5 py-3 font-semibold text-base hover:bg-gray-900 transition mt-2"
+                  className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-full px-5 py-3 font-semibold text-base hover:bg-gray-900 transition mt-2 disabled:opacity-50"
                   onClick={handleCreateNewCard}
+                  disabled={isCreatingCard}
                 >
-                  <span className="text-xl">+</span> Create New Card
+                  {isCreatingCard ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xl">+</span> Create New Card
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -914,10 +1062,11 @@ export const Dashboard: React.FC = () => {
                     companyLogo={tempCompanyLogoUrl || dashboard.businessCard?.profile.companyLogo}
                     location={dashboard.businessCard?.profile.location || ''}
                     bio={dashboard.businessCard?.profile.bio || ''}
+
                   />
                   <div className="text-center text-gray-400 mt-2 text-xs">Card live preview</div>
                   <a
-                    href="#"
+                    href={dashboard.businessCard?.id ? `/card/${dashboard.businessCard.id}` : '#'}
                     className="block text-center text-blue-500 text-xs mt-1 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"

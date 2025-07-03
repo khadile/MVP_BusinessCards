@@ -33,6 +33,11 @@ export const StepName: React.FC<StepNameProps> = ({ goNext }) => {
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Enter your full name"
+          onKeyDown={e => {
+            if (e.key === 'Enter' && name.trim()) {
+              handleContinue();
+            }
+          }}
         />
         <div className="flex gap-5 justify-end">
           <button
