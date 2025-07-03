@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useDashboardStore } from '../../stores/dashboardStore';
+import { useOnboardingStore } from '../../stores/onboardingStore';
 import { CardPreview } from '../../components/preview/CardPreview';
 import { FileUpload } from '../../components/ui/FileUpload';
 import { LinksSection } from './LinksSection';
@@ -80,14 +81,75 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
 export const Dashboard: React.FC = () => {
   const { user, currentCard, updateBusinessCard: updateAuthCard, signOut } = useAuthStore();
   const dashboard = useDashboardStore();
+  const onboarding = useOnboardingStore();
   
-  // Initialize dashboard from auth store data
+  // Track current user to detect user changes
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  // Initialize dashboard from onboarding data or auth store data
   useEffect(() => {
-    if (currentCard && !dashboard.businessCard) {
-      console.log('🔄 Initializing dashboard from auth store:', currentCard);
-      dashboard.initializeFromAuthCard(currentCard);
+    const userId = user?.uid || null;
+    const hasUserChanged = currentUserId !== userId;
+    
+    // Check if we have onboarding data available
+    const hasOnboardingData = onboarding.name.trim() || onboarding.jobTitle.trim() || onboarding.company.trim();
+    
+    console.log('🔄 Dashboard effect triggered:', { 
+      userId, 
+      currentUserId, 
+      hasUserChanged, 
+      currentCard: !!currentCard,
+      dashboardUserId: dashboard.businessCard?.userId,
+      hasOnboardingData
+    });
+    
+    // Update tracked user ID
+    setCurrentUserId(userId);
+    
+    // Priority 1: Use onboarding data for new users or fresh sessions
+    if (hasOnboardingData && userId) {
+      console.log('🎯 Initializing dashboard from onboarding data:', {
+        name: onboarding.name,
+        jobTitle: onboarding.jobTitle,
+        company: onboarding.company
+      });
+      
+      // Initialize from onboarding data
+      dashboard.initializeFromOnboarding({
+        name: onboarding.name,
+        jobTitle: onboarding.jobTitle,
+        company: onboarding.company,
+        email: onboarding.email,
+        phone: onboarding.phone,
+        links: onboarding.links
+      });
+      
+      // Clear onboarding data after using it
+      onboarding.reset();
+      return;
     }
-  }, [currentCard, dashboard]);
+    
+    // Priority 2: Use auth store data for existing users
+    if (currentCard && userId) {
+      const shouldInitialize = !dashboard.businessCard || 
+                              dashboard.businessCard.userId !== userId ||
+                              dashboard.businessCard.id !== currentCard.id;
+      
+      if (shouldInitialize) {
+        console.log('🔄 Initializing dashboard from auth store:', currentCard);
+        dashboard.initializeFromAuthCard(currentCard);
+      }
+    }
+  }, [user?.uid, currentCard, dashboard, currentUserId, onboarding]);
+
+  // Clear dashboard when user logs out
+  useEffect(() => {
+    if (!user && currentUserId !== null) {
+      console.log('🧹 Clearing dashboard for user logout');
+      dashboard.clearDashboard();
+      setCurrentUserId(null);
+    }
+  }, [user, dashboard, currentUserId]);
 
   // Local state for form fields
   const [showCardDropdown, setShowCardDropdown] = useState(false);

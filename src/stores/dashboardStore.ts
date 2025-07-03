@@ -66,6 +66,9 @@ interface DashboardState {
   updateCard: (cardId: string, updates: Partial<BusinessCard>) => void;
   deleteCard: (cardId: string) => void;
   setActiveCard: (cardId: string) => void;
+  
+  // Clear dashboard state (for user switching)
+  clearDashboard: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -358,6 +361,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     
     console.log('🔄 Initializing dashboard from auth card:', authCard);
     
+    // Clear any existing temporary state when switching users
+    const existingCard = get().businessCard;
+    if (existingCard && existingCard.userId !== authCard.userId) {
+      console.log('🔄 Switching users - clearing temporary state');
+    }
+    
     const businessCard: BusinessCard = {
       id: authCard.id, // Use the actual Firestore document ID
       userId: authCard.userId || 'temp-user-id',
@@ -406,6 +415,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       unsavedChanges: {},
       cards: [businessCard], // Add initial card to cards array
       activeCardId: businessCard.id, // Set as active
+      // Clear temporary state when switching users
+      tempProfileImageUrls: {},
+      tempCoverPhotoUrls: {},
+      tempCompanyLogoUrls: {},
+      profileImage: null,
+      coverPhoto: null,
+      companyLogo: null,
+      previousProfileImageUrl: null,
+      previousCoverPhotoUrl: null,
+      previousCompanyLogoUrl: null,
     });
   },
   
@@ -501,6 +520,33 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         isDirty: false,
         unsavedChanges: {},
       };
+    });
+  },
+  
+  // Clear dashboard state when user switches
+  clearDashboard: () => {
+    set({
+      activeSection: 'About',
+      isDirty: false,
+      isSaving: false,
+      previewMode: 'mobile',
+      businessCard: null,
+      lastSavedCard: null,
+      lastSavedCardName: '',
+      unsavedChanges: {},
+      cardName: '',
+      profileImage: null,
+      coverPhoto: null,
+      companyLogo: null,
+      isUploading: false,
+      tempProfileImageUrls: {},
+      tempCoverPhotoUrls: {},
+      tempCompanyLogoUrls: {},
+      previousProfileImageUrl: null,
+      previousCoverPhotoUrl: null,
+      previousCompanyLogoUrl: null,
+      cards: [],
+      activeCardId: null,
     });
   },
 })); 
