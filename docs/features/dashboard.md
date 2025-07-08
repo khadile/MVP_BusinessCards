@@ -1,17 +1,27 @@
 # Dashboard Feature Specification
 
 ## Overview
-The dashboard provides a comprehensive interface for users to manage and customize their digital business cards after completing the onboarding process. It features real-time preview, advanced customization options, and seamless integration with the onboarding flow.
+The dashboard provides a comprehensive interface for users to manage and customize their digital business cards after completing the onboarding process. It features real-time preview, advanced customization options, multi-card management, and seamless integration with the onboarding flow.
 
 ## Current Implementation Status
 
 ### ✅ Implemented Features
 
+#### Multi-Card Management System ✅ **RECENTLY ENHANCED**
+- **Card Dropdown**: Header dropdown for creating, switching, and deleting cards
+- **State Synchronization**: Robust sync between dashboard and auth stores
+- **Card Creation**: Automatic card activation upon creation
+- **Card Switching**: Proper state management during card switches
+- **Card Deletion**: Safe deletion with Firebase cleanup and state updates
+- **ID Generation**: Enhanced uniqueness with `Date.now() + Math.random()`
+- **Duplicate Prevention**: Prevents creation of duplicate cards
+- **Debug System**: Comprehensive logging for state tracking
+
 #### Core Dashboard Structure
 - **Responsive Layout**: Sidebar navigation with main content area and live preview
 - **Section Management**: About and Links sections with smooth transitions
-- **Header Integration**: Card name display with unsaved changes indicator
-- **State Management**: Zustand store with proper dirty state tracking
+- **Header Integration**: Card name display with proper card switching
+- **State Management**: Zustand store with proper dirty state tracking and multi-store sync
 
 #### About Section
 - **Card Management**: 
@@ -40,6 +50,7 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Shared Platform System**: Uses centralized platform definitions
 - **Modal Workflow**: Platform picker and add/edit link modals
 - **Real-time Preview**: Links update immediately in card preview
+- **Proper Link Management**: "View Card" link now correctly points to card URL
 
 #### Live Preview System
 - **Real-time Updates**: All changes reflect immediately in preview
@@ -47,14 +58,27 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Theme Preview**: Color changes apply instantly
 - **Layout Preview**: Left aligned vs centered layout switching
 - **Link Preview**: Active links display with proper icons
+- **Multi-Card Preview**: Preview updates when switching between cards
 
-#### State Management
-- **Zustand Store**: Centralized state management
+#### State Management ✅ **RECENTLY ENHANCED**
+- **Zustand Store**: Centralized state management with improved multi-store sync
+- **Business Cards Synchronization**: `initializeFromBusinessCards()` method syncs all cards
+- **Active Card Management**: Proper switching between multiple cards
 - **Dirty State Tracking**: Proper detection of unsaved changes
 - **Image State Management**: Temporary URLs for preview, proper revert logic
 - **Onboarding Integration**: Automatic initialization from onboarding data
+- **User Switching Detection**: Prevents useEffect interference during manual switches
 
 ### 🔧 Technical Implementation
+
+#### Multi-Card State Management ✅ **RECENTLY IMPLEMENTED**
+- **Store Synchronization**: Dashboard store now syncs with auth store's full `businessCards` array
+- **Card Creation Flow**: `handleCreateCard()` with duplicate prevention and auto-activation
+- **Card Switching Flow**: `handleSelectCard()` with proper state sync across stores
+- **Card Deletion Flow**: `handleDeleteCard()` with Firebase cleanup and state updates
+- **Debug Logging**: Comprehensive console.log statements for troubleshooting
+- **ID Generation**: `Date.now() + Math.random()` for unique card IDs
+- **State Initialization**: `initializeFromBusinessCards()` for proper multi-card setup
 
 #### File Upload System ✅ **UPDATED WITH FIREBASE STORAGE**
 - **FileUpload Component**: Reusable component with drag-and-drop
@@ -72,13 +96,22 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Image Revert**: Temporary URLs cleared, saved images restored
 - **Form Reset**: All form fields reset to saved values
 - **Preview Sync**: Preview immediately reflects reverted state
+- **Multi-Card Revert**: Proper revert logic for switched cards
 
 #### Onboarding Integration
 - **Data Transfer**: Profile info, links, and settings from onboarding
-- **State Initialization**: Proper setup of dashboard state
+- **State Initialization**: Proper setup of dashboard state with multi-card support
 - **Link Activation**: All onboarding links set to active by default
 
 ### 🎨 UI/UX Features
+
+#### Card Management UX ✅ **RECENTLY ENHANCED**
+- **Dropdown Interface**: Clean card selection dropdown in header
+- **Create Card Button**: Prominent "Create New Card" option
+- **Card Indicators**: Visual indicators for active card
+- **Switch Confirmation**: Smooth card switching with proper feedback
+- **Delete Confirmation**: Safety confirmation for card deletion
+- **Toast Notifications**: User feedback for all card operations
 
 #### Responsive Design
 - **Desktop-First**: Optimized for desktop with responsive elements
@@ -91,6 +124,7 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Save/Cancel Buttons**: Clear action buttons with proper states
 - **Loading States**: Save operation feedback
 - **Error Handling**: Validation and error messages
+- **Toast System**: Comprehensive toast notifications for all actions
 
 #### Accessibility
 - **Keyboard Navigation**: Proper focus management
@@ -98,6 +132,13 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Color Contrast**: WCAG compliant color combinations
 
 ### 📋 Data Flow
+
+#### Multi-Card Management Flow ✅ **RECENTLY IMPLEMENTED**
+1. **Initialization**: `initializeFromBusinessCards()` syncs all cards from auth store
+2. **Card Creation**: User clicks "Create New Card" → `handleCreateCard()` → new card added to both stores → auto-activation
+3. **Card Switching**: User selects card → `handleSelectCard()` → both stores updated → preview refreshes
+4. **Card Deletion**: User deletes card → confirmation → Firebase deletion → state cleanup → toast notification
+5. **State Sync**: Dashboard useEffect monitors auth store changes with user switching detection
 
 #### Save Process
 1. User makes changes (forms, images, theme)
@@ -125,6 +166,11 @@ The dashboard provides a comprehensive interface for users to manage and customi
 
 ### 🔄 Integration Points
 
+#### With Authentication System ✅ **ENHANCED**
+- **Business Cards Array**: Dashboard syncs with auth store's full card collection
+- **Current Card Tracking**: Proper active card management across stores
+- **User State Management**: Seamless integration with user authentication
+
 #### With Onboarding
 - **Data Initialization**: Profile, links, and settings transfer
 - **Link Management**: Shared platform definitions and workflows
@@ -134,6 +180,7 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Shared Components**: PlatformPickerModal and AddLinkModal
 - **State Integration**: Links managed in dashboard store
 - **Preview Integration**: Links display in real-time preview
+- **URL Management**: "View Card" link now properly generates card URLs
 
 ### 🚀 Future Enhancements
 
@@ -141,33 +188,42 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **QR Code Generation**: Share card via QR code
 - **Analytics Dashboard**: View card visit statistics
 - **Advanced Themes**: Custom gradient and pattern options
-- **Bulk Operations**: Multiple link management
+- **Bulk Operations**: Multiple link management across cards
 - **Export Options**: PDF and image export
 
 #### Technical Improvements
-- **File Upload Optimization**: Image compression and optimization
-- **Caching Strategy**: Improved performance for large images
-- **Offline Support**: Basic offline functionality
+- **Performance Optimization**: Optimize multi-card state management
+- **Caching Strategy**: Improved performance for large card collections
+- **Offline Support**: Basic offline functionality for card management
 - **Real-time Collaboration**: Multi-user editing (future)
 
 ## Testing Strategy
 
-### Unit Tests
-- **Store Logic**: State management and business logic
+### Unit Tests ✅ **ENHANCED WITH MULTI-CARD TESTS**
+- **Store Logic**: State management and business logic including multi-card operations
 - **Component Logic**: Form validation and user interactions
 - **Utility Functions**: Image handling and data transformation
+- **Card Management**: Create, switch, and delete operations
 
 ### Integration Tests
+- **Multi-Card Flow**: Complete card management workflow
 - **Onboarding Integration**: Data transfer and state consistency
 - **Link Management**: Modal workflows and state updates
 - **Save/Cancel Flow**: Complete user workflows
 
 ### E2E Tests
-- **Complete User Journey**: Onboarding to dashboard to save
+- **Complete User Journey**: Onboarding to dashboard to multi-card management
+- **Card Operations**: Create, switch, delete cards end-to-end
 - **Image Management**: Upload, preview, remove, revert
 - **Theme Customization**: Color changes and preview updates
 
 ## Performance Considerations
+
+### Multi-Card Optimization ✅ **RECENTLY IMPLEMENTED**
+- **Selective State Updates**: Only update changed cards
+- **Efficient Card Switching**: Optimized state transitions
+- **Memory Management**: Proper cleanup of unused card data
+- **Debug Performance**: Minimal impact from debug logging
 
 ### Image Optimization
 - **Lazy Loading**: Images load only when needed
@@ -180,6 +236,11 @@ The dashboard provides a comprehensive interface for users to manage and customi
 - **Memoization**: Expensive calculations cached
 
 ## Security Considerations
+
+### Multi-Card Security ✅ **IMPLEMENTED**
+- **User Isolation**: Each user's cards are properly isolated
+- **Firebase Security**: Proper security rules for multi-card access
+- **State Validation**: Proper validation of card operations
 
 ### File Upload Security ✅ **IMPLEMENTED**
 - **File Validation**: Type and size restrictions (max 5MB, image types only)

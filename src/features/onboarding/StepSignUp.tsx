@@ -48,11 +48,14 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, localEmail, localPassword);
       const user = userCredential.user;
       
+      console.log('✅ User created successfully:', user.uid);
+
       // Check if user profile already exists
       const userProfileRef = doc(db, 'users', user.uid);
       const userProfileSnap = await getDoc(userProfileRef);
       if (userProfileSnap.exists()) {
         // User already has a profile, redirect to dashboard
+        console.log('ℹ️ User already has a profile, redirecting to dashboard.');
         navigate('/dashboard');
         return;
       }
@@ -72,7 +75,9 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         },
       };
       
+      console.log('📝 Creating user profile...');
       await setDoc(doc(db, 'users', user.uid), userProfile);
+      console.log('✅ User profile created successfully');
       
       // 3. Save onboarding data to Firestore under user's UID
       const cardData = {
@@ -98,11 +103,14 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         isPublic: true,
       };
       
+      console.log('📝 Saving card data to Firestore...');
       await setDoc(doc(db, 'businessCards', `card-${user.uid}`), cardData);
+      console.log('✅ Card data saved successfully');
       
       // 4. Redirect to dashboard
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('❌ Sign up error:', err);
       setError(err.message || 'Sign up failed.');
       setToastVisible(true);
     } finally {
@@ -114,9 +122,15 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
     setLoading(true);
     setError(null);
     try {
+      console.log('🔄 Starting Google sign up...');
+
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
+
+      console.log('✅ Google sign in successful:', user.uid);
+      console.log('👤 User email:', user.email);
+      console.log('🔐 User email verified:', user.emailVerified);
 
       // Verify user is authenticated
       if (!user || !user.uid) {
@@ -128,6 +142,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
       const userProfileSnap = await getDoc(userProfileRef);
       if (userProfileSnap.exists()) {
         // User already has a profile, redirect to dashboard
+        console.log('ℹ️ User already has a profile, redirecting to dashboard.');
         navigate('/dashboard');
         return;
       }
@@ -150,7 +165,9 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         },
       };
 
+      console.log('📝 Creating user profile...');
       await setDoc(doc(db, 'users', user.uid), userProfile);
+      console.log('✅ User profile created successfully');
 
       // Save onboarding data to Firestore (same structure as handleSignUp)
       const cardData = {
@@ -176,10 +193,13 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
         isPublic: true,
       };
 
+      console.log('📝 Saving card data to Firestore...');
       await setDoc(doc(db, 'businessCards', `card-${user.uid}`), cardData);
+      console.log('✅ Card data saved successfully');
 
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('❌ Google sign up error:', err);
       // Handle specific Firebase errors
       let errorMessage = 'Google sign up failed.';
       if (err.code === 'auth/popup-closed-by-user') {

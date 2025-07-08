@@ -20,9 +20,13 @@ export const PasswordResetPage: React.FC = () => {
     setSuccess(false);
     
     try {
+      console.log('🔄 Sending password reset email...');
       await sendPasswordResetEmail(auth, email);
+      console.log('✅ Password reset email sent');
       setSuccess(true);
     } catch (err: any) {
+      console.error('❌ Password reset error:', err);
+      
       // Handle specific Firebase errors
       let errorMessage = 'Failed to send reset email.';
       

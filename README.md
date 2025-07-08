@@ -1,21 +1,36 @@
 # Digital Business Card Creator
 
 ## Key Features
-- **Multi-card management:** Create, switch, and delete multiple business cards per user. Each card is fully independent.
+- **Multi-card management:** Create, switch, and delete multiple business cards per user. Each card is fully independent with robust state synchronization.
 - **Robust per-card image handling:** Profile, cover, and logo images are isolated per card and never lost on save or edit.
 - **Instant link toggling:** Enable/disable links with a single click—auto-saves instantly, no 'Unsaved Changes' banner.
 - **Toast notifications:** Modern, top-center toasts for all major actions (save, discard, create, delete, switch, error).
+- **Enhanced keyboard navigation:** Complete keyboard support throughout onboarding with Enter key progression.
 - **Modern UX:** Responsive, accessible, and fast. All actions provide immediate feedback.
+
+## Recent Improvements ✅
+- **Fixed multi-card state synchronization:** Cards now properly sync between dashboard and auth stores
+- **Enhanced card creation flow:** New cards automatically become active upon creation
+- **Improved card deletion:** Proper Firebase cleanup and state management
+- **Fixed card switching:** Resolved issues with multiple cards showing as "Active"
+- **Added keyboard navigation:** Enter key progression throughout onboarding steps
+- **Fixed "View Card" link:** Now properly points to the correct card URL
+- **Enhanced ID generation:** Improved uniqueness to prevent duplicate cards
+- **Added comprehensive debugging:** Better error tracking and state monitoring
 
 ## Usage
 1. **Create and Manage Cards:**
    - Use the dropdown in the dashboard header to create, switch, or delete cards.
    - Deleting a card (except the active/last card) requires confirmation and shows a toast.
+   - New cards automatically become active when created.
 2. **Image Uploads:**
    - Upload profile, cover, and logo images per card. Images persist across edits and saves unless explicitly changed.
 3. **Links Management:**
    - Add, edit, or remove links. Toggle links on/off instantly—changes are auto-saved.
-4. **Saving and Feedback:**
+4. **Keyboard Navigation:**
+   - Press Enter in any main input field during onboarding to progress to the next step.
+   - All forms support complete keyboard navigation for accessibility.
+5. **Saving and Feedback:**
    - Most actions auto-save. Manual save is only needed for About or theme changes.
    - Toast notifications appear for all major actions.
 
@@ -24,11 +39,13 @@
 
 ## Architecture & Best Practices
 - Feature-based folder structure
-- Zustand for state management
+- Zustand for state management with proper store synchronization
 - Strict TypeScript, accessibility, and modern React patterns
+- Comprehensive error handling and user feedback systems
 
 ## For Developers
 - See `docs/features/dashboard.md` and `docs/features/link-management.md` for detailed flows.
+- Recent fixes documented in `docs/features/dashboard.md` under "Multi-Card Management"
 
 ## 🚀 Current Status
 

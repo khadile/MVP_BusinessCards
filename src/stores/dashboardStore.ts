@@ -309,6 +309,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Initialize from onboarding data
   initializeFromOnboarding: (onboardingData) => {
+    console.log('🎯 Initializing dashboard from onboarding data:', onboardingData);
+    
     const businessCard: BusinessCard = {
       id: 'temp-id',
       userId: 'temp-user-id',
@@ -368,12 +370,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   // Initialize from auth store data
   initializeFromAuthCard: (authCard) => {
     if (!authCard) {
+      console.warn('No auth card provided to initializeFromAuthCard');
       return;
     }
+    
+    console.log('🔄 Initializing dashboard from auth card:', authCard);
     
     // Clear any existing temporary state when switching users
     const existingCard = get().businessCard;
     if (existingCard && existingCard.userId !== authCard.userId) {
+      console.log('🔄 Switching users - clearing temporary state');
     }
     
     const businessCard: BusinessCard = {
@@ -413,6 +419,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       updatedAt: authCard.updatedAt || new Date(),
     };
     
+    console.log('✅ Dashboard initialized with card ID:', businessCard.id);
+    
     set(state => {
       // Check if we already have cards (to avoid replacing existing cards)
       const existingCards = state.cards || [];
@@ -448,7 +456,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   
   // Initialize from all business cards from auth store
   initializeFromBusinessCards: (businessCards, currentCardId) => {
+    console.log('🔄 Initializing dashboard from all business cards:', { count: businessCards.length, currentCardId });
+    
     if (!businessCards || businessCards.length === 0) {
+      console.warn('No business cards provided to initializeFromBusinessCards');
       return;
     }
     
@@ -493,6 +504,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     // Find the active card (current card or first card)
     const activeCardId = currentCardId || dashboardCards[0]?.id;
     const activeCard = dashboardCards.find(card => card.id === activeCardId) || dashboardCards[0];
+    
+    console.log('✅ Dashboard initialized with all cards:', { 
+      totalCards: dashboardCards.length, 
+      activeCardId,
+      activeCardName: activeCard?.cardName 
+    });
     
     set({
       cards: dashboardCards,
@@ -540,11 +557,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       // Check if card already exists to prevent duplicates
       const cardExists = state.cards.some(existingCard => existingCard.id === card.id);
       if (cardExists) {
+        console.log('🚫 Card already exists, skipping creation:', card.id);
         return state; // Return current state unchanged
       }
 
       // Preserve the original cardName instead of overriding with profile.name
       const cardWithName = { ...card, cardName: card.cardName || card.profile.name || 'Untitled Card' };
+      console.log('🎯 Creating card:', { cardId: cardWithName.id, cardName: cardWithName.cardName });
       return {
         cards: [...state.cards, cardWithName],
         activeCardId: cardWithName.id,
@@ -607,7 +626,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setActiveCard: (cardId) => {
     set(state => {
       const card = state.cards.find(c => c.id === cardId) || null;
+      console.log('🎯 Setting active card:', { 
+        cardId, 
+        cardName: card?.cardName, 
+        profileName: card?.profile.name,
+        currentActiveId: state.activeCardId,
+        availableCards: state.cards.map(c => ({ id: c.id, name: c.cardName || c.profile.name }))
+      });
+      
       if (!card) {
+        console.error('❌ Card not found in cards array:', cardId);
         return state; // Return unchanged state if card not found
       }
       
