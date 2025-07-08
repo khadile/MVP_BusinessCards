@@ -214,6 +214,8 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
 - Auto-save functionality during form completion
 - Enhanced error recovery mechanisms
 
+- Planned: Add to Apple Wallet (.pkpass) feature for iOS users, enabling users to save their card to Apple Wallet with a QR code to the public card view. See `docs/features/apple-wallet.md` for details.
+
 ## Conclusion
 
 The recent improvements have significantly enhanced the Digital Business Card Creator MVP with:

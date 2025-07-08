@@ -109,7 +109,7 @@ export const LoginPage: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* Google Sign In */}
           <button
-            className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-lg py-3 mb-6 bg-white hover:bg-gray-50 shadow-sm font-medium text-sm disabled:opacity-50 transition"
+            className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-lg py-3 mb-6 bg-white hover:bg-gray-50 shadow-sm font-medium text-sm text-gray-700 disabled:opacity-50 transition"
             onClick={handleGoogleLogin}
             disabled={loading}
           >

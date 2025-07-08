@@ -20,8 +20,21 @@ export const PublicCardView: React.FC = () => {
         if (!cardId) throw new Error('No card ID provided');
         const cardDoc = await getDoc(doc(db, 'businessCards', cardId));
         if (!cardDoc.exists()) throw new Error('Card not found');
-        setCard({ ...cardDoc.data(), id: cardDoc.id } as BusinessCard);
+        
+        const cardData = cardDoc.data();
+        console.log('📄 Fetched card data:', {
+          id: cardDoc.id,
+          hasProfileImage: !!cardData.profile?.profileImage,
+          hasCoverPhoto: !!cardData.profile?.coverPhoto,
+          hasCompanyLogo: !!cardData.profile?.companyLogo,
+          profileImageUrl: cardData.profile?.profileImage,
+          coverPhotoUrl: cardData.profile?.coverPhoto,
+          companyLogoUrl: cardData.profile?.companyLogo,
+        });
+        
+        setCard({ ...cardData, id: cardDoc.id } as BusinessCard);
       } catch (err: any) {
+        console.error('❌ Error fetching card:', err);
         setError(err.message || 'Failed to load card');
       } finally {
         setLoading(false);

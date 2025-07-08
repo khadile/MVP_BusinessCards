@@ -107,39 +107,39 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl mx-auto p-10 flex flex-col md:flex-row gap-8" style={{ minHeight: '420px', maxHeight: '90vh' }}>
+      <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl mx-auto p-10 flex flex-col md:flex-row gap-8" style={{ minHeight: '420px', maxHeight: '90vh' }}>
         <div className="flex-1 flex flex-col justify-center">
-          <button className="mb-6 text-gray-400 hover:text-gray-700 text-lg flex items-center gap-1 self-start" onClick={onBack || onClose}>
+          <button className="mb-6 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg flex items-center gap-1 self-start" onClick={onBack || onClose}>
             <span className="text-2xl">←</span> Back
           </button>
           <div className="flex items-center gap-4 mb-6">
             {platform.icon}
-            <span className="text-lg font-semibold">{platform.label}</span>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">{platform.label}</span>
           </div>
-          <label className="block mb-1 font-medium text-gray-700 text-xs">{platform.label} link*</label>
+          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300 text-xs">{platform.label} link*</label>
           <input
-            className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+            className="w-full border border-gray-200 dark:border-gray-600 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 shadow-sm placeholder:text-xs text-gray-900 dark:text-white"
             type="text"
             value={url}
             onChange={e => setUrl(e.target.value)}
             placeholder={platform.placeholder}
           />
-          <label className="block mb-1 font-medium text-gray-700 text-xs">Link title</label>
+          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300 text-xs">Link title</label>
           <input
-            className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+            className="w-full border border-gray-200 dark:border-gray-600 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 shadow-sm placeholder:text-xs text-gray-900 dark:text-white"
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder={platform.defaultTitle}
           />
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-8">
+          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mb-8">
             <span>Test your link</span>
             {isValidUrl && (
               <a 
                 href={testUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-blue-500 underline flex items-center gap-1 hover:text-blue-600 transition"
+                className="text-blue-500 dark:text-blue-400 underline flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-300 transition"
                 onClick={(e) => {
                   // Prevent modal from closing when clicking test link
                   e.stopPropagation();
@@ -153,20 +153,20 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
             {isEdit && onRemove && (
               <button
                 type="button"
-                className="px-5 py-2 rounded-full border text-red-600 bg-white hover:bg-gray-50 font-medium shadow-sm text-xs"
+                className="px-5 py-2 rounded-full border border-gray-200 dark:border-gray-600 text-red-600 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium shadow-sm text-xs"
                 onClick={onRemove}
               >
                 Remove
               </button>
             )}
             <button
-              className="px-5 py-2 rounded-full border text-gray-700 bg-white hover:bg-gray-50 font-medium shadow-sm text-xs"
+              className="px-5 py-2 rounded-full border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium shadow-sm text-xs"
               onClick={onBack || onClose}
             >
               Back
             </button>
             <button
-              className="px-5 py-2 rounded-full bg-blue-500 text-white font-semibold hover:bg-blue-600 shadow-md transition disabled:opacity-50 text-xs"
+              className="px-5 py-2 rounded-full bg-blue-500 dark:bg-blue-600 text-white font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 shadow-md transition disabled:opacity-50 text-xs"
               disabled={!url.trim()}
               onClick={() => {
                 if (!url.trim()) return;

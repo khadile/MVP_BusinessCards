@@ -56,7 +56,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   // Generate gradient from theme color
   const getGradientStyle = () => {
     return {
-      background: `linear-gradient(135deg, ${theme}20 0%, ${theme}40 100%)`,
+      background: `linear-gradient(135deg, ${theme}CC 0%, ${theme}AA 100%)`,
     };
   };
 
@@ -72,13 +72,18 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
 
   return (
     <div 
-      className={`${cardClass} rounded-[1.5rem] overflow-hidden border shadow-2xl mx-auto`}
+      className={`${cardClass} rounded-[1.5rem] overflow-hidden border-2 border-gray-200 dark:border-gray-600 shadow-2xl dark:shadow-gray-900/50 mx-auto bg-white`}
       style={getGradientStyle()}
     >
       {/* Cover photo as normal block */}
       <div className="h-16 w-full flex items-center justify-center overflow-hidden">
         {coverPhoto ? (
-          <img src={coverPhoto} alt="Cover" className="w-full h-full object-cover" />
+          <img 
+            src={coverPhoto} 
+            alt="Cover" 
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: `${theme}60` }}>
             <span className="text-xs text-white opacity-70">Cover Photo</span>
@@ -90,7 +95,12 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
         {/* Profile avatar with layout positioning */}
         <div className={`w-14 h-14 rounded-full bg-white border-4 flex items-center justify-center overflow-hidden shadow-lg ${isCentered ? 'mx-auto' : 'ml-4'} mb-2`} style={{ borderColor: theme }}>
           {profileImage ? (
-            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+            <img 
+              src={profileImage} 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           ) : (
             <img src="/ixl-logo.svg" alt="ILX" className="w-8 h-8" />
           )}
@@ -98,7 +108,12 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
         {/* Company logo with layout positioning */}
         {companyLogo && (
           <div className={`w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center overflow-hidden shadow-md ${isCentered ? 'mx-auto' : 'ml-6'} mb-2`}>
-            <img src={companyLogo} alt="Company Logo" className="w-full h-full object-cover" />
+            <img 
+              src={companyLogo} 
+              alt="Company Logo" 
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
         )}
         {/* Name and title section with layout-specific styling */}

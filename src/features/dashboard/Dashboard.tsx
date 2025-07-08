@@ -45,19 +45,19 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
 
   return (
     <div className="flex flex-col gap-8 w-full items-center justify-center py-10">
-      <div className="text-xl font-semibold mb-2">QR Code</div>
+      <div className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">QR Code</div>
       <div className="flex flex-row gap-3 items-center mb-4">
         {QR_COLORS.map(c => (
           <button
             key={c}
-            className={`w-7 h-7 rounded-full border-2 ${color === c ? 'border-blue-500' : 'border-gray-200'}`}
+            className={`w-7 h-7 rounded-full border-2 ${color === c ? 'border-blue-500' : 'border-gray-200 dark:border-gray-600'}`}
             style={{ background: c }}
             onClick={() => setColor(c)}
             aria-label={`Choose color ${c}`}
           />
         ))}
       </div>
-      <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col items-center">
         <QRCodeCanvas 
           value={publicUrl} 
           size={192} 
@@ -67,7 +67,7 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
           data-testid="qr-code"
         />
         <button
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition disabled:opacity-50"
+          className="mt-4 px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 dark:hover:bg-blue-600 transition disabled:opacity-50"
           onClick={handleDownload}
           disabled={isDownloading}
         >
@@ -527,49 +527,49 @@ export const Dashboard: React.FC = () => {
 
   // Sidebar rendering
   const renderSidebar = () => (
-    <aside className="w-48 bg-white border-r min-h-full flex flex-col py-6 px-6 gap-1">
+    <aside className="w-48 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-full flex flex-col py-6 px-6 gap-1">
       <div className="mb-4">
-        <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">CONTENT</div>
+        <div className="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1 tracking-wide">CONTENT</div>
         <button
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'About' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'About' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
           onClick={() => dashboard.setActiveSection('About')}
         >
-          <span className="text-black"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="black" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="black" strokeWidth="2"/></svg></span> About
+          <span className="text-gray-800 dark:text-gray-200"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/><path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/></svg></span> About
         </button>
         <button
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'Links' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'Links' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
           onClick={() => dashboard.setActiveSection('Links')}
         >
-          <span className="text-black"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="black" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="black" strokeWidth="2"/></svg></span> Links
+          <span className="text-gray-800 dark:text-gray-200"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 7a5 5 0 00-7.07 0l-4 4a5 5 0 007.07 7.07l1-1" stroke="currentColor" strokeWidth="2"/><path d="M7 17a5 5 0 007.07 0l4-4a5 5 0 00-7.07-7.07l-1 1" stroke="currentColor" strokeWidth="2"/></svg></span> Links
         </button>
       </div>
       <div className="mb-4">
-        <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">SHARING</div>
+        <div className="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1 tracking-wide">SHARING</div>
         <button 
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'QR Code' ? 'bg-orange-100 text-orange-600' : 'hover:bg-gray-100 text-gray-700'}`}
+          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition ${dashboard.activeSection === 'QR Code' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
           onClick={() => dashboard.setActiveSection('QR Code')}
         >
-          <span className="text-black"> <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="black" strokeWidth="2"/><polyline points="17 8 12 3 7 8" stroke="black" strokeWidth="2"/><line x1="12" y1="3" x2="12" y2="15" stroke="black" strokeWidth="2"/></svg></span> QR Code
+          <span className="text-gray-800 dark:text-gray-200"> <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2"/><polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2"/></svg></span> QR Code
         </button>
       </div>
       <div className="mt-auto">
-        <div className="font-bold text-xs text-gray-800 mb-1 tracking-wide">ACCOUNT</div>
+        <div className="font-bold text-xs text-gray-800 dark:text-gray-200 mb-1 tracking-wide">ACCOUNT</div>
         <button 
-          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 text-gray-700"
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
           onClick={handleSettings}
         >
-          <span className="text-black">
+          <span className="text-gray-800 dark:text-gray-200">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="3" stroke="black" strokeWidth="2"/>
-              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="black" strokeWidth="2"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" strokeWidth="2"/>
             </svg>
           </span> Settings
         </button>
         <button 
-          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-50 text-red-600 mt-1"
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 mt-1"
           onClick={handleSignOut}
         >
-          <span className="text-red-600">
+          <span className="text-red-600 dark:text-red-400">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2"/>
               <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2"/>
@@ -586,23 +586,23 @@ export const Dashboard: React.FC = () => {
     <div className="flex flex-col gap-6 w-full relative min-h-[600px]">
       {/* About Title */}
       <div className="mb-2">
-        <h2 className="text-xl font-semibold text-gray-900">About</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About</h2>
       </div>
       {/* Card Name and Layout */}
       <div className="flex flex-row gap-x-8 w-full">
         <div className="flex flex-row items-center gap-2 w-1/2">
-          <label className="text-[11px] font-small text-gray-700 whitespace-nowrap">Card Name:</label>
+          <label className="text-[11px] font-small text-gray-700 dark:text-gray-300 whitespace-nowrap">Card Name:</label>
           <input 
-            className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded-xl px-4 py-2 text-xs w-full font-semibold text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.cardName || ''} 
             onChange={e => handleCardNameChange(e.target.value)}
             placeholder="Enter card name..."
           />
         </div>
         <div className="flex flex-row items-center gap-2 w-1/2">
-          <label className="text-[11px] font-small text-gray-700 whitespace-nowrap">Card Layout:</label>
+          <label className="text-[11px] font-small text-gray-700 dark:text-gray-300 whitespace-nowrap">Card Layout:</label>
           <select 
-            className="border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-xs w-full font-semibold" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded-xl px-4 py-2 text-xs w-full font-semibold text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'} 
             onChange={e => handleLayoutChange(e.target.value as 'Left Aligned' | 'Centered')}
           >
@@ -647,42 +647,42 @@ export const Dashboard: React.FC = () => {
       {/* Name, Location, Job Title, Company, Email, Phone */}
       <div className="grid grid-cols-2 gap-x-8 gap-y-3 w-full mt-2">
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Name</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Name</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.name || ''} 
             onChange={e => handleNameChange(e.target.value)} 
             placeholder="Enter your name..."
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Location</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Location</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.location || ''} 
             onChange={e => handleLocationChange(e.target.value)} 
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Job Title</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Job Title</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.jobTitle || ''} 
             onChange={e => handleJobTitleChange(e.target.value)} 
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Company</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Company</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.company || ''} 
             onChange={e => handleCompanyChange(e.target.value)} 
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Email</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Email</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.email || ''} 
             onChange={e => handleEmailChange(e.target.value)} 
             placeholder="Enter your email..."
@@ -690,9 +690,9 @@ export const Dashboard: React.FC = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] font-medium text-gray-600">Phone</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Phone</label>
           <input 
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs w-full" 
+            className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs w-full text-gray-900 dark:text-white" 
             value={dashboard.businessCard?.profile.phone || ''} 
             onChange={e => handlePhoneChange(e.target.value)} 
             placeholder="Enter your phone number..."
@@ -702,9 +702,9 @@ export const Dashboard: React.FC = () => {
       </div>
       {/* Bio */}
       <div className="flex flex-col gap-1 w-full">
-        <label className="text-[11px] font-medium text-gray-600">Bio</label>
+        <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300">Bio</label>
         <textarea 
-          className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs min-h-[36px] w-full" 
+          className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-xs min-h-[36px] w-full text-gray-900 dark:text-white" 
           value={dashboard.businessCard?.profile.bio || ''} 
           onChange={e => handleBioChange(e.target.value)} 
           placeholder="PR & Media Communications\nLet's work!" 
@@ -713,7 +713,7 @@ export const Dashboard: React.FC = () => {
       {/* Theme pickers */}
       <div className="w-full mt-1">
         <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
-          <label className="text-[11px] font-medium text-gray-600 col-span-1 row-span-1 self-center">Card Theme</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300 col-span-1 row-span-1 self-center">Card Theme</label>
           <div className="flex gap-x-3">
             {["#000000", "#F59E42", "#FDBA74", "#FDE68A", "#4ADE80", "#60A5FA", "#818CF8", "#F472B6", "#F87171", "#FACC15"].map(color => (
               <button
@@ -724,7 +724,7 @@ export const Dashboard: React.FC = () => {
               />
             ))}
           </div>
-          <label className="text-[11px] font-medium text-gray-600 col-span-1 row-span-1 self-center">Link Color</label>
+          <label className="text-[11px] font-medium text-gray-600 dark:text-gray-300 col-span-1 row-span-1 self-center">Link Color</label>
           <div className="flex gap-x-3">
             {["#000000", "#F59E42", "#FDBA74", "#FDE68A", "#4ADE80", "#60A5FA", "#818CF8", "#F472B6", "#F87171", "#FACC15"].map(color => (
               <button
@@ -919,14 +919,14 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* Outer header container */}
       <header className="w-full flex items-center justify-between px-10 py-5 bg-transparent">
         <div className="flex items-center gap-3">
           <img src="/ixl-logo.svg" alt="ILX Logo" className="h-8 w-8 rounded-full" />
-          <span className="font-bold text-xl text-gray-800">{dashboard.businessCard?.cardName || dashboard.businessCard?.profile.name || 'Your Card'}</span>
+          <span className="font-bold text-xl text-gray-800 dark:text-white">{dashboard.businessCard?.cardName || dashboard.businessCard?.profile.name || 'Your Card'}</span>
           {hasUnsavedChanges && (
-            <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+            <span className="text-xs text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 px-2 py-1 rounded-full">
               Unsaved changes
             </span>
           )}
@@ -934,7 +934,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <button
-              className="flex items-center gap-2 border rounded-lg px-3 py-1 text-sm bg-white font-bold text-gray-800 min-w-[120px]"
+              className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1 text-sm bg-white dark:bg-gray-800 font-bold text-gray-800 dark:text-white min-w-[120px]"
               onClick={() => setShowCardDropdown((v) => !v)}
               type="button"
             >
@@ -942,7 +942,7 @@ export const Dashboard: React.FC = () => {
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2"/></svg>
             </button>
             {showCardDropdown && (
-              <div className="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl z-50 p-4 flex flex-col gap-2">
+              <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-xl z-50 p-4 flex flex-col gap-2">
                 {dashboard.cards.map((card, index) => {
                   const isActive = dashboard.activeCardId === card.id;
                   console.log(`🔍 Card ${index + 1}: ID=${card.id}, ActiveID=${dashboard.activeCardId}, IsActive=${isActive}, BusinessCard=${dashboard.businessCard?.id}`);
@@ -950,20 +950,20 @@ export const Dashboard: React.FC = () => {
                   return (
                     <div key={card.id} className="relative">
                       <button
-                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium ${isActive ? 'bg-gray-100 text-black' : 'hover:bg-gray-50 text-gray-700'}`}
+                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium ${isActive ? 'bg-gray-100 dark:bg-gray-700 text-black dark:text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                         onClick={() => {
                           console.log('🖱️ Card clicked:', card.id);
                           handleSelectCard(card.id);
                         }}
                       >
-                        <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">{(card.cardName || card.profile.name || 'U').charAt(0).toUpperCase()}</span>
+                        <span className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center font-bold text-xs text-gray-800 dark:text-white">{(card.cardName || card.profile.name || 'U').charAt(0).toUpperCase()}</span>
                         <span className="flex-1 truncate">{card.cardName || card.profile.name || 'Untitled Card'}</span>
-                        {isActive && <span className="ml-2 text-xs text-orange-500">Active</span>}
+                        {isActive && <span className="ml-2 text-xs text-orange-500 dark:text-orange-400">Active</span>}
                       </button>
                       {/* Delete button for non-active cards, only if more than one card exists */}
                       {!isActive && dashboard.cards.length > 1 && (
                         <button
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 p-1"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 p-1"
                           title="Delete card"
                           onClick={async e => {
                             e.stopPropagation();
@@ -999,7 +999,7 @@ export const Dashboard: React.FC = () => {
                   );
                 })}
                 <button
-                  className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-full px-5 py-3 font-semibold text-base hover:bg-gray-900 transition mt-2 disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 bg-black dark:bg-gray-700 text-white rounded-full px-5 py-3 font-semibold text-base hover:bg-gray-900 dark:hover:bg-gray-600 transition mt-2 disabled:opacity-50"
                   onClick={handleCreateNewCard}
                   disabled={isCreatingCard}
                 >
@@ -1021,7 +1021,7 @@ export const Dashboard: React.FC = () => {
             )}
           </div>
           <button
-            className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 transition"
+            className="bg-black dark:bg-gray-700 text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 dark:hover:bg-gray-600 transition"
             onClick={() => {
               if (currentCard?.id) {
                 window.open(`/card/${currentCard.id}`, '_blank', 'noopener,noreferrer');
@@ -1035,7 +1035,7 @@ export const Dashboard: React.FC = () => {
       </header>
       {/* Main dashboard container */}
       <div className="flex flex-1 justify-center items-start w-full px-3 pb-1">
-        <div className="w-full max-w-6xl bg-white rounded-3xl shadow-lg flex flex-row min-h-[700px] mt-2 overflow-hidden">
+        <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-3xl shadow-lg flex flex-row min-h-[700px] mt-2 overflow-hidden">
           {renderSidebar()}
           <main className="flex-1 flex flex-row gap-0 px-10 py-10 overflow-y-auto">
             <div className="flex-1 flex flex-col">
@@ -1064,10 +1064,10 @@ export const Dashboard: React.FC = () => {
                     bio={dashboard.businessCard?.profile.bio || ''}
 
                   />
-                  <div className="text-center text-gray-400 mt-2 text-xs">Card live preview</div>
+                  <div className="text-center text-gray-400 dark:text-gray-500 mt-2 text-xs">Card live preview</div>
                   <a
                     href={dashboard.businessCard?.id ? `/card/${dashboard.businessCard.id}` : '#'}
-                    className="block text-center text-blue-500 text-xs mt-1 hover:underline"
+                    className="block text-center text-blue-500 dark:text-blue-400 text-xs mt-1 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

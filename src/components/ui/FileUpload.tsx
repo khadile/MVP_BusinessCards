@@ -122,7 +122,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         {/* Preview container */}
         <div className={`
           ${previewClassName} 
-          ${isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'} 
+          ${isDragOver ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-300 dark:border-gray-600'} 
           border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden
           transition-all duration-200 relative group cursor-pointer
         `}>
@@ -157,14 +157,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               </button>
             </>
           ) : (
-            <span className="text-[13px] text-gray-400">{placeholder}</span>
+            <span className="text-[13px] text-gray-400 dark:text-gray-500">{placeholder}</span>
           )}
         </div>
         
         {/* Drag overlay */}
         {isDragOver && (
-          <div className="absolute inset-0 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-            <span className="text-blue-600 font-medium text-sm">Drop image here</span>
+          <div className="absolute inset-0 bg-blue-500 bg-opacity-20 dark:bg-blue-400 dark:bg-opacity-30 rounded-lg flex items-center justify-center">
+            <span className="text-blue-600 dark:text-blue-400 font-medium text-sm">Drop image here</span>
           </div>
         )}
         
@@ -183,14 +183,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       <button
         type="button"
         onClick={handleClick}
-        className="text-[11px] text-blue-500 hover:underline mt-0.5"
+        className="text-[11px] text-blue-500 dark:text-blue-400 hover:underline mt-0.5"
       >
         {previewUrl ? 'Change Image' : 'Upload'}
       </button>
       
       {/* Error message */}
       {error && (
-        <span className="text-[10px] text-red-500 mt-1">{error}</span>
+        <span className="text-[10px] text-red-500 dark:text-red-400 mt-1">{error}</span>
       )}
       
       {/* Hidden file input */}

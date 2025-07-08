@@ -173,9 +173,9 @@ export const LinksSection: React.FC = () => {
   return (
     <div className="w-full">
       <div className="flex items-center gap-3 mb-4">
-        <span className="font-bold text-lg">Links</span>
+        <span className="font-bold text-lg text-gray-900 dark:text-white">Links</span>
         <div className="flex gap-2 ml-auto">
-          <button className="bg-black text-white rounded-full px-4 py-2 font-semibold text-sm" onClick={openPlatformModal}>
+          <button className="bg-black dark:bg-gray-700 text-white rounded-full px-4 py-2 font-semibold text-sm hover:bg-gray-900 dark:hover:bg-gray-600 transition" onClick={openPlatformModal}>
             + Add Links and Contact Info
           </button>
         </div>
@@ -183,11 +183,11 @@ export const LinksSection: React.FC = () => {
       {/* Links List */}
       <div className="flex flex-col gap-2 mb-6">
         {links?.map((link, idx) => (
-          <div key={idx} className="flex items-center bg-gray-50 rounded-xl px-4 py-3 gap-3 cursor-pointer" onClick={() => openEditLinkModal(idx)}>
-            <span className="cursor-move text-gray-300 mr-2" onClick={e => e.stopPropagation()}>&#8942;</span>
-            <span>{PLATFORM_ICONS[link.type] || <span className="w-8 h-8 bg-gray-200 rounded-full" />}</span>
-            <span className="text-sm font-medium flex-1">{link.label}</span>
-            <button onClick={e => { e.stopPropagation(); toggleActive(idx); }} className={`w-10 h-6 rounded-full border transition ${link.isActive ? 'bg-black border-black' : 'bg-gray-200 border-gray-300'}`}> 
+          <div key={idx} className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition" onClick={() => openEditLinkModal(idx)}>
+            <span className="cursor-move text-gray-300 dark:text-gray-500 mr-2" onClick={e => e.stopPropagation()}>&#8942;</span>
+            <span>{PLATFORM_ICONS[link.type] || <span className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full" />}</span>
+            <span className="text-sm font-medium flex-1 text-gray-900 dark:text-white">{link.label}</span>
+            <button onClick={e => { e.stopPropagation(); toggleActive(idx); }} className={`w-10 h-6 rounded-full border transition ${link.isActive ? 'bg-black dark:bg-gray-600 border-black dark:border-gray-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600'}`}> 
               <span className={`block w-4 h-4 rounded-full bg-white shadow transform transition ${link.isActive ? 'translate-x-4' : 'translate-x-1'}`}></span>
             </button>
           </div>
@@ -195,14 +195,14 @@ export const LinksSection: React.FC = () => {
       </div>
       {/* Recommended Links */}
       <div className="mt-6">
-        <div className="font-semibold text-gray-700 mb-2">Recommended links</div>
+        <div className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Recommended links</div>
         <div className="flex gap-4">
           {RECOMMENDED_PLATFORMS.map(platform => (
-            <div key={platform.type} className="flex flex-col items-center bg-gray-50 rounded-2xl px-6 py-5 gap-2 shadow-sm min-w-[120px] max-w-[140px] w-full">
+            <div key={platform.type} className="flex flex-col items-center bg-gray-50 dark:bg-gray-700 rounded-2xl px-6 py-5 gap-2 shadow-sm min-w-[120px] max-w-[140px] w-full">
               {platform.icon}
-              <span className="text-base font-medium text-gray-800 mt-2 mb-1">{platform.label}</span>
+              <span className="text-base font-medium text-gray-800 dark:text-white mt-2 mb-1">{platform.label}</span>
               <button
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-gray-100 text-2xl text-gray-500 font-bold mt-2"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500 text-2xl text-gray-500 dark:text-gray-300 font-bold mt-2"
                 onClick={() => openAddLinkModal(platform)}
               >
                 +

@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "aircardapp1"
+    "default": "ixl-business-card",
+    "mvp": "aircardapp1"
   },
   "targets": {},
   "etags": {}
