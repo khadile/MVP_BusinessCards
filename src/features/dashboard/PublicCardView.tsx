@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { CardPreview } from '../../components/preview/CardPreview';
+import AddToAppleWalletButton from '../../components/ui/AddToAppleWalletButton';
 import { BusinessCard } from '../../types';
 import { PLATFORM_OPTIONS } from '../../utils/platforms';
 
 export const PublicCardView: React.FC = () => {
-  const { cardId } = useParams<{ cardId: string }>();
+  const { id: cardId } = useParams<{ id: string }>();
   const [card, setCard] = useState<BusinessCard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,22 +78,36 @@ export const PublicCardView: React.FC = () => {
       </div>
       <div className="flex-1 w-full h-full flex items-center justify-center">
         <div className="flex items-center justify-center w-full h-full" style={{ minHeight: '90vh' }}>
-          <CardPreview
-            name={card.profile.name}
-            jobTitle={card.profile.jobTitle}
-            company={card.profile.company}
-            email={card.profile.email || ''}
-            phone={card.profile.phone || ''}
-            links={normalizedLinks.filter(l => l.isActive) || []}
-            theme={card.theme.primaryColor}
-            linkColor={card.theme.secondaryColor}
-            layout={card.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'}
-            profileImage={card.profile.profileImage}
-            coverPhoto={card.profile.coverPhoto}
-            companyLogo={card.profile.companyLogo}
-            location={card.profile.location || ''}
-            bio={card.profile.bio || ''}
-          />
+          <div className="flex flex-col items-center gap-6">
+            <CardPreview
+              name={card.profile.name}
+              jobTitle={card.profile.jobTitle}
+              company={card.profile.company}
+              email={card.profile.email || ''}
+              phone={card.profile.phone || ''}
+              links={normalizedLinks.filter(l => l.isActive) || []}
+              theme={card.theme.primaryColor}
+              linkColor={card.theme.secondaryColor}
+              layout={card.theme.layout === 'modern' ? 'Left Aligned' : 'Centered'}
+              profileImage={card.profile.profileImage}
+              coverPhoto={card.profile.coverPhoto}
+              companyLogo={card.profile.companyLogo}
+              location={card.profile.location || ''}
+              bio={card.profile.bio || ''}
+            />
+            
+            {/* Apple Wallet Button for public users */}
+            <AddToAppleWalletButton 
+              passData={{
+                name: card.profile.name,
+                company: card.profile.company,
+                cardId: card.id,
+                userId: card.userId,
+                publicCardUrl: window.location.href
+              }}
+              className="shadow-lg"
+            />
+          </div>
         </div>
       </div>
       <div className="text-center text-gray-400 mt-4 text-xs pb-4">Share this link to let others view your card</div>

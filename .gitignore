@@ -62,10 +62,14 @@ Desktop.ini
 # Package manager files
 yarn.lock
 package-lock.json
-pnpm-lock.yaml
+pnpm-lock.yaml 
 
 # Apple Wallet Certificates (NEVER COMMIT)
 certificates/
 *.cer
 *.p12
-*.pem 
+*.pem
+
+# Allow certificates in functions directory for deployment
+!functions/certificates/
+!functions/certificates/** 

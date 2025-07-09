@@ -7,6 +7,7 @@ import { FileUpload } from '../../components/ui/FileUpload';
 import { LinksSection } from './LinksSection';
 import { SettingsModal } from './SettingsModal';
 import { Toast } from '../../components/ui/Toast';
+import AddToAppleWalletButton from '../../components/ui/AddToAppleWalletButton';
 import { uploadBusinessCardImage, deleteFile } from '../../services/fileUpload';
 import { QRCodeCanvas } from 'qrcode.react';
 
@@ -18,6 +19,8 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
   const [color, setColor] = React.useState('#000000');
   const [isDownloading, setIsDownloading] = React.useState(false);
   const publicUrl = `${window.location.origin}/card/${cardId}`;
+  const { businessCard } = useDashboardStore();
+  const { user } = useAuthStore();
   
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -66,13 +69,28 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
           includeMargin={true}
           data-testid="qr-code"
         />
-        <button
-          className="mt-4 px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 dark:hover:bg-blue-600 transition disabled:opacity-50"
-          onClick={handleDownload}
-          disabled={isDownloading}
-        >
-          {isDownloading ? 'Downloading...' : 'Download QR Code'}
-        </button>
+        <div className="flex flex-col gap-3 mt-4">
+          <button
+            className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 dark:hover:bg-blue-600 transition disabled:opacity-50"
+            onClick={handleDownload}
+            disabled={isDownloading}
+          >
+            {isDownloading ? 'Downloading...' : 'Download QR Code'}
+          </button>
+          
+          {businessCard && user && (
+            <AddToAppleWalletButton 
+              passData={{
+                name: businessCard.profile.name || '',
+                company: businessCard.profile.company || '',
+                cardId: businessCard.id,
+                userId: user.uid,
+                publicCardUrl: publicUrl
+              }}
+              className="text-sm"
+            />
+          )}
+        </div>
       </div>
     </div>
   );

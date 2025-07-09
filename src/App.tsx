@@ -25,25 +25,25 @@ function App() {
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
+    <AuthProvider>
+      <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<PasswordResetPage />} />
             <Route path="/onboarding/*" element={<OnboardingWizard />} />
             <Route path="/card/:id" element={<PublicCardView />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
           </Routes>
-        </Router>
-      </AuthProvider>
+      </Router>
+    </AuthProvider>
     </ThemeProvider>
   );
 }

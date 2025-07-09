@@ -141,13 +141,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       if (updatedBusinessCard.profile) {
         // Only update image URLs if there's actually a new image (not null)
         if (tempProfileImageUrls[cardId] !== undefined && tempProfileImageUrls[cardId] !== null) {
-          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId];
+          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId] || undefined;
         }
         if (tempCoverPhotoUrls[cardId] !== undefined && tempCoverPhotoUrls[cardId] !== null) {
-          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId];
+          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId] || undefined;
         }
         if (tempCompanyLogoUrls[cardId] !== undefined && tempCompanyLogoUrls[cardId] !== null) {
-          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId];
+          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId] || undefined;
         }
         
         // Handle image removal (when explicitly set to undefined in business card)
