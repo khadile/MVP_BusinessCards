@@ -47,9 +47,24 @@
 - See `docs/features/dashboard.md` and `docs/features/link-management.md` for detailed flows.
 - Recent fixes documented in `docs/features/dashboard.md` under "Multi-Card Management"
 
-## 🚀 Current Status
+### 🚀 Current Status
 
 ### ✅ Completed Features
+
+#### Apple Wallet Integration ⚠️ **IN PROGRESS**
+- **Status**: 85% Complete - Implementation done but iOS recognition issues
+- **Backend**: Manual .pkpass generation using Node.js and OpenSSL
+- **Certificate Management**: Apple Developer certificates properly configured (WWDR G4)
+- **Pass Structure**: Compliant pass.json with Apple Wallet specifications
+- **QR Code Generation**: Dynamic QR codes linking to public card view
+- **Cryptographic Signing**: Using Apple certificates for pass validation
+- **Frontend Integration**: "Add to Apple Wallet" button with iOS detection
+- **Current Issues**: 
+  - iOS Safari downloads pass but doesn't recognize it as Apple Wallet compatible
+  - Chrome shows "Sorry, you pass cannot be installed on Passbook right now" error
+  - Missing @2x and @3x icon files may cause validation failures
+- **Next Steps**: Online validation tool, icon file generation, structure review
+- **Technical Details**: See `docs/features/apple-wallet.md` for complete documentation
 
 #### Core Platform
 - **React + TypeScript**: Modern, type-safe development

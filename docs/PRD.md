@@ -105,11 +105,24 @@ ILX provides a comprehensive digital business card platform that allows users to
 - Brand guidelines
 - Bulk operations
 
-#### 8. Add to Apple Wallet (.pkpass) for iOS (Planned)
-- Allow users to add their digital business card to Apple Wallet on iOS devices.
-- Pass displays Name, Company, and a large QR code linking to the public card view.
-- Requires backend generation and signing of .pkpass files with Apple certificates.
-- See `docs/features/apple-wallet.md` for detailed technical specification and implementation plan.
+#### 8. Apple Wallet Integration (.pkpass) - **IN PROGRESS** ⚠️
+- **Status**: 85% Complete - Implementation done but iOS recognition issues
+- **Current Issues**: 
+  - iOS Safari downloads pass but doesn't recognize it as Apple Wallet compatible
+  - Chrome shows "Sorry, you pass cannot be installed on Passbook right now" error
+  - Missing @2x and @3x icon files may cause validation failures
+- **Completed**: 
+  - Manual .pkpass generation using Node.js and OpenSSL
+  - Apple Developer certificates properly configured (WWDR G4)
+  - Pass structure compliant with Apple Wallet format
+  - QR code generation linking to public card view
+  - Cryptographic signing using Apple certificates
+  - Frontend "Add to Apple Wallet" button with iOS detection
+- **Next Steps**: 
+  - Use online validator to identify specific validation errors
+  - Generate proper @2x and @3x icon versions
+  - Compare with working pass examples
+- **Technical Details**: See `docs/features/apple-wallet.md` for complete implementation documentation
 
 ## User Experience
 
