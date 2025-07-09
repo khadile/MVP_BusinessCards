@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CardPreview } from '../preview/CardPreview';
 import { getPlatformLinkUrl } from '../../utils';
+import { IconUpload } from '../ui/IconUpload';
 
 interface PlatformOption {
   type: string;
@@ -13,9 +14,9 @@ interface PlatformOption {
 interface AddLinkModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { url: string; title: string }) => void;
+  onSubmit: (data: { url: string; title: string; customIcon?: string | null; customIconPath?: string | null }) => void;
   platform: PlatformOption;
-  initialValue?: { url: string; title: string } | undefined;
+  initialValue?: { url: string; title: string; customIcon?: string | null; customIconPath?: string | null } | undefined;
   mode?: 'add' | 'edit';
   onRemove?: (() => void) | undefined;
   onBack?: () => void;
@@ -65,10 +66,14 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
 }) => {
   const [url, setUrl] = useState(initialValue?.url || '');
   const [title, setTitle] = useState(initialValue?.title || platform.defaultTitle);
+  const [customIcon, setCustomIcon] = useState<string | null>(initialValue?.customIcon || null);
+  const [customIconPath, setCustomIconPath] = useState<string | null>(initialValue?.customIconPath || null);
 
   useEffect(() => {
     setUrl(initialValue?.url || '');
     setTitle(initialValue?.title || platform.defaultTitle);
+    setCustomIcon(initialValue?.customIcon || null);
+    setCustomIconPath(initialValue?.customIconPath || null);
   }, [open, initialValue, platform.defaultTitle]);
 
   if (!open) return null;
@@ -84,6 +89,12 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
   const testUrl = getTestUrl();
   const isValidUrl = testUrl && testUrl !== '#';
 
+  // Handle custom icon change
+  const handleIconChange = (iconUrl: string | null, iconPath: string | null) => {
+    setCustomIcon(iconUrl);
+    setCustomIconPath(iconPath);
+  };
+
   // Preview links logic
   let previewLinks = links;
   if (mode === 'add' && url.trim()) {
@@ -94,12 +105,13 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
         label: title,
         url: url,
         icon: platform.type,
+        customIcon: customIcon,
       },
     ];
   } else if (mode === 'edit' && editingLinkIdx !== null && url.trim()) {
     previewLinks = links.map((l, i) =>
       i === editingLinkIdx
-        ? { ...l, type: platform.type, label: title, url: url, icon: platform.type }
+        ? { ...l, type: platform.type, label: title, url: url, icon: platform.type, customIcon: customIcon }
         : l
     );
   }
@@ -115,6 +127,25 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
           <div className="flex items-center gap-4 mb-6">
             {platform.icon}
             <span className="text-lg font-semibold text-gray-900 dark:text-white">{platform.label}</span>
+          </div>
+          
+          {/* Custom Icon Upload Section */}
+          <div className="mb-6">
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm">
+              Custom Icon (Optional)
+            </label>
+            <div className="flex items-center justify-center">
+              <IconUpload
+                currentIcon={customIcon}
+                currentIconPath={customIconPath}
+                onIconChange={handleIconChange}
+                platformIcon={platform.icon}
+                platformLabel={platform.label}
+              />
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+              Upload a custom icon to personalize this link. Only affects this specific link.
+            </p>
           </div>
           <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300 text-xs">{platform.label} link*</label>
           <input
@@ -170,7 +201,12 @@ export const AddLinkModal: React.FC<AddLinkModalProps> = ({
               disabled={!url.trim()}
               onClick={() => {
                 if (!url.trim()) return;
-                onSubmit({ url: url.trim(), title: title.trim() });
+                onSubmit({ 
+                  url: url.trim(), 
+                  title: title.trim(),
+                  customIcon: customIcon,
+                  customIconPath: customIconPath
+                });
               }}
             >
               {isEdit ? 'Update' : 'Add link'}

@@ -1,0 +1,46 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.com.ilx.businesscard",
+  "teamIdentifier": "TEAM_ID_PLACEHOLDER",
+  "organizationName": "ILX",
+  "description": "Digital Business Card",
+  "logoText": "ILX",
+  "backgroundColor": "rgb(253, 186, 116)",
+  "foregroundColor": "rgb(0, 0, 0)",
+  "labelColor": "rgb(0, 0, 0)",
+  "generic": {
+    "primaryFields": [
+      {
+        "key": "name",
+        "label": "Name",
+        "value": "{{name}}"
+      },
+      {
+        "key": "company",
+        "label": "Company", 
+        "value": "{{company}}"
+      }
+    ],
+    "secondaryFields": [],
+    "auxiliaryFields": [],
+    "backFields": [
+      {
+        "key": "website",
+        "label": "View Full Card",
+        "value": "{{publicCardUrl}}"
+      },
+      {
+        "key": "powered-by",
+        "label": "Powered by",
+        "value": "ILX Digital Business Cards"
+      }
+    ]
+  },
+  "barcodes": [
+    {
+      "format": "PKBarcodeFormatQR",
+      "message": "{{publicCardUrl}}",
+      "messageEncoding": "iso-8859-1"
+    }
+  ]
+} 

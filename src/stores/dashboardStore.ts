@@ -139,14 +139,26 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       // Update business card with new image URLs if they exist
       const updatedBusinessCard = { ...businessCard, cardName };
       if (updatedBusinessCard.profile) {
-        if (tempProfileImageUrls[cardId] !== undefined) {
-          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId] ?? undefined;
+        // Only update image URLs if there's actually a new image (not null)
+        if (tempProfileImageUrls[cardId] !== undefined && tempProfileImageUrls[cardId] !== null) {
+          updatedBusinessCard.profile.profileImage = tempProfileImageUrls[cardId];
         }
-        if (tempCoverPhotoUrls[cardId] !== undefined) {
-          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId] ?? undefined;
+        if (tempCoverPhotoUrls[cardId] !== undefined && tempCoverPhotoUrls[cardId] !== null) {
+          updatedBusinessCard.profile.coverPhoto = tempCoverPhotoUrls[cardId];
         }
-        if (tempCompanyLogoUrls[cardId] !== undefined) {
-          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId] ?? undefined;
+        if (tempCompanyLogoUrls[cardId] !== undefined && tempCompanyLogoUrls[cardId] !== null) {
+          updatedBusinessCard.profile.companyLogo = tempCompanyLogoUrls[cardId];
+        }
+        
+        // Handle image removal (when explicitly set to undefined in business card)
+        if (businessCard.profile.profileImage === undefined) {
+          updatedBusinessCard.profile.profileImage = undefined;
+        }
+        if (businessCard.profile.coverPhoto === undefined) {
+          updatedBusinessCard.profile.coverPhoto = undefined;
+        }
+        if (businessCard.profile.companyLogo === undefined) {
+          updatedBusinessCard.profile.companyLogo = undefined;
         }
       }
       
@@ -161,9 +173,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         unsavedChanges: {},
         isSaving: false,
         // Clear temporary URLs and files after saving
-        tempProfileImageUrls: { ...tempProfileImageUrls, [cardId]: null },
-        tempCoverPhotoUrls: { ...tempCoverPhotoUrls, [cardId]: null },
-        tempCompanyLogoUrls: { ...tempCompanyLogoUrls, [cardId]: null },
+        tempProfileImageUrls: Object.fromEntries(Object.entries(tempProfileImageUrls).filter(([key]) => key !== cardId)),
+        tempCoverPhotoUrls: Object.fromEntries(Object.entries(tempCoverPhotoUrls).filter(([key]) => key !== cardId)),
+        tempCompanyLogoUrls: Object.fromEntries(Object.entries(tempCompanyLogoUrls).filter(([key]) => key !== cardId)),
         profileImage: null,
         coverPhoto: null,
         companyLogo: null,

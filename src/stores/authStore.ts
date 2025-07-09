@@ -3,6 +3,41 @@ import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/a
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 
+// Utility function to safely parse timestamps from Firestore
+const parseTimestamp = (timestamp: any): Date => {
+  if (!timestamp) return new Date();
+  
+  // Handle Firestore Timestamp objects
+  if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+    try {
+      return timestamp.toDate();
+    } catch (error) {
+      console.warn('Failed to parse Firestore timestamp:', error);
+      return new Date();
+    }
+  }
+  
+  // Handle JavaScript Date objects
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  
+  // Handle string dates
+  if (typeof timestamp === 'string') {
+    const parsedDate = new Date(timestamp);
+    return isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+  }
+  
+  // Handle timestamp numbers (milliseconds)
+  if (typeof timestamp === 'number') {
+    return new Date(timestamp);
+  }
+  
+  // Fallback to current date
+  console.warn('Unknown timestamp format:', timestamp, 'defaulting to current date');
+  return new Date();
+};
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -138,7 +173,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const userDoc = await getDoc(doc(db, 'users', uid));
       
       if (userDoc.exists()) {
-        const profileData = userDoc.data() as UserProfile;
+        const data = userDoc.data();
+        const profileData: UserProfile = {
+          uid: data.uid,
+          email: data.email,
+          displayName: data.displayName,
+          photoURL: data.photoURL,
+          createdAt: parseTimestamp(data.createdAt),
+          updatedAt: parseTimestamp(data.updatedAt),
+          isEmailVerified: data.isEmailVerified,
+          preferences: data.preferences || {
+            theme: 'light',
+            notifications: true,
+          },
+        };
         set({ profile: profileData });
         console.log('✅ User profile loaded:', profileData);
       } else {
@@ -191,8 +239,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           profile: data.profile,
           theme: data.theme,
           links: data.links || [],
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
+          createdAt: parseTimestamp(data.createdAt),
+          updatedAt: parseTimestamp(data.updatedAt),
           isPublic: data.isPublic || false,
           shareableUrl: data.shareableUrl,
         };

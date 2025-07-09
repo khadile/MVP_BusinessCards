@@ -4,6 +4,7 @@ import { AddLinkModal } from '../../components/forms/AddLinkModal';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { BusinessCardLink } from '../../types';
 import { PLATFORM_OPTIONS } from '../../utils/platforms';
+import { deleteFile } from '../../services/fileUpload';
 
 const RECOMMENDED_PLATFORMS = [
   {
@@ -98,12 +99,39 @@ export const LinksSection: React.FC = () => {
     setModalOrigin(null);
   };
   // Add or update link handler
-  const handleAddOrUpdateLink = (data: { url: string; title: string }) => {
+  const handleAddOrUpdateLink = async (data: { url: string; title: string; customIcon?: string | null; customIconPath?: string | null }) => {
     if (!selectedPlatform) return;
     if (editingLinkIdx !== null) {
       // Update existing link
-      const updatedLinks = links.map((l, i) => i === editingLinkIdx ? { ...l, ...data, label: data.title } : l);
-      dashboard.setLinks(updatedLinks);
+      const updatedLinks = links.map(async (l, i) => {
+        if (i === editingLinkIdx) {
+          const existingLink = l;
+          
+          // Clean up old custom icon if it's being replaced
+          if (existingLink.customIconPath && data.customIconPath && existingLink.customIconPath !== data.customIconPath) {
+            try {
+              await deleteFile(existingLink.customIconPath);
+              console.log('✅ Old custom icon deleted from Firebase Storage:', existingLink.customIconPath);
+            } catch (error) {
+              console.error('❌ Failed to delete old custom icon from Firebase Storage:', error);
+            }
+          }
+          
+          const updatedLink: BusinessCardLink = {
+            ...l,
+            url: data.url,
+            label: data.title,
+            ...(data.customIcon && { customIcon: data.customIcon }),
+            ...(data.customIconPath && { customIconPath: data.customIconPath })
+          };
+          return updatedLink;
+        }
+        return l;
+      });
+      
+      // Wait for all updates to complete
+      const resolvedLinks = await Promise.all(updatedLinks);
+      dashboard.setLinks(resolvedLinks);
     } else {
       // Add new link
       const now = new Date();
@@ -136,14 +164,28 @@ export const LinksSection: React.FC = () => {
         createdAt: now,
         updatedAt: now,
         createdBy: 'user', // Replace with actual user id if available
+        ...(data.customIcon && { customIcon: data.customIcon }),
+        ...(data.customIconPath && { customIconPath: data.customIconPath })
       };
       dashboard.setLinks([...links, newLink]);
     }
     closeModals();
   };
   // Remove link handler
-  const handleRemoveLink = () => {
+  const handleRemoveLink = async () => {
     if (editingLinkIdx !== null) {
+      const linkToRemove = links[editingLinkIdx];
+      
+      // Clean up custom icon from Firebase Storage if it exists
+      if (linkToRemove?.customIconPath) {
+        try {
+          await deleteFile(linkToRemove.customIconPath);
+          console.log('✅ Custom icon deleted from Firebase Storage:', linkToRemove.customIconPath);
+        } catch (error) {
+          console.error('❌ Failed to delete custom icon from Firebase Storage:', error);
+        }
+      }
+      
       const updatedLinks = links.filter((_, i) => i !== editingLinkIdx);
       dashboard.setLinks(updatedLinks);
       closeModals();
@@ -185,7 +227,17 @@ export const LinksSection: React.FC = () => {
         {links?.map((link, idx) => (
           <div key={idx} className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition" onClick={() => openEditLinkModal(idx)}>
             <span className="cursor-move text-gray-300 dark:text-gray-500 mr-2" onClick={e => e.stopPropagation()}>&#8942;</span>
-            <span>{PLATFORM_ICONS[link.type] || <span className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full" />}</span>
+            <span className="w-8 h-8 flex items-center justify-center">
+              {link.customIcon ? (
+                <img 
+                  src={link.customIcon} 
+                  alt={`${link.label} icon`} 
+                  className="w-8 h-8 rounded-lg object-cover"
+                />
+              ) : (
+                PLATFORM_ICONS[link.type] || <span className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full" />
+              )}
+            </span>
             <span className="text-sm font-medium flex-1 text-gray-900 dark:text-white">{link.label}</span>
             <button onClick={e => { e.stopPropagation(); toggleActive(idx); }} className={`w-10 h-6 rounded-full border transition ${link.isActive ? 'bg-black dark:bg-gray-600 border-black dark:border-gray-600' : 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600'}`}> 
               <span className={`block w-4 h-4 rounded-full bg-white shadow transform transition ${link.isActive ? 'translate-x-4' : 'translate-x-1'}`}></span>
@@ -238,7 +290,12 @@ export const LinksSection: React.FC = () => {
           onClose={closeModals}
           onSubmit={handleAddOrUpdateLink}
           platform={selectedPlatform}
-          initialValue={editingLinkIdx !== null && links?.[editingLinkIdx] ? { url: links[editingLinkIdx]!.url, title: links[editingLinkIdx]!.label } : undefined}
+          initialValue={editingLinkIdx !== null && links?.[editingLinkIdx] ? { 
+            url: links[editingLinkIdx]!.url, 
+            title: links[editingLinkIdx]!.label,
+            customIcon: links[editingLinkIdx]!.customIcon || null,
+            customIconPath: links[editingLinkIdx]!.customIconPath || null
+          } : undefined}
           mode={editingLinkIdx !== null ? 'edit' : 'add'}
           onRemove={editingLinkIdx !== null ? handleRemoveLink : undefined}
           onBack={handleAddLinkBack}

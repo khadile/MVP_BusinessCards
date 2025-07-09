@@ -46,6 +46,8 @@ export interface BusinessCardLink {
   label: string;
   url: string;
   icon?: string;
+  customIcon?: string; // URL to custom uploaded icon
+  customIconPath?: string; // Firebase Storage path for cleanup
   color?: string;
   backgroundColor?: string;
   order: number;

@@ -477,16 +477,16 @@ export const Dashboard: React.FC = () => {
           links: dashboard.businessCard.links,
         };
         
-        // Only add optional properties if they exist
-        if (dashboard.businessCard.profile.profileImage) {
+        // Handle image properties (including removal when undefined)
+        if (dashboard.businessCard.profile.profileImage !== undefined) {
           updates.profile.profileImage = dashboard.businessCard.profile.profileImage;
           updates.profile.profileImagePath = dashboard.businessCard.profile.profileImagePath;
         }
-        if (dashboard.businessCard.profile.coverPhoto) {
+        if (dashboard.businessCard.profile.coverPhoto !== undefined) {
           updates.profile.coverPhoto = dashboard.businessCard.profile.coverPhoto;
           updates.profile.coverPhotoPath = dashboard.businessCard.profile.coverPhotoPath;
         }
-        if (dashboard.businessCard.profile.companyLogo) {
+        if (dashboard.businessCard.profile.companyLogo !== undefined) {
           updates.profile.companyLogo = dashboard.businessCard.profile.companyLogo;
           updates.profile.companyLogoPath = dashboard.businessCard.profile.companyLogoPath;
         }

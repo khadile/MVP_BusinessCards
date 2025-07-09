@@ -8,6 +8,7 @@ interface CardLink {
   label: string;
   url: string;
   icon?: string;
+  customIcon?: string;
 }
 
 interface CardPreviewProps {
@@ -155,7 +156,17 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
                 className={`flex items-center gap-3 bg-transparent rounded-lg px-3 py-2 text-sm transition hover:bg-gray-100 ${isCentered ? 'justify-center' : 'justify-start'}${isInvalid ? ' border border-red-500' : ''}`}
                 style={{ textDecoration: 'underline', color: linkColor }}
               >
-                <span style={{ color: linkColor }}>{platformIcons[link.type] || platformIcons.custom}</span>
+                <span style={{ color: linkColor }} className="flex items-center justify-center">
+                  {link.customIcon ? (
+                    <img 
+                      src={link.customIcon} 
+                      alt={`${link.label} icon`} 
+                      className="w-8 h-8 rounded-lg object-cover"
+                    />
+                  ) : (
+                    platformIcons[link.type] || platformIcons.custom
+                  )}
+                </span>
                 <span className="font-medium">{link.label}</span>
                 {isInvalid && <span className="text-xs text-red-500 ml-2">Invalid</span>}
               </a>
