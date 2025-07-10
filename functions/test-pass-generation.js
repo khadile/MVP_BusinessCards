@@ -81,7 +81,7 @@ function validateConfiguration() {
 async function createTestAppleWalletPass(passData) {
   console.log('🔧 Starting test Apple Wallet pass creation...');
   
-  const { name, company, cardId, userId, publicCardUrl } = passData;
+  const { name, company, jobTitle, cardId, userId, publicCardUrl } = passData;
   
   // Create temporary directory for pass files
   const tempDir = path.join(os.tmpdir(), `test-pass-${Date.now()}`);
@@ -90,45 +90,98 @@ async function createTestAppleWalletPass(passData) {
   console.log('📁 Created temp directory:', tempDir);
   
   try {
-    // 1. Create pass.json with enhanced structure
+    // 1. Validate and sanitize input data with robust fallbacks
+    const sanitizedName = (name && name.trim()) || 'Digital Business Card';
+    const sanitizedCompany = (company && company.trim()) || '';
+    const sanitizedJobTitle = (jobTitle && jobTitle.trim()) || '';
+    
+    console.log('📝 Field validation:');
+    console.log(`   Name: "${sanitizedName}" ${name !== sanitizedName ? '(fallback applied)' : ''}`);
+    console.log(`   Company: "${sanitizedCompany}" ${!sanitizedCompany ? '(empty - will be handled)' : ''}`);
+    console.log(`   Job Title: "${sanitizedJobTitle}" ${!sanitizedJobTitle ? '(empty - will be handled)' : ''}`);
+    
+    // Build dynamic secondary fields based on available data
+    const secondaryFields = [];
+    
+    // Strategy: Include only fields that have meaningful data
+    if (sanitizedJobTitle && sanitizedCompany) {
+      // Both title and company - use left/right alignment
+      secondaryFields.push(
+        {
+          key: 'title',
+          label: 'Title',
+          value: sanitizedJobTitle,
+          textAlignment: 'PKTextAlignmentLeft'
+        },
+        {
+          key: 'company',
+          label: 'Company',
+          value: sanitizedCompany,
+          textAlignment: 'PKTextAlignmentRight'
+        }
+      );
+    } else if (sanitizedJobTitle) {
+      // Only title - center alignment
+      secondaryFields.push({
+        key: 'title',
+        label: 'Title',
+        value: sanitizedJobTitle,
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    } else if (sanitizedCompany) {
+      // Only company - center alignment
+      secondaryFields.push({
+        key: 'company',
+        label: 'Company',
+        value: sanitizedCompany,
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    } else {
+      // Neither - use professional fallback
+      secondaryFields.push({
+        key: 'professional',
+        label: 'Professional',
+        value: 'Digital Business Card',
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    }
+    
+    console.log(`📋 Generated ${secondaryFields.length} secondary field(s):`, secondaryFields.map(f => `${f.label}: ${f.value}`));
+    
+    // Create pass.json with dynamic field structure
     const passJson = {
       formatVersion: 1,
       passTypeIdentifier: APPLE_WALLET_CONFIG.passTypeId,
       serialNumber: `${cardId}-${Date.now()}`,
       teamIdentifier: APPLE_WALLET_CONFIG.teamId,
-      organizationName: 'ILX Digital Business Cards',
-      description: `${name} - Digital Business Card`,
+      organizationName: 'ILX Digital Solutions',
+      description: `${sanitizedName} - Digital Business Card`,
       logoText: 'ILX',
       
       // Add webServiceURL and authenticationToken for proper validation
       webServiceURL: 'https://us-central1-aircardapp1.cloudfunctions.net/passWebService',
       authenticationToken: 'ilx-auth-token-2024',
       
-      // Colors in rgb format
-      backgroundColor: 'rgb(255, 255, 255)',
-      foregroundColor: 'rgb(0, 0, 0)',
-      labelColor: 'rgb(102, 102, 102)',
+      // Colors matching CardPreview theme (#FDBA74 = rgb(253, 186, 116))
+      backgroundColor: 'rgb(253, 186, 116)',  // ILX orange theme
+      foregroundColor: 'rgb(17, 24, 39)',    // Dark gray for text (gray-900)
+      labelColor: 'rgb(107, 114, 128)',      // Medium gray for labels (gray-500)
       
       // Add expiration date
       expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       
-      // Pass structure
+      // Pass structure - dynamic layout based on available data
       generic: {
         primaryFields: [{
           key: 'name',
           label: 'Name',
-          value: name,
+          value: sanitizedName,
           textAlignment: 'PKTextAlignmentCenter'
         }],
-        secondaryFields: [{
-          key: 'company',
-          label: 'Company', 
-          value: company,
-          textAlignment: 'PKTextAlignmentCenter'
-        }],
+        secondaryFields: secondaryFields,
         auxiliaryFields: [{
           key: 'website',
-          label: 'View Full Card',
+          label: 'Digital Card',
           value: 'Scan QR Code',
           textAlignment: 'PKTextAlignmentCenter'
         }]
@@ -149,11 +202,15 @@ async function createTestAppleWalletPass(passData) {
       }, {
         key: 'support',
         label: 'Support',
-        value: 'Digital Business Card by ILX'
+        value: 'Digital Business Cards by ILX'
       }, {
         key: 'contact',
         label: 'Contact',
         value: 'support@ilxapp.com'
+      }, {
+        key: 'fullcard',
+        label: 'Full Digital Card',
+        value: publicCardUrl
       }]
     };
     
@@ -291,6 +348,7 @@ async function runTest() {
   const testPassData = {
     name: 'John Doe',
     company: 'ILX Digital Solutions',
+    jobTitle: 'Senior Developer',
     cardId: 'test-card-123',
     userId: 'test-user-456',
     publicCardUrl: 'https://aircardapp1.web.app/card/test-card-123'

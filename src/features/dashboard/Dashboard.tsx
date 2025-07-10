@@ -83,6 +83,7 @@ const QRCodeSection: React.FC<{ cardId: string }> = ({ cardId }) => {
               passData={{
                 name: businessCard.profile.name || '',
                 company: businessCard.profile.company || '',
+                jobTitle: businessCard.profile.jobTitle || '',
                 cardId: businessCard.id,
                 userId: user.uid,
                 publicCardUrl: publicUrl

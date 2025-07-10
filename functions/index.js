@@ -95,57 +95,106 @@ function validateConfiguration() {
 async function createManualAppleWalletPass(passData) {
   console.log('🔧 Starting manual Apple Wallet pass creation...');
   
-  const { name, company, cardId, userId, publicCardUrl } = passData;
+  const { name, company, cardId, userId, publicCardUrl, jobTitle } = passData;
   
   // Create temporary directory for pass files
   const tempDir = path.join(os.tmpdir(), `pass-${Date.now()}`);
   fs.mkdirSync(tempDir, { recursive: true });
   
   try {
-    // 1. Create pass.json
+    // 1. Validate and sanitize input data with robust fallbacks
+    const sanitizedName = (name && name.trim()) || 'Digital Business Card';
+    const sanitizedCompany = (company && company.trim()) || '';
+    const sanitizedJobTitle = (jobTitle && jobTitle.trim()) || '';
+    
+    console.log('📝 Field validation:');
+    console.log(`   Name: "${sanitizedName}" ${name !== sanitizedName ? '(fallback applied)' : ''}`);
+    console.log(`   Company: "${sanitizedCompany}" ${!sanitizedCompany ? '(empty - will be handled)' : ''}`);
+    console.log(`   Job Title: "${sanitizedJobTitle}" ${!sanitizedJobTitle ? '(empty - will be handled)' : ''}`);
+    
+    // Build dynamic secondary fields based on available data
+    const secondaryFields = [];
+    
+    // Strategy: Create well-aligned layout with proper field distribution
+    if (sanitizedJobTitle && sanitizedCompany) {
+      // Both title and company - use separate lines with natural alignment
+      secondaryFields.push({
+        key: 'title',
+        label: 'Title',
+        value: sanitizedJobTitle,
+        textAlignment: 'PKTextAlignmentNatural'
+      });
+      secondaryFields.push({
+        key: 'company',
+        label: 'Company',
+        value: sanitizedCompany,
+        textAlignment: 'PKTextAlignmentNatural'
+      });
+    } else if (sanitizedJobTitle) {
+      // Only title - center alignment
+      secondaryFields.push({
+        key: 'title',
+        label: 'Title',
+        value: sanitizedJobTitle,
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    } else if (sanitizedCompany) {
+      // Only company - center alignment
+      secondaryFields.push({
+        key: 'company',
+        label: 'Company',
+        value: sanitizedCompany,
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    } else {
+      // Neither - use professional fallback
+      secondaryFields.push({
+        key: 'professional',
+        label: 'Professional',
+        value: 'Digital Business Card',
+        textAlignment: 'PKTextAlignmentCenter'
+      });
+    }
+    
+    console.log(`📋 Generated ${secondaryFields.length} secondary field(s):`, secondaryFields.map(f => `${f.label}: ${f.value}`));
+    
+    // Create pass.json with dynamic field structure
     const passJson = {
       formatVersion: 1,
       passTypeIdentifier: APPLE_WALLET_CONFIG.passTypeId,
       serialNumber: `${cardId}-${Date.now()}`,
       teamIdentifier: APPLE_WALLET_CONFIG.teamId,
-      organizationName: 'ILX Digital Business Cards',
-      description: `${name} - Digital Business Card`,
+      organizationName: 'ILX Digital Solutions',
+      description: `${sanitizedName} - Digital Business Card`,
       logoText: 'ILX',
       
       // Add webServiceURL and authenticationToken for proper validation
       webServiceURL: 'https://us-central1-aircardapp1.cloudfunctions.net/passWebService',
       authenticationToken: 'ilx-auth-token-2024', // 16+ character token as required
       
-      // Use rgb() colors as specified in Apple documentation
-      backgroundColor: 'rgb(255, 255, 255)',
-      foregroundColor: 'rgb(0, 0, 0)',
-      labelColor: 'rgb(102, 102, 102)',
+      // Colors matching CardPreview theme (#FDBA74 = rgb(253, 186, 116))
+      backgroundColor: 'rgb(253, 186, 116)',  // ILX orange theme
+      foregroundColor: 'rgb(17, 24, 39)',    // Dark gray for text (gray-900)
+      labelColor: 'rgb(107, 114, 128)',      // Medium gray for labels (gray-500)
       
       // Add expiration date (1 year from now)
       expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       
-      // Pass structure - using generic pass type
+      // Pass structure - dynamic layout based on available data
       generic: {
         primaryFields: [
           {
             key: 'name',
-            label: 'Name',
-            value: name,
+            label: 'NAME',
+            value: sanitizedName,
             textAlignment: 'PKTextAlignmentCenter'
           }
         ],
-        secondaryFields: [
-          {
-            key: 'company',
-            label: 'Company', 
-            value: company,
-            textAlignment: 'PKTextAlignmentCenter'
-          }
-        ],
+        secondaryFields: secondaryFields,
         auxiliaryFields: [
           {
-            key: 'website',
-            label: 'View Full Card',
+            key: 'qrcode',
+            label: 'DIGITAL CARD',
             value: 'Scan QR Code',
             textAlignment: 'PKTextAlignmentCenter'
           }
@@ -171,12 +220,17 @@ async function createManualAppleWalletPass(passData) {
         {
           key: 'support',
           label: 'Support',
-          value: 'Digital Business Card by ILX'
+          value: 'Digital Business Cards by ILX'
         },
         {
           key: 'contact',
           label: 'Contact',
           value: 'support@ilxapp.com'
+        },
+        {
+          key: 'fullcard',
+          label: 'Full Digital Card',
+          value: publicCardUrl
         }
       ]
     };
@@ -324,26 +378,42 @@ exports.generateAppleWalletPass = functions.https.onRequest(async (req, res) => 
   
   try {
     // Extract parameters from either query string (GET) or request body (POST)
-    let name, company, cardId, userId, publicCardUrl;
+    let name, company, jobTitle, cardId, userId, publicCardUrl;
     
     if (req.method === 'GET') {
       // For iOS devices using GET with query parameters
       console.log('Processing GET request with query parameters');
-      ({ name, company, cardId, userId, publicCardUrl } = req.query);
+      ({ name, company, jobTitle, cardId, userId, publicCardUrl } = req.query);
     } else {
       // For other devices using POST with JSON body
       console.log('Processing POST request with JSON body');
-      ({ name, company, cardId, userId, publicCardUrl } = req.body);
+      ({ name, company, jobTitle, cardId, userId, publicCardUrl } = req.body);
     }
     
-    console.log('Extracted request data:', { name, company, cardId, userId, publicCardUrl });
+    console.log('Extracted request data:', { name, company, jobTitle, cardId, userId, publicCardUrl });
     
-    // Validate input
-    if (!name || !company || !cardId || !userId || !publicCardUrl) {
+    // Enhanced validation - only require essential fields
+    const requiredFieldsMissing = [];
+    if (!cardId) requiredFieldsMissing.push('cardId');
+    if (!userId) requiredFieldsMissing.push('userId');
+    if (!publicCardUrl) requiredFieldsMissing.push('publicCardUrl');
+    
+    if (requiredFieldsMissing.length > 0) {
       return res.status(400).json({ 
-        error: 'Missing required fields: name, company, cardId, userId, publicCardUrl' 
+        error: `Missing required fields: ${requiredFieldsMissing.join(', ')}`,
+        note: 'name, company, and jobTitle are optional and will use fallbacks if empty'
       });
     }
+    
+    // Log field availability for debugging
+    console.log('📊 Field availability check:');
+    console.log(`   name: ${name ? '✅ provided' : '❌ empty (will use fallback)'}`);
+    console.log(`   company: ${company ? '✅ provided' : '❌ empty (will be skipped if no value)'}`);
+    console.log(`   jobTitle: ${jobTitle ? '✅ provided' : '❌ empty (will be skipped if no value)'}`);
+    console.log(`   cardId: ${cardId ? '✅ provided' : '❌ MISSING (required)'}`);
+    console.log(`   userId: ${userId ? '✅ provided' : '❌ MISSING (required)'}`);
+    console.log(`   publicCardUrl: ${publicCardUrl ? '✅ provided' : '❌ MISSING (required)'}`);
+    
     
     // Validate Apple Wallet configuration
     console.log('Starting Apple Wallet configuration validation...');
@@ -361,7 +431,7 @@ exports.generateAppleWalletPass = functions.https.onRequest(async (req, res) => 
     
     // Generate the pass using manual implementation
     const passBuffer = await createManualAppleWalletPass({
-      name, company, cardId, userId, publicCardUrl
+      name, company, jobTitle, cardId, userId, publicCardUrl
     });
     
     // Check if this is an iOS request by looking at User-Agent

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './features/auth/AuthProvider';
 import { ThemeProvider } from './components/ui/ThemeProvider';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
+import { PasswordProtectedRoute } from './features/auth/PasswordProtectedRoute';
 import { LandingPage } from './features/landing/LandingPage';
 import { LoginPage } from './features/auth/LoginPage';
 import { PasswordResetPage } from './features/auth/PasswordResetPage';
@@ -28,19 +29,28 @@ function App() {
     <AuthProvider>
       <Router>
           <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/reset-password" element={<PasswordResetPage />} />
-            <Route path="/onboarding/*" element={<OnboardingWizard />} />
+            {/* Public card view - no password protection needed */}
             <Route path="/card/:id" element={<PublicCardView />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+            
+            {/* All other routes require password protection */}
+            <Route path="/*" element={
+              <PasswordProtectedRoute>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/reset-password" element={<PasswordResetPage />} />
+                  <Route path="/onboarding/*" element={<OnboardingWizard />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </PasswordProtectedRoute>
+            } />
           </Routes>
       </Router>
     </AuthProvider>

@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 export interface AppleWalletPassData {
   name: string;
   company: string;
+  jobTitle: string;
   cardId: string;
   userId: string;
   publicCardUrl: string;
@@ -189,6 +190,7 @@ export class AppleWalletService {
         const params = new URLSearchParams({
           name: passData.name,
           company: passData.company,
+          jobTitle: passData.jobTitle,
           cardId: passData.cardId,
           userId: passData.userId,
           publicCardUrl: passData.publicCardUrl
@@ -216,6 +218,7 @@ export class AppleWalletService {
         body: JSON.stringify({
           name: passData.name,
           company: passData.company,
+          jobTitle: passData.jobTitle,
           cardId: passData.cardId,
           userId: passData.userId,
           publicCardUrl: passData.publicCardUrl

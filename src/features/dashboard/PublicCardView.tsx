@@ -101,6 +101,7 @@ export const PublicCardView: React.FC = () => {
               passData={{
                 name: card.profile.name,
                 company: card.profile.company,
+                jobTitle: card.profile.jobTitle || '',
                 cardId: card.id,
                 userId: card.userId,
                 publicCardUrl: window.location.href
