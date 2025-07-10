@@ -136,7 +136,7 @@ export const LoginPage: React.FC = () => {
                 value={email}
                 onChange={handleEmailChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 placeholder="Enter your email"
                 disabled={loading}
               />
@@ -152,7 +152,7 @@ export const LoginPage: React.FC = () => {
                 value={password}
                 onChange={handlePasswordChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 placeholder="Enter your password"
                 disabled={loading}
               />

@@ -188,7 +188,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
         <p className="text-gray-500 mb-4 text-xs">Let's add some more info to your card. You can add contact info, social media, payment links and more</p>
         <label className="block mb-1 font-medium text-gray-700 text-xs">Email <span className="text-gray-400 text-xs">Optional</span></label>
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="email"
           value={localEmail}
           onChange={e => setLocalEmail(e.target.value)}
@@ -201,7 +201,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
         />
         <label className="block mb-1 font-medium text-gray-700 text-xs">Phone Number <span className="text-gray-400 text-xs">Optional</span></label>
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="tel"
           value={localPhone}
           onChange={e => setLocalPhone(e.target.value)}
@@ -283,7 +283,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex-1">
                   <input
-                    className="w-full rounded-xl border border-gray-200 px-4 py-2 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-2 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 text-gray-900"
                     placeholder="Search content..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
@@ -343,7 +343,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
               </div>
               <label className="block mb-1 font-medium text-gray-700 text-xs">{modalPlatform.label} link*</label>
               <input
-                className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+                className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
                 type="text"
                 value={modalLink.url}
                 onChange={e => setModalLink({ ...modalLink, url: e.target.value })}
@@ -351,7 +351,7 @@ export const StepContacts: React.FC<StepContactsProps> = ({ goNext, goBack }) =>
               />
               <label className="block mb-1 font-medium text-gray-700 text-xs">Link title</label>
               <input
-                className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+                className="w-full border border-gray-200 rounded-md px-3 py-2 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
                 type="text"
                 value={modalLink.title}
                 onChange={e => setModalLink({ ...modalLink, title: e.target.value })}

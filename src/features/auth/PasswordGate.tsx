@@ -77,7 +77,7 @@ export const PasswordGate: React.FC<PasswordGateProps> = ({ children }) => {
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="Enter access password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 bg-white"
                   disabled={isLoading}
                   autoFocus
                 />

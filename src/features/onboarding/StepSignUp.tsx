@@ -239,7 +239,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="email"
           value={localEmail}
           onChange={handleEmailChange}
@@ -252,7 +252,7 @@ export const StepSignUp: React.FC<StepSignUpProps> = ({ goBack }) => {
           disabled={loading}
         />
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="password"
           value={localPassword}
           onChange={handlePasswordChange}

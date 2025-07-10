@@ -25,7 +25,7 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
         <p className="text-gray-500 mb-4 text-xs">Add job title and company to your digital business card</p>
         <label className="block mb-1 font-medium text-gray-700 text-xs">Job Title</label>
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="text"
           value={localJobTitle}
           onChange={e => setLocalJobTitle(e.target.value)}
@@ -38,7 +38,7 @@ export const StepWork: React.FC<StepWorkProps> = ({ goNext, goBack }) => {
         />
         <label className="block mb-1 font-medium text-gray-700 text-xs">Company</label>
         <input
-          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs"
+          className="w-full border border-gray-200 rounded-md px-3 py-2 mb-4 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-50 shadow-sm placeholder:text-xs text-gray-900"
           type="text"
           value={localCompany}
           onChange={e => setLocalCompany(e.target.value)}
