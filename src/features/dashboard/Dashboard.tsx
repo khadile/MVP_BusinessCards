@@ -479,7 +479,7 @@ export const Dashboard: React.FC = () => {
   // Save and cancel handlers
   const handleSave = async () => {
     try {
-      if (currentCard && dashboard.businessCard) {
+      if (dashboard.businessCard) {
         // Update the card in Firestore via auth store
         const updates: any = {
           profile: {
@@ -513,7 +513,7 @@ export const Dashboard: React.FC = () => {
           updates.cardName = dashboard.businessCard.cardName;
         }
         
-        await updateAuthCard(currentCard.id, updates);
+        await updateAuthCard(dashboard.businessCard.id, updates);
         
         // Also update local dashboard store
         await dashboard.saveChanges();
@@ -531,12 +531,15 @@ export const Dashboard: React.FC = () => {
     showToast('Changes discarded.');
   };
 
-  // Check if there are unsaved changes
+  // Check if there are unsaved changes (excluding links since they auto-save)
   const tempProfileImageUrl = dashboard.activeCardId ? dashboard.tempProfileImageUrls[dashboard.activeCardId] : null;
   const tempCoverPhotoUrl = dashboard.activeCardId ? dashboard.tempCoverPhotoUrls[dashboard.activeCardId] : null;
   const tempCompanyLogoUrl = dashboard.activeCardId ? dashboard.tempCompanyLogoUrls[dashboard.activeCardId] : null;
 
-  const hasUnsavedChanges = dashboard.isDirty || 
+  // Check if unsaved changes are NOT just link changes (links auto-save)
+  const hasNonLinkChanges = dashboard.unsavedChanges && Object.keys(dashboard.unsavedChanges).some(key => key !== 'links');
+  
+  const hasUnsavedChanges = hasNonLinkChanges || 
     dashboard.profileImage || 
     dashboard.coverPhoto || 
     dashboard.companyLogo ||
@@ -1042,11 +1045,11 @@ export const Dashboard: React.FC = () => {
           <button
             className="bg-black dark:bg-gray-700 text-white rounded-full px-5 py-2 font-semibold text-sm hover:bg-gray-900 dark:hover:bg-gray-600 transition"
             onClick={() => {
-              if (currentCard?.id) {
-                window.open(`/card/${currentCard.id}`, '_blank', 'noopener,noreferrer');
+              if (dashboard.businessCard?.id) {
+                window.open(`/card/${dashboard.businessCard.id}`, '_blank', 'noopener,noreferrer');
               }
             }}
-            disabled={!currentCard?.id}
+            disabled={!dashboard.businessCard?.id}
           >
             Share Your Card
           </button>

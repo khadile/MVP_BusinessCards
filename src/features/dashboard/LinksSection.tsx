@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { PlatformPickerModal } from '../../components/forms/PlatformPickerModal';
 import { AddLinkModal } from '../../components/forms/AddLinkModal';
 import { useDashboardStore } from '../../stores/dashboardStore';
+import { useAuthStore } from '../../stores/authStore';
 import { BusinessCardLink } from '../../types';
 import { PLATFORM_OPTIONS } from '../../utils/platforms';
 import { deleteFile } from '../../services/fileUpload';
+import { Toast } from '../../components/ui/Toast';
 
 const RECOMMENDED_PLATFORMS = [
   {
@@ -50,6 +52,7 @@ const PLATFORM_ICONS: Record<string, JSX.Element> = Object.fromEntries(PLATFORM_
 
 export const LinksSection: React.FC = () => {
   const dashboard = useDashboardStore();
+  const { updateBusinessCard } = useAuthStore();
   const links = dashboard.businessCard?.links || [];
   const [showPlatformModal, setShowPlatformModal] = useState(false);
   const [showAddLinkModal, setShowAddLinkModal] = useState(false);
@@ -57,6 +60,15 @@ export const LinksSection: React.FC = () => {
   const [editingLinkIdx, setEditingLinkIdx] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [modalOrigin, setModalOrigin] = useState<'recommended' | 'picker' | null>(null);
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+
+  // Show toast notification
+  const showToast = (message: string) => {
+    setToast({ message, visible: true });
+  };
+
+  // Hide toast notification
+  const hideToast = () => setToast(t => ({ ...t, visible: false }));
 
   // Open platform picker modal
   const openPlatformModal = () => {
@@ -100,102 +112,181 @@ export const LinksSection: React.FC = () => {
   };
   // Add or update link handler
   const handleAddOrUpdateLink = async (data: { url: string; title: string; customIcon?: string | null; customIconPath?: string | null }) => {
-    if (!selectedPlatform) return;
-    if (editingLinkIdx !== null) {
-      // Update existing link
-      const updatedLinks = links.map(async (l, i) => {
-        if (i === editingLinkIdx) {
-          const existingLink = l;
-          
-          // Clean up old custom icon if it's being replaced
-          if (existingLink.customIconPath && data.customIconPath && existingLink.customIconPath !== data.customIconPath) {
-            try {
-              await deleteFile(existingLink.customIconPath);
-              console.log('✅ Old custom icon deleted from Firebase Storage:', existingLink.customIconPath);
-            } catch (error) {
-              console.error('❌ Failed to delete old custom icon from Firebase Storage:', error);
+    if (!selectedPlatform || !dashboard.businessCard) return;
+    
+    try {
+      let updatedLinks: BusinessCardLink[];
+      let actionMessage: string;
+
+      if (editingLinkIdx !== null) {
+        // Update existing link
+        const updatedLinksPromises = links.map(async (l, i) => {
+          if (i === editingLinkIdx) {
+            const existingLink = l;
+            
+            // Clean up old custom icon if it's being replaced
+            if (existingLink.customIconPath && data.customIconPath && existingLink.customIconPath !== data.customIconPath) {
+              try {
+                await deleteFile(existingLink.customIconPath);
+                console.log('✅ Old custom icon deleted from Firebase Storage:', existingLink.customIconPath);
+              } catch (error) {
+                console.error('❌ Failed to delete old custom icon from Firebase Storage:', error);
+              }
             }
+            
+            const updatedLink: BusinessCardLink = {
+              ...l,
+              url: data.url,
+              label: data.title,
+              updatedAt: new Date(),
+              ...(data.customIcon && { customIcon: data.customIcon }),
+              ...(data.customIconPath && { customIconPath: data.customIconPath })
+            };
+            return updatedLink;
           }
-          
-          const updatedLink: BusinessCardLink = {
-            ...l,
-            url: data.url,
-            label: data.title,
-            ...(data.customIcon && { customIcon: data.customIcon }),
-            ...(data.customIconPath && { customIconPath: data.customIconPath })
-          };
-          return updatedLink;
-        }
-        return l;
-      });
+          return l;
+        });
+        
+        // Wait for all updates to complete
+        updatedLinks = await Promise.all(updatedLinksPromises);
+        actionMessage = `${data.title} link updated`;
+      } else {
+        // Add new link
+        const now = new Date();
+        const newLink: BusinessCardLink = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          type: selectedPlatform.type,
+          label: data.title,
+          url: data.url,
+          icon: selectedPlatform.type,
+          order: links.length,
+          isActive: true,
+          isPublic: true,
+          style: {
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 500,
+            padding: 8,
+            margin: 0,
+            shadow: false,
+          },
+          behavior: {
+            openInNewTab: true,
+            trackClicks: true,
+            requireConfirmation: false,
+          },
+          analytics: {
+            totalClicks: 0,
+            clickRate: 0,
+          },
+          createdAt: now,
+          updatedAt: now,
+          createdBy: 'user',
+          ...(data.customIcon && { customIcon: data.customIcon }),
+          ...(data.customIconPath && { customIconPath: data.customIconPath })
+        };
+        updatedLinks = [...links, newLink];
+        actionMessage = `${data.title} link added`;
+      }
+
+      // Update dashboard store (cast to expected type)
+      dashboard.setLinks(updatedLinks as any);
       
-      // Wait for all updates to complete
-      const resolvedLinks = await Promise.all(updatedLinks);
-      dashboard.setLinks(resolvedLinks);
-    } else {
-      // Add new link
-      const now = new Date();
-      const newLink: BusinessCardLink = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        type: selectedPlatform.type,
-        label: data.title,
-        url: data.url,
-        icon: selectedPlatform.type,
-        order: links.length,
-        isActive: true,
-        isPublic: true,
-        style: {
-          borderRadius: 12,
-          fontSize: 14,
-          fontWeight: 500,
-          padding: 8,
-          margin: 0,
-          shadow: false,
-        },
-        behavior: {
-          openInNewTab: true,
-          trackClicks: true,
-          requireConfirmation: false,
-        },
-        analytics: {
-          totalClicks: 0,
-          clickRate: 0,
-        },
-        createdAt: now,
-        updatedAt: now,
-        createdBy: 'user', // Replace with actual user id if available
-        ...(data.customIcon && { customIcon: data.customIcon }),
-        ...(data.customIconPath && { customIconPath: data.customIconPath })
-      };
-      dashboard.setLinks([...links, newLink]);
+      // Auto-save to Firebase (transform to expected interface)
+      const transformedLinks = updatedLinks.map(link => ({
+        id: link.id,
+        platform: link.type,
+        url: link.url,
+        isActive: link.isActive
+      }));
+      
+      await updateBusinessCard(dashboard.businessCard.id, {
+        links: transformedLinks,
+        updatedAt: new Date()
+      });
+
+      showToast(actionMessage);
+      closeModals();
+    } catch (error) {
+      console.error('❌ Failed to save link:', error);
+      showToast('Failed to save link. Please try again.');
     }
-    closeModals();
   };
   // Remove link handler
   const handleRemoveLink = async () => {
-    if (editingLinkIdx !== null) {
+    if (editingLinkIdx !== null && dashboard.businessCard) {
       const linkToRemove = links[editingLinkIdx];
+      const linkName = linkToRemove?.label || 'Link';
       
-      // Clean up custom icon from Firebase Storage if it exists
-      if (linkToRemove?.customIconPath) {
-        try {
-          await deleteFile(linkToRemove.customIconPath);
-          console.log('✅ Custom icon deleted from Firebase Storage:', linkToRemove.customIconPath);
-        } catch (error) {
-          console.error('❌ Failed to delete custom icon from Firebase Storage:', error);
+      try {
+        // Clean up custom icon from Firebase Storage if it exists
+        if (linkToRemove?.customIconPath) {
+          try {
+            await deleteFile(linkToRemove.customIconPath);
+            console.log('✅ Custom icon deleted from Firebase Storage:', linkToRemove.customIconPath);
+          } catch (error) {
+            console.error('❌ Failed to delete custom icon from Firebase Storage:', error);
+          }
         }
+        
+        const updatedLinks = links.filter((_, i) => i !== editingLinkIdx);
+        
+        // Update dashboard store (cast to expected type)
+        dashboard.setLinks(updatedLinks as any);
+        
+        // Auto-save to Firebase (transform to expected interface)
+        const transformedLinks = updatedLinks.map(link => ({
+          id: link.id,
+          platform: link.type,
+          url: link.url,
+          isActive: link.isActive
+        }));
+        
+        await updateBusinessCard(dashboard.businessCard.id, {
+          links: transformedLinks,
+          updatedAt: new Date()
+        });
+
+        showToast(`${linkName} removed`);
+        closeModals();
+      } catch (error) {
+        console.error('❌ Failed to remove link:', error);
+        showToast('Failed to remove link. Please try again.');
       }
-      
-      const updatedLinks = links.filter((_, i) => i !== editingLinkIdx);
-      dashboard.setLinks(updatedLinks);
-      closeModals();
     }
   };
   // Toggle active/inactive
   const toggleActive = async (idx: number) => {
-    const updatedLinks = links.map((l, i) => i === idx ? { ...l, isActive: !l.isActive } : l);
-    dashboard.setLinks(updatedLinks);
-    await dashboard.saveChanges();
+    if (!dashboard.businessCard) return;
+    
+    const link = links[idx];
+    const newStatus = !link.isActive;
+    const linkName = link?.label || 'Link';
+    
+    try {
+      const updatedLinks = links.map((l, i) => i === idx ? { ...l, isActive: newStatus, updatedAt: new Date() } : l);
+      
+             // Update dashboard store (cast to expected type)
+       dashboard.setLinks(updatedLinks as any);
+       
+       // Auto-save to Firebase (transform to expected interface)
+       const transformedLinks = updatedLinks.map(link => ({
+         id: link.id,
+         platform: link.type,
+         url: link.url,
+         isActive: link.isActive
+       }));
+       
+       await updateBusinessCard(dashboard.businessCard.id, {
+         links: transformedLinks,
+         updatedAt: new Date()
+       });
+
+       showToast(`${linkName} turned ${newStatus ? 'on' : 'off'}`);
+    } catch (error) {
+      console.error('❌ Failed to toggle link:', error);
+      showToast('Failed to update link. Please try again.');
+    }
   };
 
   // Smart back handler for AddLinkModal
@@ -316,6 +407,9 @@ export const LinksSection: React.FC = () => {
           editingLinkIdx={editingLinkIdx}
         />
       )}
+      
+      {/* Toast notification */}
+      <Toast message={toast.message} visible={toast.visible} onClose={hideToast} />
     </div>
   );
 }; 
